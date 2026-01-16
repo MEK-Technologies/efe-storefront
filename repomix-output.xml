@@ -1,0 +1,702 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: components/navigation-bar
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+components/
+  navigation-bar/
+    variants/
+      image-grid.tsx
+      text-grid.tsx
+      text-image-grid.tsx
+    autocomplete.tsx
+    cart.tsx
+    favorites.tsx
+    mobile-inline-script.ts
+    navigation-bar-wrapper.tsx
+    navigation-bar.tsx
+    navigation-item.tsx
+    open-cart-button.tsx
+    search-button.tsx
+    types.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="components/navigation-bar/variants/image-grid.tsx">
+import Image from "next/image"
+import Link from "next/link"
+import { ImageGridItem } from "../types"
+
+interface ImageGridVariantProps {
+  items: ImageGridItem[]
+}
+
+export function ImageGridVariant({ items }: ImageGridVariantProps) {
+  if (!items) return null
+
+  return (
+    <div className="mx-auto mb-10 mt-20 grid w-full max-w-container-md grid-cols-[repeat(_auto-fit,minmax(200px,1fr)_)] gap-8 px-4 md:my-0 md:py-14 xl:px-0">
+      {items.map((singleCategory) => (
+        <Link
+          prefetch={false}
+          href={singleCategory.href}
+          className="submenu__inner flex flex-col items-center gap-4"
+          key={singleCategory.text}
+        >
+          <Image
+            className="h-[150px] w-[200px] rounded-md bg-neutral-200 object-cover transition-transform hover:scale-105"
+            src={singleCategory.image}
+            width={200}
+            height={150}
+            alt={singleCategory.text}
+          />
+          <p className="text-center text-[20px] text-slate-800 hover:underline">{singleCategory.text}</p>
+        </Link>
+      ))}
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/variants/text-grid.tsx">
+"use client"
+
+import Link from "next/link"
+import { TextGridItem } from "../types"
+import { usePathname } from "next/navigation"
+
+interface TextGridVariantProps {
+  items: TextGridItem[]
+}
+
+export function TextGridVariant({ items }: TextGridVariantProps) {
+  const pathname = usePathname()
+  const isAi = pathname.startsWith("/ai")
+
+  if (!items?.length) return null
+
+  return (
+    <div className="mx-auto mb-10 mt-20 grid w-full max-w-container-md grid-cols-[repeat(_auto-fit,minmax(250px,1fr)_)] gap-8 @sm:px-8 @7xl:px-0 md:my-0 md:py-14">
+      {items.map((singleCategory) => (
+        <div className="submenu__inner flex w-full flex-col gap-4" key={singleCategory.text}>
+          {singleCategory.href ? (
+            <Link href={`${isAi ? "/ai" : ""}${singleCategory.href}`} prefetch={false}>
+              <h4 className="submenu__title text-[22px] font-semibold underline-offset-4 hover:underline">
+                {singleCategory.text}
+              </h4>
+            </Link>
+          ) : (
+            <h4 className="submenu__title text-[22px] font-semibold">{singleCategory.text}</h4>
+          )}
+          <ul className="submenu__list flex flex-col items-start justify-start gap-2 text-left">
+            {singleCategory?.items?.map((item) => (
+              <li key={item.text}>
+                <Link
+                  href={`${isAi ? "/ai" : ""}${item.href}`}
+                  prefetch={false}
+                  className=" underline-offset-4 hover:underline"
+                >
+                  {item.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/variants/text-image-grid.tsx">
+import Image from "next/image"
+import Link from "next/link"
+import { TextImageGridItem } from "../types"
+
+interface TextImageGridVariantProps {
+  items: TextImageGridItem[]
+}
+
+export function TextImageGridVariant({ items }: TextImageGridVariantProps) {
+  if (!items) return null
+
+  const textItems = items.filter((item) => !item.image)
+  const imageItems = items.filter((item) => item.image).slice(0, 3)
+
+  return (
+    <div className="mx-auto mb-10 mt-20 flex w-full max-w-container-md flex-wrap justify-between gap-4 px-4 md:my-0 md:flex-nowrap md:gap-10 md:py-14 xl:px-0">
+      <div className="flex w-full flex-col gap-2 text-center md:w-1/2 md:text-left">
+        <ul>
+          {textItems.map((item) => (
+            <li key={item.text} className="text-[22px] hover:underline">
+              <Link prefetch={false} href={item.href || "#"}>
+                {item.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="grid w-full grid-cols-[repeat(_auto-fit,minmax(160px,1fr)_)] gap-8 md:w-1/2">
+        {imageItems.map((singleCategory) => (
+          <Link
+            prefetch={false}
+            href={singleCategory.href || "#"}
+            className="submenu__inner flex flex-col items-center gap-4"
+            key={singleCategory.text}
+          >
+            <Image
+              className="h-[200px] w-[160px] rounded-md bg-neutral-200 object-cover transition-transform hover:scale-105"
+              src={singleCategory.image!}
+              width={160}
+              height={200}
+              alt={singleCategory.text!}
+            />
+            <p className="text-center text-[20px] text-slate-800 hover:underline">{singleCategory.text}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/autocomplete.tsx">
+"use client"
+
+import { type KeyboardEvent, useState } from "react"
+
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+
+import { useClickAway } from "@uidotdev/usehooks"
+
+import { cn } from "utils/cn"
+import { getHighlightedText } from "utils/highlighted-text"
+import { useAutocomplete } from "utils/use-autocomplete"
+
+import { SearchIcon } from "components/icons/search-icon"
+import { Spinner } from "components/spinner"
+
+interface AutocompleteProps {
+  className?: string
+}
+
+export function Autocomplete({ className }: AutocompleteProps) {
+  const router = useRouter()
+  const pathanme = usePathname()
+
+  const isAi = pathanme.startsWith("/ai")
+
+  const [isOpen, setIsOpen] = useState(false)
+  const { query, results, isPending, onChange, status } = useAutocomplete({
+    callback: () => !isOpen && setIsOpen(true),
+  })
+  const ref = useClickAway<HTMLDivElement>(() => {
+    setIsOpen(false)
+  })
+
+  function handleOnInputFocus() {
+    if (hasResults) setIsOpen(true)
+  }
+
+  function handleOnKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      router.push(`${isAi ? "/ai/search" : "/search"}?q=${query}`)
+      setIsOpen(false)
+    }
+  }
+
+  const hasResults = !!results && results.length > 0
+
+  return (
+    <div className="not-supports-[container-type]:md:block relative hidden supports-[container-type]:@5xl:block">
+      <div className={cn("relative block w-[240px] overflow-hidden rounded-md", className)}>
+        {!!isPending && <Spinner className="absolute inset-y-1.5 right-2" />}
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+          <SearchIcon className="size-4 text-neutral-500" />
+        </div>
+        <input
+          type="search"
+          className="block w-full rounded-md border border-neutral-300 bg-neutral-100 px-2.5 py-1.5 pl-10 text-sm text-black focus:border-blue-500 focus:ring-blue-500  "
+          placeholder="Search..."
+          onChange={onChange}
+          onFocus={handleOnInputFocus}
+          onKeyDown={handleOnKeyDown}
+        />
+      </div>
+
+      <div
+        className={cn("absolute top-10 z-50 w-[240px] rounded-b-md bg-white shadow-lg", { hidden: !isOpen })}
+        ref={ref}
+      >
+        {hasResults &&
+          results.map((singleProduct) => (
+            <Link
+              href={`${isAi ? "/ai/product" : "/product"}/${singleProduct.handle}`}
+              className="flex h-[70px] cursor-pointer items-center gap-4 border-b border-neutral-200 p-4 last:rounded-b-md last:border-0 hover:bg-neutral-50"
+              key={singleProduct.id}
+              onClick={() => setIsOpen(false)}
+            >
+              <p className="line-clamp-2 text-xs">{getHighlightedText(singleProduct.title, query)}</p>
+            </Link>
+          ))}
+        {status === "error" && (
+          <p className="p-4 text-xs text-red-500">Sorry, something went wrong, please try again later</p>
+        )}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/cart.tsx">
+"use client"
+
+import { cn } from "utils/cn"
+import { OpenCartButton } from "./open-cart-button"
+import { useCartStore } from "stores/cart-store"
+import { BagIcon } from "components/icons/bag-icon"
+
+interface CartProps {
+  className?: string
+}
+
+export function Cart({ className }: CartProps) {
+  const cart = useCartStore((s) => s.cart)
+  const preloadSheet = useCartStore((s) => s.preloadSheet)
+
+  return (
+    <div
+      className={cn(
+        "relative size-8 cursor-pointer items-center justify-center fill-none transition-transform hover:scale-105",
+        className
+      )}
+      onMouseOver={preloadSheet}
+      onTouchStart={preloadSheet}
+    >
+      <BagIcon className="text-black" />
+      {!!cart?.totalQuantity && (
+        <div className="absolute bottom-0 right-0 flex size-4 items-center justify-center rounded-full bg-black text-[11px] text-white">
+          {cart?.totalQuantity}
+        </div>
+      )}
+      <OpenCartButton />
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/favorites.tsx">
+import Link from "next/link"
+import { FavoritesIcon } from "components/icons/favorites-icon"
+import { cn } from "utils/cn"
+
+interface FavoritesProps {
+  className?: string
+}
+
+export function Favorites({ className }: FavoritesProps) {
+  return (
+    <div
+      className={cn(
+        "mt-0.5 size-8 cursor-pointer items-center justify-center fill-none transition-transform active:scale-[0.98]",
+        className
+      )}
+    >
+      <Link aria-label="Go to favorites items" href="/favorites" prefetch={false}>
+        <FavoritesIcon />
+      </Link>
+    </div>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/mobile-inline-script.ts">
+export const mobileInlineScript = `
+const menu = document.querySelector(".menu")
+const menuInner = menu?.querySelector(".menu__inner")
+const menuArrow = menu?.querySelector(".menu__arrow")
+const menuTitle = menu?.querySelector(".menu__title")
+const burger = document.querySelector(".burger")
+const overlay = document.querySelector(".overlay")
+const closeButton = document.querySelector(".menu-close-button")
+const allLinks = document.querySelectorAll(".submenu__inner")
+let subMenu = null
+
+function toggleMenu() {
+  menu?.classList.toggle("is-active")
+  overlay?.classList.toggle("is-active")
+}
+
+function showSubMenu(children) {
+  subMenu = children.querySelector(".submenu")
+  subMenu.classList.add("is-active")
+  subMenu.style.animation = "slideLeft 0.35s ease forwards"
+  const menuTitle = children.querySelector("i").parentNode.childNodes[0].textContent
+  menu.querySelector(".menu__title").textContent = menuTitle
+  menu.querySelector(".menu__header")?.classList.add("is-active")
+}
+
+function hideSubMenu() {
+  if (subMenu) subMenu.style.animation = "slideRight 0.25s ease forwards"
+  setTimeout(() => subMenu?.classList.remove("is-active"), 300)
+
+  menu.querySelector(".menu__title").textContent = ""
+  menu.querySelector(".menu__header").classList.remove("is-active")
+}
+
+function toggleSubMenu(e) {
+  if (!menu?.classList.contains("is-active")) return
+  if (e.target.closest(".menu__dropdown")) {
+    const children = e.target.closest(".menu__dropdown")
+    showSubMenu(children)
+  }
+}
+
+const debouncedHandleResize = debounce(handleResize, 100)
+
+function handleResize() {
+  if (window.innerWidth >= 768 && menu?.classList.contains("is-active")) toggleMenu()
+}
+
+const resizeObserver = new ResizeObserver(debouncedHandleResize)
+resizeObserver.observe(document.body)
+
+burger?.addEventListener("click", toggleMenu)
+overlay?.addEventListener("click", toggleMenu)
+closeButton?.addEventListener("click", toggleMenu)
+menuArrow?.addEventListener("click", hideSubMenu)
+menuTitle?.addEventListener("click", hideSubMenu)
+menuInner?.addEventListener("click", toggleSubMenu)
+Array.from(allLinks).map((link) => link?.addEventListener("click", toggleMenu))
+
+function debounce(func, delay) {
+  let inDebounce
+  return function () {
+    const context = this
+    const args = arguments
+    clearTimeout(inDebounce)
+    inDebounce = setTimeout(() => func.apply(context, args), delay)
+  }
+}
+`
+</file>
+
+<file path="components/navigation-bar/navigation-bar-wrapper.tsx">
+"use client"
+
+import useSWR from "swr"
+import { navigationFetcher } from "lib/navigation"
+import { NavigationBar } from "./navigation-bar"
+import type { NavItem } from "./types"
+
+interface NavigationData {
+  items: NavItem[]
+}
+
+interface NavigationBarWrapperProps {
+  fallbackData: NavigationData
+}
+
+export function NavigationBarWrapper({ fallbackData }: NavigationBarWrapperProps) {
+  const { data: navigationData } = useSWR<NavigationData>("/api/navigation", navigationFetcher, {
+    fallbackData,
+    revalidateOnFocus: false,
+    revalidateOnMount: true,
+    revalidateOnReconnect: true,
+    refreshInterval: 10000,
+  })
+
+  const items = navigationData?.items || fallbackData.items
+
+  return <NavigationBar items={items} />
+}
+</file>
+
+<file path="components/navigation-bar/navigation-bar.tsx">
+import { Suspense } from "react"
+import { ChevronIcon } from "components/icons/chevron-icon"
+import dynamic from "next/dynamic"
+
+import { cn } from "utils/cn"
+import { Autocomplete } from "./autocomplete"
+import { Cart } from "./cart"
+import { Favorites } from "./favorites"
+import { ImageGridItem, NavItem, TextGridItem, TextImageGridItem } from "./types"
+import { ImageGridVariant } from "./variants/image-grid"
+import { TextGridVariant } from "./variants/text-grid"
+import { TextImageGridVariant } from "./variants/text-image-grid"
+import { Skeleton } from "components/ui/skeleton"
+import { CloseIcon } from "components/icons/close-icon"
+import { SearchButton } from "./search-button"
+import { NavigationItem } from "./navigation-item"
+import Link from "next/link"
+
+const ProductAddedAlert = dynamic(() =>
+  import("components/product/product-added-alert").then((mod) => mod.ProductAddedAlert)
+)
+
+interface NavigationBarProps {
+  items: NavItem[]
+}
+
+function VariantGrid({
+  variant,
+  items,
+}: {
+  variant?: "text-grid" | "image-grid" | "text-image-grid"
+  items?: TextGridItem[] | ImageGridItem[] | TextImageGridItem[]
+}) {
+  if (!items) return null
+
+  switch (variant) {
+    case "text-grid":
+      return <TextGridVariant items={items as TextGridItem[]} />
+    case "image-grid":
+      return <ImageGridVariant items={items as ImageGridItem[]} />
+    case "text-image-grid":
+      return <TextImageGridVariant items={items as TextImageGridItem[]} />
+    default:
+      return null
+  }
+}
+
+export function NavigationBar({ items }: NavigationBarProps) {
+  const itemsMarkup = items.map((singleMenuItem) => (
+    <li
+      data-content={singleMenuItem.text}
+      className={cn(
+        "menu__item not-supports-[container-type]:md:h-full relative z-50 supports-[container-type]:@3xl:h-full",
+        { menu__dropdown: !!singleMenuItem.submenu }
+      )}
+      key={singleMenuItem.text}
+    >
+      <NavigationItem singleMenuItem={singleMenuItem} />
+
+      <div className="submenu megamenu__text w-full border-b border-black/10 shadow-sm">
+        <VariantGrid items={singleMenuItem.submenu?.items} variant={singleMenuItem.submenu?.variant} />
+      </div>
+    </li>
+  ))
+
+  return (
+    <header className="mega-navbar sticky top-0 z-50 mx-auto my-0 flex w-full flex-wrap content-center items-center justify-between border-b border-black/10 bg-white p-4 py-6">
+      <div className="not-supports-[container-type]:md:mx-auto not-supports-[container-type]:md:w-full not-supports-[container-type]:md:max-w-container-md not-supports-[container-type]:md:px-0 flex justify-start px-4 supports-[container-type]:@3xl:mx-auto supports-[container-type]:@3xl:w-full supports-[container-type]:@3xl:max-w-container-md supports-[container-type]:@3xl:px-0">
+        <Link
+          prefetch={false}
+          href="/"
+          className="brand not-supports-[container-type]:md:flex mr-20 hidden items-center text-xl font-bold supports-[container-type]:@3xl:flex"
+        >
+          Acme
+        </Link>
+
+        <section className="navbar__left not-supports-[container-type]:md:hidden flex w-full justify-between supports-[container-type]:@3xl:hidden">
+          <button className="burger" id="burger" aria-label="open menu" aria-controls="menu">
+            <span className="burger-line"></span>
+            <span className="burger-line"></span>
+            <span className="burger-line"></span>
+          </button>
+          <Link prefetch={false} href="/" className="brand flex items-center text-xl font-bold">
+            Acme
+          </Link>
+          <div className="menu-actions absolute right-4 flex items-center justify-center gap-2">
+            <Favorites className="not-supports-[container-type]:md:hidden flex supports-[container-type]:@3xl:hidden" />
+            <Suspense fallback={<Skeleton className="size-8" />}>
+              <Cart className="not-supports-[container-type]:md:hidden flex supports-[container-type]:@3xl:hidden" />
+            </Suspense>
+            <SearchButton />
+          </div>
+          <ProductAddedAlert className="not-supports-[container-type]:md:hidden supports-[container-type]:@3xl:hidden" />
+        </section>
+        <section className="navbar__center not-supports-[container-type]:md:justify-center w-full supports-[container-type]:@3xl:justify-center">
+          <span className="overlay"></span>
+          <div className="menu w-full" id="menu">
+            <div className="menu__header">
+              <span className="menu__arrow">
+                <i className="rotate-90">
+                  <ChevronIcon />
+                </i>
+              </span>
+              <span className="menu__title"></span>
+            </div>
+            <div className="menu__inner flex w-full justify-between">
+              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@7xl:px-0">
+                {itemsMarkup}
+              </ul>
+              <div className="relative ml-auto flex items-center">
+                <button
+                  className="menu-close-button not-supports-[container-type]:md:hidden absolute right-3 top-0 bg-transparent supports-[container-type]:@3xl:hidden"
+                  aria-label="close menu"
+                  aria-controls="menu"
+                >
+                  <CloseIcon className="size-5" />
+                </button>
+                <Autocomplete className="mr-6" />
+                <div className="flex gap-2">
+                  <Favorites className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
+                  <Cart className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
+                  <ProductAddedAlert className="not-supports-[container-type]:md:block hidden supports-[container-type]:@3xl:block" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </header>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/navigation-item.tsx">
+"use client"
+
+import type { MouseEvent } from "react"
+import { ChevronIcon } from "components/icons/chevron-icon"
+import { NavItem } from "./types"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+
+export function NavigationItem({ singleMenuItem }: { singleMenuItem: NavItem }) {
+  const pathname = usePathname()
+  const isAi = pathname.startsWith("/ai")
+
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (singleMenuItem.submenu && window.innerWidth < 768) {
+      e.preventDefault()
+    }
+  }
+
+  return (
+    <Link
+      prefetch={false}
+      onClick={handleClick}
+      href={`${isAi ? "/ai" : ""}${singleMenuItem.href}`}
+      className="menu__link h-full text-[22px] md:text-sm/[18px]"
+    >
+      {singleMenuItem.text}
+      {!!singleMenuItem.submenu && (
+        <i>
+          <ChevronIcon />
+        </i>
+      )}
+    </Link>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/open-cart-button.tsx">
+"use client"
+
+import { useCartStore } from "stores/cart-store"
+
+export function OpenCartButton() {
+  const openCart = useCartStore((s) => s.openCart)
+
+  return (
+    <button className="absolute inset-0 size-full bg-transparent" onClick={() => openCart()}>
+      <span className="sr-only">open cart</span>
+    </button>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/search-button.tsx">
+"use client"
+
+import { useModalStore } from "stores/modal-store"
+
+import { ThinSearchIcon } from "components/icons/thin-search-icon"
+import { Button } from "components/ui/button-old"
+
+export function SearchButton() {
+  const openModal = useModalStore((s) => s.openModal)
+
+  return (
+    <Button
+      aria-label="Launch search modal"
+      variant="ghost"
+      className="ml-3 flex items-center justify-center p-1"
+      onClick={() => openModal("search")}
+    >
+      <ThinSearchIcon className="size-6" />
+    </Button>
+  )
+}
+</file>
+
+<file path="components/navigation-bar/types.ts">
+export interface NavItem {
+  text: string
+  href?: string
+  submenu?: Submenu
+  pageDisplayType?: "CLP" | "PLP"
+}
+
+interface Submenu {
+  variant: "text-grid" | "image-grid" | "text-image-grid"
+  items: SubmenuItem[]
+}
+
+export interface TextGridItem {
+  text: string
+  href?: string
+  items: Array<{ text: string; href: string }>
+  pageDisplayType?: "CLP" | "PLP"
+}
+
+export interface ImageGridItem {
+  href: string
+  image: string
+  text: string
+}
+
+export interface TextImageGridItem {
+  href?: string
+  image?: string
+  text?: string
+}
+
+type SubmenuItem = TextGridItem | ImageGridItem | TextImageGridItem
+</file>
+
+</files>

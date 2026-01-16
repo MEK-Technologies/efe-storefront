@@ -1,0 +1,362 @@
+import { unstable_cache } from "next/cache"
+
+
+
+import { FilterBuilder } from "lib/algolia/filter-builder"
+import { env } from "env.mjs"
+
+
+import { HttpTypes } from "@medusajs/types"
+
+import { HITS_PER_PAGE } from "constants/index"
+
+import { searchClient as algolia, type SortType } from "./client"
+
+import type { BrowseProps, SearchSingleIndexProps } from "algoliasearch"
+import type { CommerceProduct } from "types"
+
+export const getProduct = unstable_cache(
+  async (handle: string) => {
+
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      searchParams: {
+        filters: new FilterBuilder().where("handle", handle).build(),
+        hitsPerPage: 1,
+      },
+    })
+
+    return hits.find(Boolean) || null
+  },
+  ["product-by-handle"],
+  { revalidate: 86400, tags: ["products"] }
+)
+
+export const getProducts = unstable_cache(
+  async (
+    options: SearchSingleIndexProps["searchParams"] = {
+      hitsPerPage: 50,
+    }
+  ) => {
+
+    return await algolia.search<HttpTypes.StoreProductCategory>({
+      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      searchParams: options,
+    })
+  },
+  ["search-products"],
+  { revalidate: 86400, tags: ["products"] }
+)
+
+export const getFeaturedProducts = unstable_cache(
+  async () => {
+
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      searchParams: {
+        attributesToRetrieve: [
+          "id",
+          "title",
+          "featuredImage",
+          "images",
+          "minPrice",
+          "variants",
+
+          "vendor",
+          "handle",
+        ],
+        hitsPerPage: 10,
+      },
+    })
+
+    return hits
+  },
+  ["featured-products"],
+  { revalidate: 86400, tags: ["products"] }
+)
+
+export const getAllProducts = async (options?: Omit<BrowseProps["browseParams"], "hitsPerPage">) => {
+
+  return await algolia.getAllResults<CommerceProduct>({
+    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    browseParams: {
+      ...options,
+    },
+  })
+}
+
+export const getSimilarProducts = unstable_cache(
+  async (collection: string | undefined, objectID: string) => {
+    const limit = 8
+    if (!collection) return []
+
+
+
+    const { results } = await algolia.getRecommendations({
+      requests: [
+        {
+          indexName: env.ALGOLIA_PRODUCTS_INDEX,
+          objectID,
+          model: "looking-similar",
+          maxRecommendations: limit,
+          threshold: 60,
+        },
+      ],
+    })
+
+    let collectionSearchResults: { hits: CommerceProduct[] } = { hits: [] }
+    if (results[0].hits.length < limit) {
+      collectionSearchResults = await algolia.search<CommerceProduct>({
+        indexName: env.ALGOLIA_PRODUCTS_INDEX,
+        searchParams: {
+          hitsPerPage: limit - results[0].hits.length,
+          filters: algolia.filterBuilder().where("collections.handle", collection).build(),
+        },
+      })
+    }
+
+    return [...(results[0].hits as unknown as CommerceProduct[]), ...collectionSearchResults.hits]
+  },
+  ["similar-products"],
+  { revalidate: 86400, tags: ["products", "recommendations"] }
+)
+
+export const getNewestProducts = unstable_cache(
+  async () => {
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, "updatedAtTimestamp:asc"),
+      searchParams: {
+        hitsPerPage: 8,
+      },
+    })
+
+    return hits
+  },
+  ["newest-products"],
+  { revalidate: 86400, tags: ["products"] }
+)
+
+export const getCollection = unstable_cache(
+  async (slug: string) => {
+
+      const results = await algolia.search<HttpTypes.StoreProductCategory>({
+      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      searchParams: {
+        filters: algolia.filterBuilder().where("handle", slug).build(),
+        hitsPerPage: 1,
+        attributesToRetrieve: ["handle", "name", "description"],
+      },
+    })
+
+    const collection = results.hits.find(Boolean) || null
+    return collection
+  },
+  ["category-by-handle"],
+  { revalidate: 86400, tags: ["categories"] }
+)
+
+export const getProductReviews = async () => ({ reviews: [], total: 0 })
+
+export const getAllReviews = async () => ({ reviews: [], totalPages: 0 })
+
+export const updateProducts = async (products: Partial<CommerceProduct>[]) => {
+
+  return algolia.update({
+    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    objects: products.filter(Boolean),
+  })
+}
+
+
+
+export const getCategories = unstable_cache(
+  async (
+    options: SearchSingleIndexProps["searchParams"] = {
+      hitsPerPage: 50,
+    }
+  ) => {
+
+    return await algolia.search<HttpTypes.StoreProductCategory>({
+      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      searchParams: options,
+    })
+  },
+  ["search-categories"],
+  { revalidate: 86400, tags: ["categories"] }
+)
+
+export const updateCategories = unstable_cache(
+  async (categories: HttpTypes.StoreProductCategory[]) => {
+
+    return algolia.update({
+      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      objects: categories.filter(Boolean) as unknown as Record<string, unknown>[],
+    })
+  },
+  ["update-categories"],
+  { revalidate: 86400, tags: ["categories"] }
+)
+
+export const deleteCategories = async (ids: string[]) => {
+
+  return algolia.delete({
+    indexName: env.ALGOLIA_CATEGORIES_INDEX,
+    objectIDs: ids,
+  })
+}
+
+export const deleteProducts = async (ids: string[]) => {
+
+  return algolia.delete({
+    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    objectIDs: ids,
+  })
+}
+
+export const getFilteredProducts = unstable_cache(
+  async (
+    query: string,
+    sortBy: string,
+    page: number,
+    filters: string,
+    collectionHandle?: string,
+    hasVendorFilter: boolean = false
+  ) => {
+    const indexName = algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, sortBy as SortType)
+
+    try {
+      const queries = [
+        algolia.search<CommerceProduct>({
+          indexName,
+          searchParams: {
+            query,
+            filters,
+            page: page - 1,
+            hitsPerPage: HITS_PER_PAGE,
+            attributesToRetrieve: [
+              "id",
+              "handle",
+              "title",
+              "priceRange",
+              "featuredImage",
+              "minPrice",
+              "variants",
+              "images",
+
+            ],
+            facets: ["flatOptions.Color", "vendor", "minPrice", "variants.availableForSale"],
+            maxValuesPerFacet: 1000,
+          },
+        }),
+        algolia.search<CommerceProduct>({
+          indexName,
+          searchParams: {
+            facets: ["vendor"],
+            hitsPerPage: HITS_PER_PAGE,
+            maxValuesPerFacet: 1000,
+          },
+        }),
+      ]
+
+      if (hasVendorFilter && collectionHandle) {
+        const filtersWithoutVendor = filters
+          .split(" AND ")
+          .filter((f) => !f.includes("vendor:"))
+          .join(" AND ")
+
+        queries.push(
+          algolia.search<CommerceProduct>({
+            indexName,
+            searchParams: {
+              facets: ["vendor"],
+              hitsPerPage: 0,
+              filters: filtersWithoutVendor,
+              maxValuesPerFacet: 1000,
+            },
+          })
+        )
+      }
+
+      const allResults = await Promise.all(queries)
+      const [results, independentFacets, vendorFacetsWithoutFilter] = allResults
+
+      const hits = results?.hits || []
+      const totalPages = results?.nbPages || 0
+      const facetDistribution = results?.facets || {}
+      const totalHits = results.nbHits || 0
+
+      let vendorFacets
+      if (hasVendorFilter && collectionHandle && vendorFacetsWithoutFilter) {
+        vendorFacets = vendorFacetsWithoutFilter.facets?.vendor
+      } else if (collectionHandle) {
+        vendorFacets = facetDistribution.vendor
+      } else {
+        vendorFacets = independentFacets.facets?.vendor
+      }
+
+      const independentFacetDistribution = {
+        ...independentFacets.facets,
+        vendor: vendorFacets || {},
+      }
+
+      return {
+        hits,
+        totalPages,
+        facetDistribution,
+        totalHits,
+        independentFacetDistribution,
+      }
+    } catch (err) {
+      return {
+        hits: [],
+        totalPages: 0,
+        facetDistribution: {},
+        totalHits: 0,
+        independentFacetDistribution: {},
+      }
+    }
+  },
+  ["filtered-products"],
+  { revalidate: 86400, tags: ["search", "products"] }
+)
+
+export const getFacetValues = unstable_cache(
+  async ({ indexName, facetName }: { indexName: string; facetName: string }) => {
+
+    const res = await algolia.getFacetValues({
+      indexName,
+      facetName,
+    })
+
+    return res?.facetHits.map(({ value }) => value)
+  },
+  ["facet-values"],
+  { revalidate: 86400, tags: ["facets"] }
+)
+
+export const getProductsByCollectionTag = unstable_cache(
+  async (tag: string, limit: number = 10) => {
+
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, "updatedAtTimestamp:desc"),
+      searchParams: {
+        filters: algolia.filterBuilder().where("tags", tag).build(),
+        hitsPerPage: limit,
+        attributesToRetrieve: [
+          "id",
+          "handle",
+          "title",
+          "featuredImage",
+          "minPrice",
+          "variants",
+
+          "vendor",
+        ],
+      },
+    })
+
+    return hits
+  },
+  ["products-by-collection-tag"],
+  { revalidate: 86400, tags: ["products"] }
+)
