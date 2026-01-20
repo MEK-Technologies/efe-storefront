@@ -5,7 +5,7 @@ import type { CommerceProduct } from "types"
 import { Breadcrumbs } from "components/breadcrumbs"
 
 // Use Medusa data fetching instead of Shopify
-import { getProduct } from "lib/algolia"
+import { getProductByHandle } from "lib/medusa/data/product-queries"
 
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import {
@@ -32,6 +32,7 @@ import { ShopifyRichText } from "components/product/faq-section/shopify-rich-tex
 
 import { slugToName } from "utils/slug-name"
 import { getVariantPrice } from "utils/medusa-product-helpers"
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
 
 export const dynamic = "force-static"
 
@@ -57,9 +58,9 @@ export default async function DraftProduct(props: ProductProps) {
 
   const productHandle = baseHandle || removeOptionsFromUrl(slug)
   
-  // Replace getAdminProduct (Shopify) with getProduct (Medusa via Algolia lib wrapper)
+  // Replace getAdminProduct (Shopify) with getProductByHandle (Medusa)
   // Note: For actual draft products we might need a different fetching strategy with Medusa
-  const product = await getProduct(productHandle)
+  const product = await getProductByHandle(productHandle)
 
   if (!product) {
     return notFound()
@@ -141,7 +142,7 @@ export default async function DraftProduct(props: ProductProps) {
               />
             )}
             <p>{product.description}</p>
-            <AddToCartButton className="mt-4" product={product} combination={combination} />
+            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode={DEFAULT_COUNTRY_CODE} />
             <FavoriteMarker handle={slug} />
 
             <FaqSectionClient

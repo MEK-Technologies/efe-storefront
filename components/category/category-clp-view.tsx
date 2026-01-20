@@ -4,6 +4,7 @@ import { getCategoryByHandle } from "lib/medusa/data/categories"
 import { listProducts } from "lib/medusa/data/products"
 import { CategoryLandingPage } from "./category-landing-page"
 import { getPageDisplayTypeByHandle } from "utils/get-page-display-type"
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
 
 interface CategoryCLPViewProps {
   params: { slug: string; page?: string }
@@ -29,7 +30,7 @@ export async function CategoryCLPView({
   // 2. Fetch products for this category
   // We use listProducts from your medusa/data/products.ts
   const { response: { products } } = await listProducts({
-    countryCode: "us", // Defaulting to US, or grab from context/cookies if available
+    countryCode: DEFAULT_COUNTRY_CODE,
     queryParams: {
       category_id: [category.id],
       limit: 8 // Fetch a few for the landing page showcase

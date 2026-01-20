@@ -31,12 +31,12 @@ import { FaqAccordionItem, FaqSectionClient } from "components/product/faq-secti
 import { ShopifyRichText } from "components/product/faq-section/shopify-rich-text"
 import { nameToSlug } from "utils/slug-name"
 import { AddToCartButton } from "components/product/add-to-cart-button"
-
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
 
 import type { CommerceProduct } from "types"
 
 import { generateJsonLd } from "./metadata"
-import { getProduct, getProducts } from "lib/algolia"
+import { getProductByHandle, getAllProductHandles } from "lib/medusa/data/product-queries"
 
 export const revalidate = 86400
 export const dynamic = "force-static"
@@ -47,13 +47,8 @@ interface ProductProps {
 }
 
 export async function generateStaticParams() {
-
-  const { hits } = await getProducts({
-    hitsPerPage: 50,
-    attributesToRetrieve: ["handle"],
-  })
-
-  return hits.map(({ handle }) => ({ slug: handle }))
+  const handles = await getAllProductHandles(100)
+  return handles.map((handle) => ({ slug: handle }))
 }
 
 export default async function Product(props: ProductProps) {
@@ -65,7 +60,7 @@ export default async function Product(props: ProductProps) {
   const baseHandle =
     Object.keys(multiOptions).length > 0 ? removeMultiOptionFromSlug(slug) : removeVisualOptionFromSlug(slug)
 
-  const product = await getProduct(baseHandle || removeOptionsFromUrl(slug))
+  const product = await getProductByHandle(baseHandle || removeOptionsFromUrl(slug))
 
   if (!product) {
     return notFound()
@@ -148,7 +143,7 @@ export default async function Product(props: ProductProps) {
               />
             )}
             <p>{product.description}</p>
-            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode="us" />
+            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode={DEFAULT_COUNTRY_CODE} />
             <FavoriteMarker handle={slug} />
             <FaqSectionClient defaultOpenSections={[nameToSlug(getDefaultFaqAccordionItemValue()[0])]}>
               <FaqAccordionItem title={getDefaultFaqAccordionItemValue()[0]}>
@@ -191,7 +186,7 @@ export default async function Product(props: ProductProps) {
         </div>
 
         <Suspense fallback={<SimilarProductsSectionSkeleton />}>
-          <SimilarProductsSection objectID={product.objectID} slug={slug} />
+          <SimilarProductsSection productId={product.id} collectionHandle={product.collection?.handle} slug={slug} />
         </Suspense>
       </main>
     </div>

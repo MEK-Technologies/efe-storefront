@@ -1,4 +1,4 @@
-import { getProduct } from "lib/algolia"
+import { getProductByHandle } from "lib/medusa/data/product-queries"
 import { env } from "env.mjs"
 import { Metadata } from "next"
 import { Product, WithContext } from "schema-dts"
@@ -13,7 +13,7 @@ interface ProductProps {
 }
 
 export async function generateMetadata({ params: { slug } }: ProductProps): Promise<Metadata> {
-  const product = await getProduct(removeOptionsFromUrl(slug))
+  const product = await getProductByHandle(removeOptionsFromUrl(slug))
 
   // Use product title/description directly (Medusa doesn't have separate SEO fields)
   const keywords = makeKeywords(product?.title)

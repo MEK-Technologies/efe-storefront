@@ -1,4 +1,4 @@
-import { BUCKETS } from "constants/index"
+import { BUCKETS, DEFAULT_COUNTRY_CODE } from "constants/index"
 import { AnnouncementBar } from "app/(browse)/home/_components/announcement-bar"
 import { HeroSection } from "app/(browse)/home/_components/hero-section"
 import { EnterpriseCategoriesSection } from "app/(browse)/home/_components/enterprise-categories-section"
@@ -13,7 +13,7 @@ export const dynamicParams = true
 
 export default async function Homepage(_props: { params: Promise<{ bucket: string }> }) {
   const {response: { products }} = await listProducts({
-    countryCode: "do"
+    countryCode: DEFAULT_COUNTRY_CODE
   })
 
   return (

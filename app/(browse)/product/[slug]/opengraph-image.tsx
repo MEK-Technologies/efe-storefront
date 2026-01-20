@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import { env } from "env.mjs"
-import { getProduct } from "lib/algolia"
+import { getProductByHandle } from "lib/medusa/data/product-queries"
 import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
 
 export const revalidate = 86400
@@ -19,7 +19,7 @@ export default async function Image({ params: { slug } }: { params: { slug: stri
   const interRegular = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Regular.ttf`)).then((res) => res.arrayBuffer())
   const interBold = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Bold.ttf`)).then((res) => res.arrayBuffer())
 
-  const product = await getProduct(removeOptionsFromUrl(slug))
+  const product = await getProductByHandle(removeOptionsFromUrl(slug))
   
   // Get featured image and price using helpers
   const featuredImage = product ? getFeaturedImage(product) : null

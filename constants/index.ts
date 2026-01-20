@@ -3,6 +3,12 @@ export const COOKIE_ACCESS_TOKEN = "ecom_accessToken"
 
 export const COOKIE_FAVORITES = "ecom_favorites"
 
+/**
+ * Default country code for the store
+ * This should match your Medusa backend region configuration
+ */
+export const DEFAULT_COUNTRY_CODE = "do" as const
+
 export const TAGS = {
   CART: "cart",
 } as const
