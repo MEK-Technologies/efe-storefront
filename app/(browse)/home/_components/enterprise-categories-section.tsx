@@ -5,10 +5,15 @@ const FEATURED_CATEGORY_HANDLES = ["fashion", "electronics", "sports-and-outdoor
 
 export async function EnterpriseCategoriesSection() {
   // Fetch categories directly from Medusa instead of Algolia
-  const categoryPromises = FEATURED_CATEGORY_HANDLES.map((handle) => getCategoryByHandle([handle]))
+  const categoryPromises = FEATURED_CATEGORY_HANDLES.map((handle) => 
+    getCategoryByHandle([handle]).catch(() => null)
+  )
   const categoriesData = await Promise.all(categoryPromises)
 
-  const featuredCategories = categoriesData.filter((cat) => cat !== null)
+  // Filter out null, undefined, and any falsy values
+  const featuredCategories = categoriesData.filter((cat): cat is NonNullable<typeof cat> => {
+    return cat !== null && cat !== undefined && !!cat.id
+  })
 
   if (featuredCategories.length === 0) {
     return null
@@ -22,7 +27,6 @@ export async function EnterpriseCategoriesSection() {
           <p className="mt-4 text-lg text-muted-foreground">Explore our curated collections</p>
         </div>
 
-        {}
         <div className="relative -mx-4 sm:-mx-8 lg:-mx-12">
           <div className="px-4 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8">

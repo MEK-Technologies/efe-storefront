@@ -7,6 +7,9 @@ import withPlugins from "next-compose-plugins"
  */
 const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" })]], {
   reactStrictMode: true,
+  experimental: {
+    instrumentationHook: true,
+  },
   logging: {
     fetches: {
       fullUrl: true,
@@ -55,6 +58,21 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
         destination: "/search?second=:second",
       },
     ]
+  },
+  webpack: (config, { isServer }) => {
+    // Fix for undici and File API in server environment
+    if (isServer) {
+      config.externals = config.externals || []
+      // Don't externalize these packages that need polyfills
+      config.resolve = config.resolve || {}
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    return config
   },
 })
 
