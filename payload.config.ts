@@ -12,9 +12,11 @@ import sharp from 'sharp'
 // NOTE: Collections commented out to prevent table creation
 // Uncomment only if corresponding tables already exist in database
 // import { Pages } from './src/collections/Pages'
+import { Users } from './src/collections/User'
 import { Categories } from './src/collections/Categories'
-// import { Banners } from './src/collections/Banners'
+import { Banners } from './src/collections/Banners'
 import { Slides } from './src/collections/Slides'
+import { Products } from './src/collections/Products'
 
 // Import Bytescale plugin
 import { bytescaleUploadPlugin } from './src/plugins/bytescale-upload'
@@ -38,21 +40,8 @@ export default buildConfig({
   },
   collections: [
     // User collection for authentication
-    // ADAPTED: Schema matches existing users table structure
-    {
-      slug: 'users',
-      auth: true,
-      access: {
-        delete: () => false,
-        update: () => false,
-      },
-      fields: [
-        // No custom fields - using only columns that exist in database
-        // Table columns: id, updated_at, created_at, enable_a_p_i_key, api_key, 
-        // api_key_index, email, reset_password_token, reset_password_expiration,
-        // salt, hash, login_attempts, lock_until
-      ],
-    },
+    // Migrated to src/collections/User.ts
+    Users,
     // Media collection for file uploads
     {
       slug: 'media',
@@ -97,8 +86,9 @@ export default buildConfig({
     // DISABLED: Only enable if tables already exist in database
     // Pages,
     Categories, // Required for Slides relationship
-    // Banners,
+    Banners,
     Slides,
+    Products, // Productos del catálogo
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'TEMP_SECRET_PLEASE_CONFIGURE_ENV_VARIABLES_12345678901234567890',
@@ -109,7 +99,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.PAYLOAD_DATABASE_URL || 'postgres://admin:password@127.0.0.1:5432/payload',
     },
-    push: true, // TEMPORARILY ENABLED: Create slide_table in database. Change back to false after table creation
+    push: true, // DISABLED: Prevent Payload from modifying existing tables (products, etc.)
   }),
   sharp,
   plugins: [

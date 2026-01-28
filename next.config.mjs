@@ -9,6 +9,8 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
   reactStrictMode: true,
   experimental: {
     instrumentationHook: true,
+    // Ensure polyfills load before other modules
+    serverComponentsExternalPackages: [],
   },
   logging: {
     fetches: {
@@ -59,7 +61,7 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
       },
     ]
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     // Fix for undici and File API in server environment
     if (isServer) {
       config.externals = config.externals || []
@@ -71,6 +73,25 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
         net: false,
         tls: false,
       }
+      
+      // CRITICAL: Ensure payload-polyfill.js loads FIRST
+      // Add it as an entry point to ensure it runs before any other code
+      config.plugins = config.plugins || []
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /^undici$/,
+          (_resource) => {
+            // Ensure polyfill is loaded before undici
+            if (!globalThis.File) {
+              try {
+                require('./payload-polyfill.js')
+              } catch (e) {
+                console.warn('Could not preload polyfill:', e)
+              }
+            }
+          }
+        )
+      )
     }
     return config
   },

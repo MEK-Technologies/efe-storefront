@@ -85,3 +85,36 @@ export const removeCartId = async () => {
     maxAge: -1,
   })
 }
+
+// Admin authentication functions
+export const getAdminAuthHeaders = async (): Promise<Record<string, string>> => {
+  try {
+    const cookies = await nextCookies()
+    const token = cookies.get("_medusa_admin_jwt")?.value
+
+    if (!token) {
+      return {}
+    }
+
+    return { authorization: `Bearer ${token}` }
+  } catch {
+    return {}
+  }
+}
+
+export const setAdminAuthToken = async (token: string) => {
+  const cookies = await nextCookies()
+  cookies.set("_medusa_admin_jwt", token, {
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
+export const removeAdminAuthToken = async () => {
+  const cookies = await nextCookies()
+  cookies.set("_medusa_admin_jwt", "", {
+    maxAge: -1,
+  })
+}

@@ -8,6 +8,16 @@ export const Slides: CollectionConfig = {
   },
   access: {
     read: () => true,
+    // Allow API operations with valid API key or authenticated user
+    create: ({ req }) => {
+      return !!req.user
+    },
+    update: ({ req }) => {
+      return !!req.user
+    },
+    delete: ({ req }) => {
+      return !!req.user
+    },
   },
   fields: [
     {
