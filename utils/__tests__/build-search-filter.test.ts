@@ -1,3 +1,4 @@
+import { describe, expect, it } from "@jest/globals"
 import { buildSearchFilter } from "../build-search-filter"
 import { HttpTypes } from "@medusajs/types"
 

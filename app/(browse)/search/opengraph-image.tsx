@@ -12,8 +12,9 @@ export const size = {
 export const contentType = "image/png"
 
 export default async function Image() {
-  const interRegular = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Regular.ttf`)).then((res) => res.arrayBuffer())
-  const interBold = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Bold.ttf`)).then((res) => res.arrayBuffer())
+  const baseUrl = env.LIVE_URL || "https://commerce.blazity.com"
+  const interRegular = fetch(new URL(`${baseUrl}/fonts/Inter-Regular.ttf`)).then((res) => res.arrayBuffer())
+  const interBold = fetch(new URL(`${baseUrl}/fonts/Inter-Bold.ttf`)).then((res) => res.arrayBuffer())
 
   return new ImageResponse(
     (

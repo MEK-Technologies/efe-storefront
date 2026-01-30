@@ -5,8 +5,8 @@
 
 import { BytescaleAdapter } from '../bytescale-adapter'
 import type { BytescaleUploadResult, FileToUpload } from '../types'
-import { isBase64, decodeBase64, getMimeTypeFromDataUri } from '../utils/base64-decoder'
-import { sanitizeFilename, addTimestampToFilename } from '../utils/path-normalizer'
+import { decodeBase64, getMimeTypeFromDataUri, isBase64 } from '../utils/base64-decoder'
+import { addTimestampToFilename, sanitizeFilename } from '../utils/path-normalizer'
 
 /**
  * Handle file upload to Bytescale

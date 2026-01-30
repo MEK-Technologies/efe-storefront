@@ -3,16 +3,16 @@
  * Tests for path-normalizer and base64-decoder utilities
  */
 
-import { describe, test, expect } from 'bun:test'
+import { describe, expect, test } from '@jest/globals'
 import {
+  addTimestampToFilename,
   normalizePath,
   sanitizeFilename,
-  addTimestampToFilename,
 } from '../utils/path-normalizer'
 import {
-  isBase64,
-  getMimeTypeFromDataUri,
   decodeBase64,
+  getMimeTypeFromDataUri,
+  isBase64,
 } from '../utils/base64-decoder'
 
 describe('Path Normalizer Utils', () => {

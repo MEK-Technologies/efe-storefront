@@ -103,15 +103,6 @@
       }
     }
   }
-  
-  // CRITICAL: Also set on process for Node.js compatibility
-  if (typeof process !== 'undefined' && process.global) {
-    try {
-      process.global.File = FileConstructor
-    } catch (e) {
-      // Ignore
-    }
-  }
 
   // Verify it worked
   try {

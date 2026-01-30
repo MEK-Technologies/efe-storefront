@@ -3,16 +3,12 @@
  * Tests for file upload handling logic
  */
 
-import { describe, test, expect, beforeAll } from 'bun:test'
+import { describe, expect, test } from '@jest/globals'
 import { handleUpload } from '../handlers/uploadHandler'
 import { BytescaleAdapter } from '../bytescale-adapter'
 import type { BytescalePluginOptions } from '../types'
 
 describe('Upload Handler', () => {
-  let adapter: BytescaleAdapter | null = null
-
-  const isRealConnection = !!(process.env.BYTESCALE_API_KEY && process.env.BYTESCALE_ACCOUNT_ID)
-
   const options: BytescalePluginOptions = {
     apiKey: process.env.BYTESCALE_API_KEY || 'secret_test_fallback',
     accountId: process.env.BYTESCALE_ACCOUNT_ID || 'test',
@@ -21,14 +17,11 @@ describe('Upload Handler', () => {
     debug: false,
   }
 
-  beforeAll(() => {
-    if (isRealConnection) {
-      adapter = new BytescaleAdapter(options)
-    }
-  })
+  const adapter = new BytescaleAdapter(options)
+  const isRealConnection = !!(process.env.BYTESCALE_API_KEY && process.env.BYTESCALE_ACCOUNT_ID)
 
   describe('handleUpload() with Buffer', () => {
-    if (isRealConnection && adapter) {
+    if (isRealConnection) {
       test('should handle plain buffer upload', async () => {
         const testContent = `Handler Test - ${new Date().toISOString()}`
         const testBuffer = Buffer.from(testContent, 'utf-8')
@@ -61,7 +54,7 @@ describe('Upload Handler', () => {
 
   describe('handleUpload() with Base64', () => {
     test('should handle base64 string', async () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
 
       const base64Content = 'SGVsbG8gV29ybGQ=' // "Hello World"
 
@@ -84,7 +77,7 @@ describe('Upload Handler', () => {
     }, 10000)
 
     test('should handle data URI with MIME type', async () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
 
       const dataUri = 'data:text/plain;base64,SGVsbG8gV29ybGQ='
 
@@ -107,7 +100,7 @@ describe('Upload Handler', () => {
   })
 
   describe('Filename sanitization', () => {
-    if (isRealConnection && adapter) {
+    if (isRealConnection) {
       test('should sanitize filename with special characters', async () => {
         const testBuffer = Buffer.from('test content', 'utf-8')
 
@@ -168,7 +161,7 @@ describe('Upload Handler', () => {
 
   describe('Error handling', () => {
     test('should throw error for invalid base64', async () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       await expect(
         handleUpload(
           {

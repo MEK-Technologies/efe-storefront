@@ -6,7 +6,7 @@ import type { CommerceProduct } from "types"
 import { makeKeywords } from "utils/make-keywords"
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import { slugToName } from "utils/slug-name"
-import { getMinPrice, getFeaturedImage } from "utils/medusa-product-helpers"
+import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
 
 interface ProductProps {
   params: { slug: string }
@@ -43,13 +43,17 @@ export function generateJsonLd(product: CommerceProduct, slug: string) {
   
   // Get brand from metadata or product type
   const brand = (product.metadata?.brand as string) || product.type?.value
+  const imageUrls = [
+    featuredImage?.url,
+    ...images.map((image) => image.url),
+  ].filter((url): url is string => Boolean(url))
 
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    description: product.description,
-    image: images.map((image) => image.url),
+    description: product.description ?? undefined,
+    image: imageUrls,
     ...(brand && {
       brand: {
         "@type": "Brand",

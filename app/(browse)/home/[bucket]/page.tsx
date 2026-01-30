@@ -4,6 +4,7 @@ import { HeroSection } from "app/(browse)/home/_components/hero-section"
 import { EnterpriseCategoriesSection } from "app/(browse)/home/_components/enterprise-categories-section"
 import { ModernNewArrivalsSection } from "app/(browse)/home/_components/modern-new-arrivals-section"
 import { listProducts } from "lib/medusa/data/products"
+import { CategoriesSection } from "../_components/categories-section"
 
 export const revalidate = 86400
 
@@ -22,6 +23,7 @@ export default async function Homepage(_props: { params: Promise<{ bucket: strin
       <HeroSection />
       <ModernNewArrivalsSection products={products} />
       <EnterpriseCategoriesSection />
+      <CategoriesSection />
     </div>
   )
 }

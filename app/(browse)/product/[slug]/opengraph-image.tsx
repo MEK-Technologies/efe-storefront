@@ -16,8 +16,9 @@ export const size = {
 export const contentType = "image/png"
 
 export default async function Image({ params: { slug } }: { params: { slug: string } }) {
-  const interRegular = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Regular.ttf`)).then((res) => res.arrayBuffer())
-  const interBold = fetch(new URL(`${env.LIVE_URL}/fonts/Inter-Bold.ttf`)).then((res) => res.arrayBuffer())
+  const baseUrl = env.LIVE_URL || "https://commerce.blazity.com"
+  const interRegular = fetch(new URL(`${baseUrl}/fonts/Inter-Regular.ttf`)).then((res) => res.arrayBuffer())
+  const interBold = fetch(new URL(`${baseUrl}/fonts/Inter-Bold.ttf`)).then((res) => res.arrayBuffer())
 
   const product = await getProductByHandle(removeOptionsFromUrl(slug))
   
@@ -51,7 +52,14 @@ export default async function Image({ params: { slug } }: { params: { slug: stri
             backgroundColor: "#eaeaea",
           }}
         >
-          <img src={featuredImage?.url} width={280} height={280} style={{ objectFit: "contain" }} />
+          {/* eslint-disable-next-line @next/next/no-img-element -- next/og ImageResponse expects plain <img> */}
+          <img
+            src={featuredImage?.url}
+            width={280}
+            height={280}
+            style={{ objectFit: "contain" }}
+            alt={product?.title ?? "Featured product image"}
+          />
         </div>
         <div
           style={{
@@ -66,6 +74,7 @@ export default async function Image({ params: { slug } }: { params: { slug: stri
           {images
             .slice(0, 4)
             .map((image, idx) => (
+              /* eslint-disable-next-line @next/next/no-img-element -- next/og ImageResponse expects plain <img> */
               <img
                 key={idx}
                 style={{
@@ -77,6 +86,11 @@ export default async function Image({ params: { slug } }: { params: { slug: stri
                 src={image.url}
                 width={85}
                 height={80}
+                alt={
+                  product?.title
+                    ? `${product.title} image ${idx + 1}`
+                    : "Product thumbnail"
+                }
               />
             ))}
         </div>

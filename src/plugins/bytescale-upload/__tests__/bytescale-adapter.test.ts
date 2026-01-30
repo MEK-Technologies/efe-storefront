@@ -3,16 +3,11 @@
  * Tests for the Bytescale SDK wrapper
  */
 
-import { describe, test, expect, beforeAll, afterAll } from 'bun:test'
+import { afterAll, beforeAll, describe, expect, test } from '@jest/globals'
 import { BytescaleAdapter } from '../bytescale-adapter'
 import type { BytescalePluginOptions } from '../types'
 
 describe('BytescaleAdapter', () => {
-  let adapter: BytescaleAdapter | null = null
-  let testFileKey: string | undefined
-
-  const isRealConnection = !!(process.env.BYTESCALE_API_KEY && process.env.BYTESCALE_ACCOUNT_ID)
-
   const options: BytescalePluginOptions = {
     apiKey: process.env.BYTESCALE_API_KEY || 'secret_test_fallback',
     accountId: process.env.BYTESCALE_ACCOUNT_ID || 'test',
@@ -21,10 +16,13 @@ describe('BytescaleAdapter', () => {
     debug: false,
   }
 
+  const adapter = new BytescaleAdapter(options)
+  let testFileKey: string | undefined
+
+  const isRealConnection = !!(process.env.BYTESCALE_API_KEY && process.env.BYTESCALE_ACCOUNT_ID)
+
   beforeAll(() => {
-    if (isRealConnection) {
-      adapter = new BytescaleAdapter(options)
-    }
+    // Adapter is already constructed; this hook is preserved for future async setup if needed.
   })
 
   afterAll(async () => {
@@ -41,7 +39,7 @@ describe('BytescaleAdapter', () => {
 
   describe('Constructor', () => {
     test('should initialize with valid options', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       expect(adapter).toBeDefined()
     })
 
@@ -118,7 +116,7 @@ describe('BytescaleAdapter', () => {
 
   describe('getPublicUrl()', () => {
     test('should generate valid public URL', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-file.jpg'
       const url = adapter.getPublicUrl(fileKey)
 
@@ -139,7 +137,7 @@ describe('BytescaleAdapter', () => {
 
   describe('getTransformedUrl()', () => {
     test('should generate URL with width transformation', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-image.jpg'
       const url = adapter.getTransformedUrl(fileKey, { width: 300 })
 
@@ -148,7 +146,7 @@ describe('BytescaleAdapter', () => {
     })
 
     test('should generate URL with width and height', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-image.jpg'
       const url = adapter.getTransformedUrl(fileKey, {
         width: 300,
@@ -160,7 +158,7 @@ describe('BytescaleAdapter', () => {
     })
 
     test('should generate URL with format transformation', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-image.jpg'
       const url = adapter.getTransformedUrl(fileKey, {
         width: 300,
@@ -172,7 +170,7 @@ describe('BytescaleAdapter', () => {
     })
 
     test('should generate URL with fit mode', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-image.jpg'
       const url = adapter.getTransformedUrl(fileKey, {
         width: 300,
@@ -184,7 +182,7 @@ describe('BytescaleAdapter', () => {
     })
 
     test('should generate URL with quality', () => {
-      if (!isRealConnection || !adapter) return
+      if (!isRealConnection) return
       const fileKey = '/test-uploads/test-image.jpg'
       const url = adapter.getTransformedUrl(fileKey, {
         width: 300,

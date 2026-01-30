@@ -3,10 +3,10 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { checkRateLimit } from "@vercel/firewall"
 
-import { env } from "env.mjs"
 import { searchClient as algolia } from "./client"
 import { FilterBuilder } from "./filter-builder"
 import { HITS_PER_PAGE } from "constants/index"
+import { getAlgoliaConfig, requireAlgolia } from "./config"
 
 import type { CommerceProduct } from "types"
 import { HttpTypes } from "@medusajs/types"
@@ -91,8 +91,11 @@ async function checkAlgoliaRateLimit(key: RateLimitKey) {
 
 const getProductCached = unstable_cache(
   async (handle: string) => {
+    requireAlgolia("getProduct")
+    const config = getAlgoliaConfig()
+    
     const { hits } = await algolia.search<CommerceProduct>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: config.productsIndex!,
       searchParams: {
         filters: new FilterBuilder().where("handle", handle).build(),
         hitsPerPage: 1,
@@ -116,8 +119,11 @@ const getProductsCached = unstable_cache(
       hitsPerPage: 50,
     }
   ) => {
+    requireAlgolia("getProducts")
+    const config = getAlgoliaConfig()
+    
     return await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: config.productsIndex!,
       searchParams: options,
     })
   },
@@ -136,8 +142,11 @@ export const getProducts = async (
 
 const searchProductsCached = unstable_cache(
   async (query: string, options: SearchSingleIndexProps["searchParams"] = {}) => {
+    requireAlgolia("searchProducts")
+    const config = getAlgoliaConfig()
+    
     return await algolia.search<CommerceProduct>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: config.productsIndex!,
       searchParams: {
         query,
         ...options,
@@ -159,8 +168,11 @@ const getCategoriesCached = unstable_cache(
       hitsPerPage: 50,
     }
   ) => {
+    requireAlgolia("getCategories")
+    const config = getAlgoliaConfig()
+    
     return await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      indexName: config.categoriesIndex!,
       searchParams: options,
     })
   },
@@ -179,8 +191,11 @@ export const getCategories = async (
 
 const getCollectionCached = unstable_cache(
   async (slug: string) => {
+    requireAlgolia("getCollection")
+    const config = getAlgoliaConfig()
+    
     const results = await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      indexName: config.categoriesIndex!,
       searchParams: {
         filters: algolia.filterBuilder().where("handle", slug).build(),
         hitsPerPage: 1,
@@ -199,19 +214,34 @@ export const getCollection = async (slug: string) => {
   return getCollectionCached(slug)
 }
 
-export const getProductReviews = async (handle: string, _options = { page: 0, limit: 10 }) => {
+export type ProductReview = {
+  created_at: string
+  body: string
+  rating: number
+  reviewer: {
+    name: string
+  }
+}
+
+export const getProductReviews = async (
+  _handle: string,
+  _options: { page?: number; limit?: number } = { page: 0, limit: 10 }
+): Promise<{ reviews: ProductReview[]; total: number }> => {
   return { reviews: [], total: 0 }
 }
 
 const getSimilarProductsCached = unstable_cache(
   async (collection: string | undefined, objectID: string) => {
+    requireAlgolia("getSimilarProducts")
+    const config = getAlgoliaConfig()
+    
     const limit = 8
     if (!collection) return []
 
     const { results } = await algolia.getRecommendations({
       requests: [
         {
-          indexName: env.ALGOLIA_PRODUCTS_INDEX,
+          indexName: config.productsIndex!,
           objectID,
           model: "looking-similar",
           maxRecommendations: limit,
@@ -223,7 +253,7 @@ const getSimilarProductsCached = unstable_cache(
     let collectionSearchResults: { hits: CommerceProduct[] } = { hits: [] }
     if (results[0].hits.length < limit) {
       collectionSearchResults = await algolia.search<CommerceProduct>({
-        indexName: env.ALGOLIA_PRODUCTS_INDEX,
+        indexName: config.productsIndex!,
         searchParams: {
           hitsPerPage: limit - results[0].hits.length,
           filters: algolia.filterBuilder().where("collections.handle", collection).build(),
@@ -251,7 +281,10 @@ const getFilteredProductsCached = unstable_cache(
     collectionHandle?: string,
     hasVendorFilter: boolean = false
   ) => {
-    const indexName = algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, sortBy as any)
+    requireAlgolia("getFilteredProducts")
+    const config = getAlgoliaConfig()
+    
+    const indexName = algolia.mapIndexToSort(config.productsIndex!, sortBy as any)
 
     try {
       const queries = [

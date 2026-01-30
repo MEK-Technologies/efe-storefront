@@ -3,12 +3,15 @@
  * Tests for the complete plugin integration with Payload CMS
  */
 
-import { describe, test, expect } from 'bun:test'
+import { describe, expect, test } from '@jest/globals'
 import { bytescaleUploadPlugin } from '../plugin'
 import type { Config } from 'payload'
 import type { BytescalePluginOptions } from '../types'
 
 describe('Bytescale Plugin Integration', () => {
+  const resolveConfig = async (configOrPromise: Config | Promise<Config>) =>
+    await Promise.resolve(configOrPromise)
+
   const options: BytescalePluginOptions = {
     apiKey: 'test-api-key-1234567890',
     accountId: 'test-account-id',
@@ -45,7 +48,7 @@ describe('Bytescale Plugin Integration', () => {
   })
 
   describe('Config modification', () => {
-    test('should return config when plugin is disabled', () => {
+    test('should return config when plugin is disabled', async () => {
       const disabledOptions: BytescalePluginOptions = {
         ...options,
         enabled: false,
@@ -56,11 +59,11 @@ describe('Bytescale Plugin Integration', () => {
         collections: [],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       expect(result).toEqual(mockConfig)
     })
 
-    test('should not modify collections without upload', () => {
+    test('should not modify collections without upload', async () => {
       const plugin = bytescaleUploadPlugin(options)
       const mockConfig: Config = {
         collections: [
@@ -73,13 +76,13 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       expect(result.collections).toBeDefined()
       expect(result.collections![0]).toEqual(mockConfig.collections![0])
     })
 
-    test('should add bytescaleKey field to upload collections', () => {
+    test('should add bytescaleKey field to upload collections', async () => {
       const plugin = bytescaleUploadPlugin(options)
       const mockConfig: Config = {
         collections: [
@@ -95,7 +98,7 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       expect(result.collections).toBeDefined()
       const mediaCollection = result.collections![0]
@@ -106,11 +109,11 @@ describe('Bytescale Plugin Integration', () => {
       )
       expect(bytescaleField).toBeDefined()
       expect(bytescaleField?.type).toBe('text')
-      expect(bytescaleField?.admin?.readOnly).toBe(true)
-      expect(bytescaleField?.admin?.hidden).toBe(true)
+      expect((bytescaleField as any)?.admin?.readOnly).toBe(true)
+      expect((bytescaleField as any)?.admin?.hidden).toBe(true)
     })
 
-    test('should not add duplicate bytescaleKey field', () => {
+    test('should not add duplicate bytescaleKey field', async () => {
       const plugin = bytescaleUploadPlugin(options)
       const mockConfig: Config = {
         collections: [
@@ -127,7 +130,7 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       const mediaCollection = result.collections![0]
       const bytescaleFields = mediaCollection.fields.filter(
@@ -137,7 +140,7 @@ describe('Bytescale Plugin Integration', () => {
       expect(bytescaleFields.length).toBe(1)
     })
 
-    test('should add hooks to upload collections', () => {
+    test('should add hooks to upload collections', async () => {
       const plugin = bytescaleUploadPlugin(options)
       const mockConfig: Config = {
         collections: [
@@ -151,7 +154,7 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       const mediaCollection = result.collections![0]
       
@@ -164,7 +167,7 @@ describe('Bytescale Plugin Integration', () => {
       expect(mediaCollection.hooks?.beforeChange?.length).toBeGreaterThan(0)
     })
 
-    test('should preserve existing hooks', () => {
+    test('should preserve existing hooks', async () => {
       const existingBeforeChange = async ({ data }: any) => data
       const existingAfterDelete = async ({ doc }: any) => doc
       
@@ -185,7 +188,7 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       const mediaCollection = result.collections![0]
       
@@ -196,7 +199,7 @@ describe('Bytescale Plugin Integration', () => {
       expect(mediaCollection.hooks?.afterDelete?.[0]).toBe(existingAfterDelete)
     })
 
-    test('should handle multiple upload collections', () => {
+    test('should handle multiple upload collections', async () => {
       const plugin = bytescaleUploadPlugin(options)
       const mockConfig: Config = {
         collections: [
@@ -217,7 +220,7 @@ describe('Bytescale Plugin Integration', () => {
         ],
       } as any
 
-      const result = plugin(mockConfig)
+      const result = await resolveConfig(plugin(mockConfig))
       
       // Media collection should have hooks
       expect(result.collections![0].hooks?.beforeChange).toBeDefined()

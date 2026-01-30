@@ -15,11 +15,16 @@ import { searchClient as algolia, type SortType } from "./client"
 import type { BrowseProps, SearchSingleIndexProps } from "algoliasearch"
 import type { CommerceProduct } from "types"
 
+// env.mjs uses `skipValidation` which can widen types to `string | undefined` at compile time.
+// These indexes are required for Algolia-backed data fetching.
+const PRODUCTS_INDEX = env.ALGOLIA_PRODUCTS_INDEX!
+const CATEGORIES_INDEX = env.ALGOLIA_CATEGORIES_INDEX!
+
 export const getProduct = unstable_cache(
   async (handle: string) => {
 
     const { hits } = await algolia.search<CommerceProduct>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: PRODUCTS_INDEX,
       searchParams: {
         filters: new FilterBuilder().where("handle", handle).build(),
         hitsPerPage: 1,
@@ -40,7 +45,7 @@ export const getProducts = unstable_cache(
   ) => {
 
     return await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: PRODUCTS_INDEX,
       searchParams: options,
     })
   },
@@ -52,7 +57,7 @@ export const getFeaturedProducts = unstable_cache(
   async () => {
 
     const { hits } = await algolia.search<CommerceProduct>({
-      indexName: env.ALGOLIA_PRODUCTS_INDEX,
+      indexName: PRODUCTS_INDEX,
       searchParams: {
         attributesToRetrieve: [
           "id",
@@ -78,12 +83,28 @@ export const getFeaturedProducts = unstable_cache(
 export const getAllProducts = async (options?: Omit<BrowseProps["browseParams"], "hitsPerPage">) => {
 
   return await algolia.getAllResults<CommerceProduct>({
-    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    indexName: PRODUCTS_INDEX,
     browseParams: {
       ...options,
     },
   })
 }
+
+export const getProductByVariantId = unstable_cache(
+  async (variantId: string) => {
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: PRODUCTS_INDEX,
+      searchParams: {
+        filters: new FilterBuilder().where("variants.id", variantId).build(),
+        hitsPerPage: 1,
+      },
+    })
+
+    return hits.find(Boolean) || null
+  },
+  ["product-by-variant-id"],
+  { revalidate: 86400, tags: ["products"] }
+)
 
 export const getSimilarProducts = unstable_cache(
   async (collection: string | undefined, objectID: string) => {
@@ -95,7 +116,7 @@ export const getSimilarProducts = unstable_cache(
     const { results } = await algolia.getRecommendations({
       requests: [
         {
-          indexName: env.ALGOLIA_PRODUCTS_INDEX,
+          indexName: PRODUCTS_INDEX,
           objectID,
           model: "looking-similar",
           maxRecommendations: limit,
@@ -107,7 +128,7 @@ export const getSimilarProducts = unstable_cache(
     let collectionSearchResults: { hits: CommerceProduct[] } = { hits: [] }
     if (results[0].hits.length < limit) {
       collectionSearchResults = await algolia.search<CommerceProduct>({
-        indexName: env.ALGOLIA_PRODUCTS_INDEX,
+        indexName: PRODUCTS_INDEX,
         searchParams: {
           hitsPerPage: limit - results[0].hits.length,
           filters: algolia.filterBuilder().where("collections.handle", collection).build(),
@@ -124,7 +145,7 @@ export const getSimilarProducts = unstable_cache(
 export const getNewestProducts = unstable_cache(
   async () => {
     const { hits } = await algolia.search<CommerceProduct>({
-      indexName: algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, "updatedAtTimestamp:asc"),
+      indexName: algolia.mapIndexToSort(PRODUCTS_INDEX, "updatedAtTimestamp:asc"),
       searchParams: {
         hitsPerPage: 8,
       },
@@ -140,7 +161,7 @@ export const getCollection = unstable_cache(
   async (slug: string) => {
 
       const results = await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      indexName: CATEGORIES_INDEX,
       searchParams: {
         filters: algolia.filterBuilder().where("handle", slug).build(),
         hitsPerPage: 1,
@@ -155,14 +176,26 @@ export const getCollection = unstable_cache(
   { revalidate: 86400, tags: ["categories"] }
 )
 
-export const getProductReviews = async () => ({ reviews: [], total: 0 })
+export type ProductReview = {
+  created_at: string
+  body: string
+  rating: number
+  reviewer: {
+    name: string
+  }
+}
+
+export const getProductReviews = async (
+  _handle: string,
+  _options: { page?: number; limit?: number } = { page: 0, limit: 10 }
+): Promise<{ reviews: ProductReview[]; total: number }> => ({ reviews: [], total: 0 })
 
 export const getAllReviews = async () => ({ reviews: [], totalPages: 0 })
 
 export const updateProducts = async (products: Partial<CommerceProduct>[]) => {
 
   return algolia.update({
-    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    indexName: PRODUCTS_INDEX,
     objects: products.filter(Boolean),
   })
 }
@@ -177,7 +210,7 @@ export const getCategories = unstable_cache(
   ) => {
 
     return await algolia.search<HttpTypes.StoreProductCategory>({
-      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      indexName: CATEGORIES_INDEX,
       searchParams: options,
     })
   },
@@ -189,7 +222,7 @@ export const updateCategories = unstable_cache(
   async (categories: HttpTypes.StoreProductCategory[]) => {
 
     return algolia.update({
-      indexName: env.ALGOLIA_CATEGORIES_INDEX,
+      indexName: CATEGORIES_INDEX,
       objects: categories.filter(Boolean) as unknown as Record<string, unknown>[],
     })
   },
@@ -200,7 +233,7 @@ export const updateCategories = unstable_cache(
 export const deleteCategories = async (ids: string[]) => {
 
   return algolia.delete({
-    indexName: env.ALGOLIA_CATEGORIES_INDEX,
+    indexName: CATEGORIES_INDEX,
     objectIDs: ids,
   })
 }
@@ -208,7 +241,7 @@ export const deleteCategories = async (ids: string[]) => {
 export const deleteProducts = async (ids: string[]) => {
 
   return algolia.delete({
-    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    indexName: PRODUCTS_INDEX,
     objectIDs: ids,
   })
 }
@@ -222,7 +255,7 @@ export const getFilteredProducts = unstable_cache(
     collectionHandle?: string,
     hasVendorFilter: boolean = false
   ) => {
-    const indexName = algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, sortBy as SortType)
+    const indexName = algolia.mapIndexToSort(PRODUCTS_INDEX, sortBy as SortType)
 
     try {
       const queries = [
@@ -338,7 +371,7 @@ export const getProductsByCollectionTag = unstable_cache(
   async (tag: string, limit: number = 10) => {
 
     const { hits } = await algolia.search<CommerceProduct>({
-      indexName: algolia.mapIndexToSort(env.ALGOLIA_PRODUCTS_INDEX, "updatedAtTimestamp:desc"),
+      indexName: algolia.mapIndexToSort(PRODUCTS_INDEX, "updatedAtTimestamp:desc"),
       searchParams: {
         filters: algolia.filterBuilder().where("tags", tag).build(),
         hitsPerPage: limit,

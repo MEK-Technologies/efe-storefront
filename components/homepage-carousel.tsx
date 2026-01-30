@@ -177,7 +177,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
           <div className="absolute inset-x-0 bottom-8 hidden lg:block">
             <div className="container mx-auto px-4">
               <div className="flex items-center justify-between">
-                <div className="flex gap-2" role="tablist">
+                <div className="flex gap-2">
                   {slides.map((_, index) => (
                     <button
                       key={index}
@@ -188,8 +188,6 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                           : "w-2 bg-foreground/30 hover:bg-foreground/50"
                       )}
                       onClick={() => scrollTo(index)}
-                      role="tab"
-                      aria-selected={selectedIndex === index}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}

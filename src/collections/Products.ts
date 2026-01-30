@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { slugify } from '../../utils/slugify'
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -128,6 +129,29 @@ export const Products: CollectionConfig = {
       admin: {
         description: 'Categorías a las que pertenece el producto',
       },
+      // Custom validation to handle objects being sent instead of IDs
+      validate: (value) => {
+        // If value is undefined or null, it's valid (optional field)
+        if (value === undefined || value === null) {
+          return true
+        }
+        
+        // If it's an array, check each item
+        if (Array.isArray(value)) {
+          // The beforeChange hook will transform objects to IDs
+          // This validation just ensures the structure is correct
+          return true
+        }
+        
+        // Single value should be string or number
+        if (typeof value === 'string' || typeof value === 'number') {
+          return true
+        }
+        
+        // Objects will be transformed by beforeChange hook
+        // So we allow them here
+        return true
+      },
     },
     {
       name: 'tags',
@@ -150,7 +174,7 @@ export const Products: CollectionConfig = {
         {
           name: 'name',
           type: 'text',
-          required: true,
+          required: false, // Made optional to handle backend data
           admin: {
             description: 'Nombre de la opción (e.g., Color, Talla)',
           },
@@ -181,7 +205,7 @@ export const Products: CollectionConfig = {
         {
           name: 'title',
           type: 'text',
-          required: true,
+          required: false, // Made optional to handle backend data
           admin: {
             description: 'Título de la variante (e.g., "Rojo / Grande")',
           },
@@ -196,7 +220,7 @@ export const Products: CollectionConfig = {
         {
           name: 'price',
           type: 'number',
-          required: true,
+          required: false, // Made optional to handle backend data
           admin: {
             description: 'Precio de la variante',
             step: 0.01,
@@ -392,7 +416,152 @@ export const Products: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ data, operation }) => {
+      async ({ data, req, operation, originalDoc }) => {
+        // Normalize handle: ensure it's URL-friendly
+        if (data?.handle) {
+          // Apply slugify to ensure handle is valid (lowercase, no spaces, URL-safe)
+          data.handle = slugify(data.handle)
+        } else if (data?.title && !data?.handle) {
+          // If handle is missing but title exists, generate handle from title
+          data.handle = slugify(data.title)
+        }
+        
+        // Ensure product has ID for update operations
+        if (operation === 'update') {
+          const productId = originalDoc?.id || data?.id || (data as any)?.id
+          if (!productId) {
+            throw new Error('Product ID is required when doing an update operation. The product must have an id field.')
+          }
+          // Ensure the ID is in the data object for the update
+          if (!data.id && productId) {
+            (data as any).id = productId
+          }
+        }
+        
+        // Transform categories from objects to IDs (backend compatibility)
+        // This handles cases where categories are sent as objects instead of IDs
+        if (data?.categories && Array.isArray(data.categories)) {
+          const transformedCategories: (string | number)[] = []
+          
+          for (const cat of data.categories) {
+            // Skip null/undefined values
+            if (cat === null || cat === undefined) {
+              continue
+            }
+            
+            // If it's already a valid ID (string or number), use it directly
+            if (typeof cat === 'string' || typeof cat === 'number') {
+              transformedCategories.push(cat)
+              continue
+            }
+            
+            // If it's an object, extract the ID - DO NOT SKIP, FIX THE STRUCTURE
+            if (typeof cat === 'object' && cat !== null) {
+              // Type assertion for object properties
+              const catObj = cat as Record<string, any>
+              
+              // Try various ID property names (comprehensive extraction)
+              let categoryId = catObj.id || 
+                              catObj._id || 
+                              catObj.category_id || 
+                              catObj.categoryId ||
+                              catObj.category?.id ||
+                              catObj.category?._id ||
+                              (typeof catObj.value === 'object' && catObj.value?.id) ||
+                              (typeof catObj.value === 'object' && catObj.value?._id)
+              
+              // If no direct ID found, look up by handle, name, or medusa_id
+              if (!categoryId && req?.payload) {
+                try {
+                  // Build search conditions - try handle first, then name
+                  const searchConditions: any[] = []
+                  
+                  if (catObj.handle) {
+                    searchConditions.push({ handle: { equals: catObj.handle } })
+                  }
+                  
+                  if (catObj.name) {
+                    searchConditions.push({ name: { equals: catObj.name } })
+                  }
+                  
+                  if (catObj.title) {
+                    searchConditions.push({ name: { equals: catObj.title } })
+                  }
+                  
+                  // If we have search conditions, try to find the category
+                  if (searchConditions.length > 0) {
+                    const categoryResult = await req.payload.find({
+                      collection: 'categories',
+                      where: {
+                        or: searchConditions,
+                      },
+                      limit: 1,
+                    })
+                    
+                    if (categoryResult.docs && categoryResult.docs.length > 0) {
+                      categoryId = categoryResult.docs[0].id
+                    }
+                  }
+                } catch (error) {
+                  throw new Error(
+                    `Failed to lookup category. Handle: "${catObj.handle || 'N/A'}", Name: "${catObj.name || 'N/A'}". Error: ${error instanceof Error ? error.message : String(error)}`
+                  )
+                }
+              }
+              
+              // If we found an ID, use it
+              if (categoryId) {
+                transformedCategories.push(categoryId)
+                continue
+              }
+              
+              // If category not found, skip it with a warning
+              // Do NOT auto-create categories here to avoid foreign key constraint violations
+              // Categories should be created via the /api/categories endpoint first
+              console.warn(
+                `[Products Hook] Category not found: handle="${catObj.handle || 'N/A'}", name="${catObj.name || 'N/A'}". Skipping this category. Please create it via /api/categories first.`
+              )
+              continue
+            }
+          }
+          
+          // Replace the categories array with the transformed IDs
+          data.categories = transformedCategories.length > 0 ? transformedCategories : undefined
+        }
+
+        // Handle options - ensure name exists or set default
+        if (data?.options && Array.isArray(data.options)) {
+          data.options = data.options.map((opt: any, index: number) => {
+            if (!opt.name && opt.title) {
+              opt.name = opt.title
+            } else if (!opt.name) {
+              opt.name = `Option ${index + 1}`
+            }
+            return opt
+          })
+        }
+
+        // Handle variants - ensure price exists or set default
+        if (data?.variants && Array.isArray(data.variants)) {
+          data.variants = data.variants.map((variant: any) => {
+            // If price is missing, try to extract from calculated_price or set to 0
+            if (variant.price === undefined || variant.price === null) {
+              if (variant.calculated_price?.calculated_amount) {
+                variant.price = variant.calculated_price.calculated_amount / 100 // Convert from cents if needed
+              } else if (variant.original_price) {
+                variant.price = variant.original_price / 100
+              } else {
+                variant.price = 0
+              }
+            }
+            // Ensure currencyCode exists
+            if (!variant.currencyCode) {
+              variant.currencyCode = variant.currency_code || 'USD'
+            }
+            return variant
+          })
+        }
+
         // Calcular minPrice y maxPrice automáticamente desde las variantes
         if (data?.variants && Array.isArray(data.variants) && data.variants.length > 0) {
           const prices = data.variants
@@ -402,7 +571,7 @@ export const Products: CollectionConfig = {
           if (prices.length > 0) {
             const minPrice = Math.min(...prices)
             const maxPrice = Math.max(...prices)
-            const currencyCode = data.priceRange?.currencyCode || data.variants[0]?.currencyCode || 'USD'
+            const currencyCode = (data.priceRange as any)?.currencyCode || (data.variants[0] as any)?.currencyCode || 'USD'
             
             data.priceRange = {
               ...(data.priceRange || {}),

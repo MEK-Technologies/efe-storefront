@@ -53,16 +53,18 @@ export const listRootCategories = async (limit: number = 5) => {
     .then(({ product_categories }) => product_categories)
 }
 
-export const getCategoryByHandle = async (categoryHandle: string[]) => {
+export const getCategoryByHandle = async (
+  categoryHandle: string[]
+): Promise<HttpTypes.StoreProductCategory | null> => {
   // Decode the handle in case it comes URL-encoded from the route
-  const decodedHandle = categoryHandle.map(h => decodeHandle(h)).join("/")
+  const decodedHandle = categoryHandle.map((h) => decodeHandle(h)).join("/")
   
   const next = {
     ...(await getCacheOptions("categories")),
   }
 
   // First try with the decoded handle
-  let result = await sdk.client
+  let result: HttpTypes.StoreProductCategory | undefined = await sdk.client
     .fetch<HttpTypes.StoreProductCategoryListResponse>(
       `/store/product-categories`,
       {
@@ -82,8 +84,8 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
     const allCategories = await listCategories({ limit: 1000 })
     const { slugify } = await import("utils/slugify")
     
-    result = allCategories.find(cat => slugify(cat.handle) === decodedHandle)
+    result = allCategories.find((cat) => slugify(cat.handle) === decodedHandle)
   }
 
-  return result
+  return result ?? null
 }

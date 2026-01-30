@@ -9,17 +9,15 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 // Import collections
-// NOTE: Collections commented out to prevent table creation
-// Uncomment only if corresponding tables already exist in database
-// import { Pages } from './src/collections/Pages'
-import { Users } from './src/collections/User'
-import { Categories } from './src/collections/Categories'
-import { Banners } from './src/collections/Banners'
-import { Slides } from './src/collections/Slides'
-import { Products } from './src/collections/Products'
+import { Users } from './src/collections/User.ts'
+import { Categories } from './src/collections/Categories.ts'
+import { Banners } from './src/collections/Banners.ts'
+import { Slides } from './src/collections/Slides.ts'
+import { Products } from './src/collections/Products.ts'
+import { Collections } from './src/collections/Collections.ts'
 
 // Import Bytescale plugin
-import { bytescaleUploadPlugin } from './src/plugins/bytescale-upload'
+import { bytescaleUploadPlugin } from './src/plugins/bytescale-upload/index.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -89,6 +87,7 @@ export default buildConfig({
     Banners,
     Slides,
     Products, // Productos del catálogo
+    Collections, // Colecciones de productos
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'TEMP_SECRET_PLEASE_CONFIGURE_ENV_VARIABLES_12345678901234567890',
@@ -99,7 +98,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.PAYLOAD_DATABASE_URL || 'postgres://admin:password@127.0.0.1:5432/payload',
     },
-    push: true, // DISABLED: Prevent Payload from modifying existing tables (products, etc.)
+    push: false, // DISABLED: Prevent Payload from modifying existing tables (products, etc.)
   }),
   sharp,
   plugins: [
@@ -107,8 +106,8 @@ export default buildConfig({
     ...(isBytescaleEnabled
       ? [
           bytescaleUploadPlugin({
-            apiKey: process.env.BYTESCALE_API_KEY!,
-            accountId: process.env.BYTESCALE_ACCOUNT_ID!,
+            apiKey: process.env.BYTESCALE_API_KEY || '',
+            accountId: process.env.BYTESCALE_ACCOUNT_ID || '',
             prefix: process.env.BYTESCALE_PREFIX || '/payload-uploads',
             enabled: true,
             debug: process.env.NODE_ENV === 'development',

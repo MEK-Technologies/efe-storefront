@@ -60,15 +60,14 @@ export function AddToCartButton({
   countryCode: string
 }) {
   const [isPending, setIsPending] = useState(false)
-  const [hasAnyAvailable, setHasAnyAvailable] = useState(true)
+  const [isAvailable, setIsAvailable] = useState(true)
   const setProduct = useAddProductStore((s) => s.setProduct)
   const clean = useAddProductStore((s) => s.clean)
   const cart = useCartStore((s) => s.cart)
   const refresh = useCartStore((s) => s.refresh)
   const setCheckoutReady = useCartStore((s) => s.setCheckoutReady)
 
-  const isAvailable = getAvailability(combination)
-  const disabled = !hasAnyAvailable || !isAvailable || isPending
+  const disabled = !isAvailable || isPending
 
   const handleClick = async () => {
     if (!combination?.id) return
@@ -95,18 +94,28 @@ export function AddToCartButton({
 
   useEffect(() => {
     const checkStock = async () => {
+      if (!combination?.id) {
+        setIsAvailable(false)
+        return
+      }
+
       const cartId = getCookie(COOKIE_CART_ID)
       const itemAvailability = await getItemAvailability({
         cartId,
         productId: product.id,
-        variantId: combination?.id,
+        variantId: combination.id,
       })
 
-      itemAvailability && setHasAnyAvailable(itemAvailability.inCartQuantity < quantityAvailable)
+      // Check if item is available to add to cart
+      const hasStock = itemAvailability.inStockQuantity > 0 || 
+                       itemAvailability.inStockQuantity === Number.POSITIVE_INFINITY
+      const canAddMore = itemAvailability.inCartQuantity < itemAvailability.inStockQuantity
+      
+      setIsAvailable(hasStock && canAddMore)
     }
 
     checkStock()
-  }, [combination?.id, isPending, quantityAvailable, cart?.items, product.id])
+  }, [combination?.id, isPending, cart?.items, product.id])
 
   return (
     <Button

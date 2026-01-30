@@ -3,7 +3,7 @@
  * Tests for Payload CMS hooks integration
  */
 
-import { describe, test, expect, beforeAll } from 'bun:test'
+import { describe, expect, test } from '@jest/globals'
 import { createBeforeChangeHook } from '../hooks/beforeChangeHook'
 import { createAfterDeleteHook } from '../hooks/afterDeleteHook'
 import { createAfterReadHook } from '../hooks/afterReadHook'

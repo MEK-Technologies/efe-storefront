@@ -1,4 +1,4 @@
-import React, { JSX, Suspense } from "react"
+import React, { Suspense } from "react"
 import Markdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -11,7 +11,7 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ children }: MarkdownRendererProps) {
   return (
-    <Markdown remarkPlugins={[remarkGfm]} components={COMPONENTS} className="space-y-3">
+    <Markdown remarkPlugins={[remarkGfm]} components={COMPONENTS as any} className="space-y-3">
       {children}
     </Markdown>
   )
@@ -120,7 +120,9 @@ function childrenTakeAllStringContents(element: any): string {
   return ""
 }
 
-const COMPONENTS = {
+// `react-markdown`'s `components` typing depends on the active JSX runtime types.
+// In this repo it becomes too restrictive for our tag mapping, so we keep it runtime-correct and cast at the callsite.
+const COMPONENTS: Record<string, any> = {
   h1: withClass("h1", "text-2xl font-semibold"),
   h2: withClass("h2", "font-semibold text-xl"),
   h3: withClass("h3", "font-semibold text-lg"),
@@ -164,8 +166,8 @@ const COMPONENTS = {
   hr: withClass("hr", "border-foreground/20"),
 }
 
-function withClass(Tag: keyof JSX.IntrinsicElements, classes: string) {
-  const Component = ({ node: _, ...props }: any) => <Tag className={classes} {...props} />
-  Component.displayName = Tag
+function withClass(Tag: string, classes: string) {
+  const Component = ({ node: _, ...props }: any) => React.createElement(Tag, { className: classes, ...props })
+  Component.displayName = String(Tag)
   return Component
 }

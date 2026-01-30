@@ -7,11 +7,7 @@ import withPlugins from "next-compose-plugins"
  */
 const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" })]], {
   reactStrictMode: true,
-  experimental: {
-    instrumentationHook: true,
-    // Ensure polyfills load before other modules
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
   logging: {
     fetches: {
       fullUrl: true,
@@ -84,7 +80,8 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
             // Ensure polyfill is loaded before undici
             if (!globalThis.File) {
               try {
-                require('./payload-polyfill.js')
+                const path = require('path')
+                require(path.resolve('./payload-polyfill.js'))
               } catch (e) {
                 console.warn('Could not preload polyfill:', e)
               }

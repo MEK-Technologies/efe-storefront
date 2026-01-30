@@ -1,7 +1,12 @@
 import { HttpTypes } from "@medusajs/types"
 
-// Re-exporting Medusa's product type as the base with review augmentations
-export type CommerceProduct = HttpTypes.StoreProduct
+// Medusa product type augmented with storefront/search-only fields (e.g. Algolia facets, reviews)
+export type CommerceProduct = HttpTypes.StoreProduct & {
+  avgRating?: number
+  totalReviews?: number
+  vendor?: string
+  minPrice?: number
+}
 
 // Convenience type aliases for commonly used Medusa SDK types
 export type StoreProduct = HttpTypes.StoreProduct
