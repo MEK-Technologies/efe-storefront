@@ -37,6 +37,23 @@ export const getProduct = unstable_cache(
   { revalidate: 86400, tags: ["products"] }
 )
 
+export const getProductById = unstable_cache(
+  async (productId: string) => {
+
+    const { hits } = await algolia.search<CommerceProduct>({
+      indexName: PRODUCTS_INDEX,
+      searchParams: {
+        filters: new FilterBuilder().where("id", productId).build(),
+        hitsPerPage: 1,
+      },
+    })
+
+    return hits.find(Boolean) || null
+  },
+  ["product-by-id"],
+  { revalidate: 86400, tags: ["products"] }
+)
+
 export const getProducts = unstable_cache(
   async (
     options: SearchSingleIndexProps["searchParams"] = {

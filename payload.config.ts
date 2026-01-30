@@ -43,6 +43,9 @@ export default buildConfig({
     // Media collection for file uploads
     {
       slug: 'media',
+      access: {
+        read: () => true, // Allow public read access to media files
+      },
       upload: {
         staticDir: path.resolve(dirname, 'public/uploads'),
         imageSizes: [

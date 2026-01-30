@@ -11,7 +11,7 @@ export const FeaturedProductsSection = ({
 
   return (
     <div className="mx-auto my-4 w-full max-w-container-sm space-y-4 px-4">
-      <h2 className="mb-8 text-4xl font-semibold">New Arrivals</h2>
+      <h2 className="mb-8 text-4xl font-semibold">Productos Destacados</h2>
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-1">
         {highlightedProducts.map((product, index) => (
           <ProductCard

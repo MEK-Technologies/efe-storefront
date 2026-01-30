@@ -52,9 +52,9 @@ export const ModernNewArrivalsSection = ({
         {}
         <div className="mb-12">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            New Arrivals
+            Productos Destacados
           </h2>
-          <p className="mt-2 text-base text-muted-foreground lg:text-lg">Fresh styles, just dropped</p>
+          <p className="mt-2 text-base text-muted-foreground lg:text-lg"></p>
         </div>
 
         {}
@@ -79,7 +79,7 @@ export const ModernNewArrivalsSection = ({
                   {index < 3 && (
                     <div className="absolute left-3 top-3 z-10">
                       <span className="inline-flex items-center rounded-full bg-foreground px-2 py-1 text-xs font-medium text-background">
-                        NEW
+                        DESTACADO
                       </span>
                     </div>
                   )}
@@ -97,7 +97,7 @@ export const ModernNewArrivalsSection = ({
             href="/search?sort=created_at_desc"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 transition-all hover:underline"
           >
-            View all new arrivals
+            Mirar Todos Nuestros Productos Destacados
             <svg
               className="size-4 transition-transform group-hover:translate-x-1"
               fill="none"

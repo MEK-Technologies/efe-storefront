@@ -7,7 +7,7 @@ export async function CategoriesSection() {
   return (
     <div className="mt-20 px-4 py-20">
       <div className="mx-auto w-full max-w-container-sm">
-        <h2 className="mb-8 text-left text-4xl font-semibold">Featured Collections</h2>
+        <h2 className="mb-8 text-left text-4xl font-semibold">Marcas</h2>
         {collections && collections.length > 0 ? (
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
             {collections.map((collection, index) => {

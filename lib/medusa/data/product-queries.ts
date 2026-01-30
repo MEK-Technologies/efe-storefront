@@ -155,3 +155,44 @@ export async function getProductsByCollection(
     return []
   }
 }
+
+/**
+ * Get products by collection ID (not handle)
+ * Used when you have the Medusa collection ID directly
+ */
+export async function getProductsByCollectionId(
+  collectionId: string,
+  limit: number = 12
+): Promise<HttpTypes.StoreProduct[]> {
+  const next = {
+    ...(await getCacheOptions("products")),
+  }
+
+  const region = await getRegion(DEFAULT_COUNTRY_CODE)
+  
+  if (!region) {
+    return []
+  }
+
+  try {
+    const productsResponse = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
+      `/store/products`,
+      {
+        method: "GET",
+        query: {
+          collection_id: [collectionId],
+          region_id: region.id,
+          fields: "*variants,*variants.calculated_price,*images,+metadata",
+          limit,
+        },
+        next,
+        cache: "force-cache",
+      }
+    )
+
+    return productsResponse.products
+  } catch (error) {
+    console.error(`Error fetching products by collection ID: ${collectionId}`, error)
+    return []
+  }
+}

@@ -19,7 +19,7 @@ export default async function Homepage(_props: { params: Promise<{ bucket: strin
 
   return (
     <div className="flex w-full flex-col">
-      <AnnouncementBar />
+      {/* <AnnouncementBar /> */}
       <HeroSection />
       <ModernNewArrivalsSection products={products} />
       <EnterpriseCategoriesSection />

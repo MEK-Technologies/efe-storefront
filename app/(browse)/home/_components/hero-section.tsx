@@ -1,6 +1,6 @@
 import { type HeroSlide, HomepageCarousel } from "components/homepage-carousel"
 import { cn } from "utils/cn"
-import { getProduct } from "lib/algolia"
+import { getProductById } from "lib/algolia"
 import { getImagesForCarousel } from "utils/visual-variant-utils"
 import { getFeaturedImage, getMinPrice, getVariantPrice } from "utils/medusa-product-helpers"
 import { type CmsSlide, getSlides } from "lib/payload-slides"
@@ -63,7 +63,7 @@ export async function HeroSection({ className }: { className?: string }) {
     if (!slide.product_star) {
       return Promise.resolve(null)
     }
-    return getProduct(slide.product_star).catch(() => null)
+    return getProductById(slide.product_star).catch(() => null)
   })
 
   const products = await Promise.all(productPromises)

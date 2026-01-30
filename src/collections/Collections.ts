@@ -47,6 +47,31 @@ export const Collections: CollectionConfig = {
       },
     },
     {
+      name: 'banner_url',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+      admin: {
+        description: 'Imagen banner de la colección (para encabezados)',
+      },
+    },
+    {
+      name: 'description',
+      type: 'richText',
+      admin: {
+        description: 'Descripción de la colección',
+      },
+    },
+    {
+      name: 'backend_collection_id',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        description: 'ID de la colección en el backend de Medusa',
+      },
+    },
+    {
       name: 'metadata',
       type: 'json',
       admin: {
