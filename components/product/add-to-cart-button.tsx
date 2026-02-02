@@ -21,33 +21,6 @@ import type { CommerceProduct } from "types"
 
 import { COOKIE_CART_ID } from "constants/index"
 
-// Helper to check if combination is a Combination type (has availableForSale)
-function isCombination(combo: Combination | HttpTypes.StoreProductVariant | undefined): combo is Combination {
-  return combo !== undefined && 'availableForSale' in combo
-}
-
-// Helper to get availability status
-function getAvailability(combo: Combination | HttpTypes.StoreProductVariant | undefined): boolean {
-  if (!combo) return false
-  if (isCombination(combo)) {
-    return combo.availableForSale
-  }
-  // For StoreProductVariant, check inventory
-  if (combo.manage_inventory && combo.inventory_quantity != null) {
-    return combo.inventory_quantity > 0
-  }
-  return true // If not managing inventory, assume available
-}
-
-// Helper to get quantity available
-function getQuantityAvailable(combo: Combination | HttpTypes.StoreProductVariant | undefined): number {
-  if (!combo) return 0
-  if (isCombination(combo)) {
-    return combo.quantityAvailable ?? 0
-  }
-  return combo.inventory_quantity ?? 0
-}
-
 export function AddToCartButton({
   className,
   product,
@@ -70,52 +43,93 @@ export function AddToCartButton({
   const disabled = !isAvailable || isPending
 
   const handleClick = async () => {
-    if (!combination?.id) return
+    console.log("[AddToCartButton] handleClick started")
+    
+    if (!combination?.id) {
+      console.warn("[AddToCartButton] No combination.id in handleClick")
+      return
+    }
 
     setIsPending(true)
-
-    setTimeout(() => {
-      setProduct({ product, combination })
-      setIsPending(false)
-    }, 300)
-
-    setTimeout(() => clean(), 4500)
-
     setCheckoutReady(false)
-    const res = await addCartItem(null, combination.id, product.id, countryCode)
 
-    if (!res.ok) toast.error("Out of stock")
+    try {
+      console.log("[AddToCartButton] Calling addCartItem...")
+      const res = await addCartItem(null, combination.id, product.id, countryCode)
+      
+      console.log("[AddToCartButton] addCartItem result:", res)
 
-    setCheckoutReady(true)
-    refresh()
+      if (!res.ok) {
+        console.warn("[AddToCartButton] addCartItem failed:", res.message)
+        toast.error(res.message || "Out of stock")
+      } else {
+        console.log("[AddToCartButton] Successfully added to cart")
+        // Show product added animation
+        setProduct({ product, combination })
+        setTimeout(() => clean(), 4500)
+      }
+    } catch (error) {
+      console.error("[AddToCartButton] Error in handleClick:", error)
+      toast.error("Error adding to cart")
+    } finally {
+      // Reset states after operation completes
+      setTimeout(() => setIsPending(false), 300)
+      setCheckoutReady(true)
+      refresh()
+    }
   }
-
-  const quantityAvailable = getQuantityAvailable(combination)
 
   useEffect(() => {
     const checkStock = async () => {
+      console.log("[AddToCartButton] checkStock started:", {
+        hasCombo: !!combination,
+        comboId: combination?.id,
+        productId: product.id
+      })
+      
       if (!combination?.id) {
+        console.warn("[AddToCartButton] No combination.id, marking as unavailable")
         setIsAvailable(false)
         return
       }
 
       const cartId = getCookie(COOKIE_CART_ID)
+      console.log("[AddToCartButton] CartId from cookie:", cartId)
+      
       const itemAvailability = await getItemAvailability({
         cartId,
         productId: product.id,
         variantId: combination.id,
       })
 
-      // Check if item is available to add to cart
-      const hasStock = itemAvailability.inStockQuantity > 0 || 
-                       itemAvailability.inStockQuantity === Number.POSITIVE_INFINITY
+      console.log("[AddToCartButton] Item availability:", itemAvailability)
+
+      // If inStockQuantity is Infinity (not managing inventory), always available
+      if (itemAvailability.inStockQuantity === Number.POSITIVE_INFINITY) {
+        console.log("[AddToCartButton] Unlimited stock (Infinity)")
+        setIsAvailable(true)
+        return
+      }
+
+      // Otherwise check if there's stock and we can add more
+      const hasStock = itemAvailability.inStockQuantity > 0
       const canAddMore = itemAvailability.inCartQuantity < itemAvailability.inStockQuantity
+      const isAvailable = hasStock && canAddMore
       
-      setIsAvailable(hasStock && canAddMore)
+      console.log("[AddToCartButton] Stock check:", {
+        hasStock,
+        canAddMore,
+        isAvailable,
+        inCart: itemAvailability.inCartQuantity,
+        inStock: itemAvailability.inStockQuantity
+      })
+      
+      setIsAvailable(isAvailable)
     }
 
     checkStock()
-  }, [combination?.id, isPending, cart?.items, product.id])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [combination?.id, product.id, cart?.items?.length])
 
   return (
     <Button

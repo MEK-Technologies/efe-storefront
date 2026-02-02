@@ -37,7 +37,6 @@ export const env = createEnv({
 
     // Medusa variables are required
     MEDUSA_BACKEND_URL: z.string(),
-    NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: z.string(),
     
     // Payload CMS variables (optional - only needed if using Payload)
     PAYLOAD_SECRET: z.string().min(32).optional(),
@@ -52,6 +51,11 @@ export const env = createEnv({
     BYTESCALE_PREFIX: z.string().default('/payload-uploads'),
     
     CRON_SECRET: z.string().optional(),
+  },
+  client: {
+    // Medusa client variables
+    NEXT_PUBLIC_MEDUSA_BACKEND_URL: z.string().url(),
+    NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: z.string(),
   },
   // Custom validation: If one Bytescale var is set, all must be set
   runtimeEnv: process.env,

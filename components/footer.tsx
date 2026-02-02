@@ -29,21 +29,6 @@ export function Footer() {
                   Todos los Productos
                 </Link>
               </li>
-              <li>
-                <Link href="/category/electronics" className="transition-colors hover:text-gray-700" prefetch={false}>
-                  Electrónicos
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/fashion" className="transition-colors hover:text-gray-700" prefetch={false}>
-                  Moda
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/sports-and-outdoors" className="transition-colors hover:text-gray-700" prefetch={false}>
-                  Deportes
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -106,7 +91,7 @@ export function Footer() {
                 <YoutubeIcon className="-mt-1 size-8 text-white" />
               </a>
             </div>
-            <div className="text-sm">© {new Date().getFullYear()} EFE Storefront. Todos los derechos reservados.</div>
+            <div className="text-sm">© {new Date().getFullYear()} EFE Distributions. Todos los derechos reservados.</div>
           </div>
         </div>
       </div>

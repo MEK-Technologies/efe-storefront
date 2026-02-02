@@ -20,11 +20,11 @@ export async function EnterpriseCategoriesSection() {
   }
 
   return (
-    <section className="relative w-full py-24">
+    <section className="relative w-full py-12">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Featured Categories</h2>
-          <p className="mt-4 text-lg text-muted-foreground">Explore our curated collections</p>
+          <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Categorías Destacadas</h2>
+          <p className="mt-4 text-lg text-muted-foreground">Explora nuestras colecciones seleccionadas</p>
         </div>
 
         <div className="relative -mx-4 sm:-mx-8 lg:-mx-12">

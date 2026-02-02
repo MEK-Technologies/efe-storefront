@@ -6,7 +6,7 @@ import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
 
 export const revalidate = 86400
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export const size = {
   width: 1200,

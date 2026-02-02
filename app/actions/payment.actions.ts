@@ -2,6 +2,7 @@
 
 import { initiatePaymentSession, placeOrder, retrieveCart } from "lib/medusa/data/cart"
 import { getCartId } from "lib/medusa/data/cookies"
+import { validateCartInventory } from "lib/medusa/data/inventory"
 
 export async function initializePayment(): Promise<{
   ok: boolean
@@ -30,16 +31,16 @@ export async function initializePayment(): Promise<{
       return { ok: false, error: "Shipping address is required" }
     }
 
-    // Initialize payment session
+    // Skip payment session initialization - not required for manual payment flow
+    // If payment provider is configured, uncomment the following:
+    /*
     const paymentSession = await initiatePaymentSession(cart, {
-      provider_id: "stripe", // TODO: Make this configurable
+      provider_id: "stripe",
     })
-
-    // For now, return a placeholder client secret
-    // TODO: Extract actual client_secret from payment session once Stripe is configured
     const clientSecret = "placeholder_client_secret"
+    */
 
-    return { ok: true, clientSecret }
+    return { ok: true, clientSecret: undefined }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Payment initialization failed" }
   }
@@ -49,6 +50,13 @@ export async function completePayment(): Promise<{
   ok: boolean
   orderId?: string
   error?: string
+  inventoryErrors?: Array<{
+    item_id: string
+    title: string
+    message: string
+    available_quantity: number
+    requested_quantity: number
+  }>
 }> {
   const cartId = await getCartId()
 
@@ -57,6 +65,33 @@ export async function completePayment(): Promise<{
   }
 
   try {
+    // Get cart to validate
+    const cart = await retrieveCart(cartId)
+
+    if (!cart) {
+      return { ok: false, error: "Cart not found" }
+    }
+
+    console.log("[completePayment] Cart data:", {
+      id: cart.id,
+      email: cart.email,
+      hasShippingAddress: !!cart.shipping_address,
+      hasShippingMethod: cart.shipping_methods?.length > 0,
+      itemCount: cart.items?.length,
+      total: cart.total,
+    })
+
+    // Validate inventory availability before placing order
+    const validation = await validateCartInventory(cart)
+
+    if (!validation.isValid) {
+      return {
+        ok: false,
+        error: "Some items are out of stock or have insufficient quantity",
+        inventoryErrors: validation.errors,
+      }
+    }
+
     // Place the order
     await placeOrder(cartId)
 

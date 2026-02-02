@@ -2,7 +2,7 @@ import { env } from "env.mjs"
 import { ImageResponse } from "next/og"
 
 export const revalidate = 86400
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export const size = {
   width: 1200,

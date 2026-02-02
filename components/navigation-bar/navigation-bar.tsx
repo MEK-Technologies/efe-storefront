@@ -15,6 +15,7 @@ import { CloseIcon } from "components/icons/close-icon"
 import { SearchButton } from "./search-button"
 import { NavigationItem } from "./navigation-item"
 import Link from "next/link"
+import { AuthButton } from "components/modals/auth-helpers"
 
 const ProductAddedAlert = dynamic(() =>
   import("components/product/product-added-alert").then((mod) => mod.ProductAddedAlert)
@@ -117,6 +118,7 @@ export function NavigationBar({ items }: NavigationBarProps) {
                 </button>
                 <Autocomplete className="mr-6" />
                 <div className="flex gap-2">
+                  <AuthButton />
                   <Favorites className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
                   <Cart className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
                   <ProductAddedAlert className="not-supports-[container-type]:md:block hidden supports-[container-type]:@3xl:block" />

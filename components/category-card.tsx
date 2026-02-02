@@ -46,13 +46,13 @@ export const CategoryCard = ({
 
       {/* Content Overlay */}
       <div className="absolute inset-0 flex flex-col justify-end p-16">
-        <h3 className="mb-6 text-5xl font-bold text-white transition-transform duration-300 group-hover:-translate-y-1">
+        <h3 className="mb-6 text-5xl font-bold text-white transition-all duration-300 group-hover:-translate-y-1 group-hover:text-orange-500">
           {title}
         </h3>
         
-        <div className="flex items-center text-sm font-medium text-white/90">
-          <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
-            Shop Now
+        <div className="flex items-center text-sm font-medium text-white/90 transition-colors duration-300 group-hover:text-orange-500">
+          <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full group-hover:after:bg-orange-500">
+            Comprar Ahora
           </span>
           <svg
             className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1"

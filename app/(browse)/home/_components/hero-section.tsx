@@ -1,9 +1,11 @@
 import { type HeroSlide, HomepageCarousel } from "components/homepage-carousel"
 import { cn } from "utils/cn"
-import { getProductById } from "lib/algolia"
+import { sdk } from "lib/medusa/config"
 import { getImagesForCarousel } from "utils/visual-variant-utils"
 import { getFeaturedImage, getMinPrice, getVariantPrice } from "utils/medusa-product-helpers"
 import { type CmsSlide, getSlides } from "lib/payload-slides"
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
+import { getRegion } from "lib/medusa/data/regions"
 
 function getImageFromSlide(slide: CmsSlide): { url: string; alt: string } | null {
   const media = slide.img_url
@@ -48,7 +50,7 @@ function getCategoryCta(slide: CmsSlide): { href: string; text: string } {
 
   return {
     href: "/search",
-    text: "Ver productos",
+    text: "Ver Productos",
   }
 }
 
@@ -56,17 +58,48 @@ export async function HeroSection({ className }: { className?: string }) {
   const slidesFromCms = await getSlides()
 
   if (!slidesFromCms.length) {
+    console.log('[HeroSection] No slides found in CMS')
     return null
   }
 
-  const productPromises = slidesFromCms.map((slide) => {
+  console.log(`[HeroSection] Loading ${slidesFromCms.length} slides from CMS`)
+
+  // Get the region first
+  const region = await getRegion(DEFAULT_COUNTRY_CODE)
+  
+  if (!region) {
+    console.error('[HeroSection] Region not found for country code:', DEFAULT_COUNTRY_CODE)
+  }
+
+  const productPromises = slidesFromCms.map(async (slide) => {
     if (!slide.product_star) {
-      return Promise.resolve(null)
+      return null
     }
-    return getProductById(slide.product_star).catch(() => null)
+    console.log(`[HeroSection] Fetching product from Medusa: ${slide.product_star}`)
+    try {
+      const queryParams: any = {}
+      if (region?.id) {
+        queryParams.region_id = region.id
+      }
+      
+      const { product } = await sdk.store.product.retrieve(slide.product_star, queryParams)
+      return product
+    } catch (err: any) {
+      console.error(`[HeroSection] Failed to fetch product ${slide.product_star}:`, err?.message || err)
+      return null
+    }
   })
 
   const products = await Promise.all(productPromises)
+  
+  products.forEach((product, index) => {
+    const slide = slidesFromCms[index]
+    if (slide.product_star && !product) {
+      console.warn(`[HeroSection] Product not found in Medusa: ${slide.product_star} for slide: ${slide.title}`)
+    } else if (product) {
+      console.log(`[HeroSection] Product loaded for slide "${slide.title}":`, product.title)
+    }
+  })
 
   const heroSlides: HeroSlide[] = slidesFromCms
     .map((slide, index) => {
@@ -142,7 +175,7 @@ export async function HeroSection({ className }: { className?: string }) {
     .filter((slide): slide is HeroSlide => slide !== null)
 
   return (
-    <div className={cn("mb-8 w-full sm:mb-12 lg:mb-16", className)}>
+    <div className={cn("mb-4 w-full sm:mb-6 lg:mb-8", className)}>
       <HomepageCarousel slides={heroSlides} />
     </div>
   )

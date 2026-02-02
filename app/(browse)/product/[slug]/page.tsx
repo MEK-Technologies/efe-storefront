@@ -28,7 +28,7 @@ import { ProductTitle } from "components/product/product-title"
 import { ProductImages } from "components/product/product-images"
 import { RightSection } from "components/product/right-section"
 import { FaqAccordionItem, FaqSectionClient } from "components/product/faq-section/faq-section-client"
-import { ShopifyRichText } from "components/product/faq-section/shopify-rich-text"
+import { RichText } from "components/product/faq-section/rich-text"
 import { nameToSlug } from "utils/slug-name"
 import { AddToCartButton } from "components/product/add-to-cart-button"
 import { DEFAULT_COUNTRY_CODE } from "constants/index"
@@ -151,7 +151,7 @@ export default async function Product(props: ProductProps) {
             <FavoriteMarker handle={slug} variantId={combination?.id} />
             <FaqSectionClient defaultOpenSections={[nameToSlug(getDefaultFaqAccordionItemValue()[0])]}>
               <FaqAccordionItem title={getDefaultFaqAccordionItemValue()[0]}>
-                <ShopifyRichText
+                <RichText
                   data={getProductDetailsContent(product)}
                   className="prose prose-sm max-w-none"
                 />

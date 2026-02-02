@@ -1,16 +1,26 @@
 import { CategoryCard } from "components/category-card"
 import { getCollections } from "lib/payload-collections"
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
 export async function CategoriesSection() {
   const collections = await getCollections(8)
+  const shuffledCollections = shuffleArray(collections || [])
 
   return (
-    <div className="mt-20 px-4 py-20">
+    <div className="mt-8 px-4 py-10">
       <div className="mx-auto w-full max-w-container-sm">
         <h2 className="mb-8 text-left text-4xl font-semibold">Marcas</h2>
-        {collections && collections.length > 0 ? (
+        {shuffledCollections && shuffledCollections.length > 0 ? (
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
-            {collections.map((collection, index) => {
+            {shuffledCollections.map((collection, index) => {
               if (!collection.handle) return null
 
               return (

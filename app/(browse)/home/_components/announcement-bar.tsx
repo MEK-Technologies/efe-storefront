@@ -9,9 +9,9 @@ export function AnnouncementBar({ className }: { className?: string }) {
         className
       )}
     >
-      Sale 50% OFF
+      ¡Descuento 50% OFF!
       <Link prefetch={false} href="/search" className="ml-2 underline hover:no-underline">
-        Shop Now
+        Comprar Ahora
       </Link>
     </div>
   )

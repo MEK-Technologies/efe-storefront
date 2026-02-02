@@ -402,8 +402,6 @@ export async function placeOrder(cartId?: string) {
   }
 
   try {
-    console.log("[placeOrder] Completing cart without payment:", id)
-    
     const cartRes = await sdk.store.cart
       .complete(id, {}, headers)
       .then(async (cartRes) => {
@@ -425,12 +423,35 @@ export async function placeOrder(cartId?: string) {
 
     return cartRes.cart
   } catch (error: any) {
-    console.error("[placeOrder] Cart completion failed:", error.message)
+    // If payment collection error, try to create order without payment session
+    if (error.message?.includes("Payment collection has not been initiated")) {
+      console.warn("[placeOrder] Attempting to create order without payment session")
+      
+      // Create order directly through orders endpoint
+      const orderRes = await sdk.client
+        .fetch<any>(`/store/orders`, {
+          method: "POST",
+          body: { cart_id: id },
+          headers,
+        })
+        .then(async (res) => {
+          const cartCacheTag = await getCacheTag("carts")
+          revalidateTag(cartCacheTag)
+          
+          const orderCacheTag = await getCacheTag("orders")
+          revalidateTag(orderCacheTag)
+          
+          return res
+        })
+      
+      if (orderRes?.order) {
+        const countryCode = orderRes.order.shipping_address?.country_code?.toLowerCase()
+        removeCartId()
+        redirect(`/${countryCode}/order/${orderRes.order.id}/confirmed`)
+      }
+    }
     
-    // Re-throw with simpler message - payment provider must be configured in backend
-    throw new Error(
-      error.message || "Failed to complete order. Contact administrator."
-    )
+    throw error
   }
 }
 

@@ -127,9 +127,16 @@ export async function login(_currentState: unknown, formData: FormData) {
   }
 }
 
-export async function signout(countryCode: string) {
-  await sdk.auth.logout()
+export async function signout() {
+  try {
+    // Try to logout from SDK (may fail if no valid session)
+    await sdk.auth.logout()
+  } catch (error) {
+    // Ignore errors - token might already be invalid
+    console.log("SDK logout error (ignored):", error)
+  }
 
+  // Always clear local tokens
   await removeAuthToken()
 
   const customerCacheTag = await getCacheTag("customers")
@@ -140,7 +147,8 @@ export async function signout(countryCode: string) {
   const cartCacheTag = await getCacheTag("carts")
   revalidateTag(cartCacheTag)
 
-  redirect(`/${countryCode}/account`)
+  // Redirect to home instead of account
+  redirect("/")
 }
 
 export async function transferCart() {

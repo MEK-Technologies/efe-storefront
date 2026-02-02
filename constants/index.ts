@@ -1,6 +1,8 @@
+// Cookies utilizadas en el proyecto (prefijo _medusa_ es estándar de Medusa.js)
 export const COOKIE_CART_ID = "_medusa_cart_id"
-export const COOKIE_ACCESS_TOKEN = "ecom_accessToken"
-
+export const COOKIE_AUTH_TOKEN = "_medusa_jwt"
+export const COOKIE_ADMIN_TOKEN = "_medusa_admin_jwt"
+export const COOKIE_CACHE_ID = "_medusa_cache_id"
 export const COOKIE_FAVORITES = "ecom_favorites"
 
 /**

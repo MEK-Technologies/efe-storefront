@@ -28,7 +28,7 @@ import { RightSection } from "components/product/right-section"
 import { AddToCartButton } from "components/product/add-to-cart-button"
 import { FavoriteMarker } from "components/product/favorite-marker"
 import { FaqAccordionItem, FaqSectionClient } from "components/product/faq-section/faq-section-client"
-import { ShopifyRichText } from "components/product/faq-section/shopify-rich-text"
+import { RichText } from "components/product/faq-section/rich-text"
 
 import { slugToName } from "utils/slug-name"
 import { getVariantPrice } from "utils/medusa-product-helpers"
@@ -153,7 +153,7 @@ export default async function DraftProduct(props: ProductProps) {
               defaultOpenSections={[slugToName(faqTitles[0])]}
             >
               <FaqAccordionItem title={faqTitles[0]}>
-                <ShopifyRichText
+                <RichText
                   data={productDetails}
                   className="prose prose-sm max-w-none"
                 />
