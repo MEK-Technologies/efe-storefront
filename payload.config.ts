@@ -15,6 +15,7 @@ import { Banners } from './src/collections/Banners.ts'
 import { Slides } from './src/collections/Slides.ts'
 import { Products } from './src/collections/Products.ts'
 import { Collections } from './src/collections/Collections.ts'
+import { Ordenes } from './src/collections/Ordenes.ts'
 
 // Import Bytescale plugin
 import { bytescaleUploadPlugin } from './src/plugins/bytescale-upload/index.ts'
@@ -35,6 +36,19 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     disable: !isPayloadEnabled,
+    components: {
+      // Custom views for orders dashboard
+      views: {
+        OrdenesDashboard: {
+          Component: './src/components/admin/OrdenesDashboard.tsx#OrdenesDashboard',
+          path: '/dashboard-ordenes',
+        },
+      },
+      // Add link to orders dashboard after nav
+      afterNavLinks: [
+        './src/components/admin/OrdenesDashboardLink.tsx#OrdenesDashboardLink',
+      ],
+    },
   },
   collections: [
     // User collection for authentication
@@ -91,6 +105,7 @@ export default buildConfig({
     Slides,
     Products, // Productos del catálogo
     Collections, // Colecciones de productos
+    Ordenes, // Órdenes de clientes
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'TEMP_SECRET_PLEASE_CONFIGURE_ENV_VARIABLES_12345678901234567890',

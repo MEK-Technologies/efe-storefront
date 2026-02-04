@@ -38,9 +38,10 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
         {/* Mobile menu button */}
         <div className="lg:hidden">
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left font-medium text-gray-900 shadow-sm"
-            aria-expanded={isMobileMenuOpen ? "true" : "false"}
+            aria-expanded={isMobileMenuOpen ? ("true" as const) : ("false" as const)}
           >
             <span>Menu</span>
             <ChevronIcon

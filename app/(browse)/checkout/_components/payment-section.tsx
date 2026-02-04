@@ -29,9 +29,9 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
         if (!result.ok) {
           if (result.inventoryErrors && result.inventoryErrors.length > 0) {
             setInventoryErrors(result.inventoryErrors)
-            toast.error("Some items are out of stock")
+            toast.error("Algunos productos no están disponibles")
           } else {
-            toast.error(result.error || "Failed to complete order")
+            toast.error(result.error || "Error al completar la orden")
           }
         }
         // If successful, the server action will redirect
@@ -41,52 +41,45 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
           // This is expected - the redirect throws but it's actually success
           return
         }
-        toast.error("An unexpected error occurred")
+        toast.error("Ocurrió un error inesperado")
       }
     })
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-        <p className="text-sm text-yellow-800">
-          <strong>Demo Mode:</strong> This is a simplified payment section. In production, you would integrate
-          Stripe Elements or another payment provider here.
-        </p>
-      </div>
-
       {inventoryErrors && inventoryErrors.length > 0 && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <h3 className="mb-2 font-semibold text-red-800">Inventory Issues</h3>
+          <h3 className="mb-2 font-semibold text-red-800">Problemas de Inventario</h3>
           <ul className="space-y-1 text-sm text-red-700">
             {inventoryErrors.map((error) => (
               <li key={error.item_id}>
                 <strong>{error.title}:</strong> {error.message}
                 {error.available_quantity > 0 && (
                   <span className="ml-1">
-                    (requested: {error.requested_quantity}, available: {error.available_quantity})
+                    (solicitado: {error.requested_quantity}, disponible: {error.available_quantity})
                   </span>
                 )}
               </li>
             ))}
           </ul>
           <p className="mt-2 text-sm text-red-600">
-            Please return to your cart and adjust quantities before proceeding.
+            Por favor, regresa al carrito y ajusta las cantidades antes de continuar.
           </p>
         </div>
       )}
 
       <div className="space-y-4">
-        <div className="rounded-lg border p-4">
-          <h3 className="mb-2 font-semibold">Payment Method</h3>
-          <p className="text-sm text-gray-600">
-            Credit Card payment (Stripe integration required)
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+          <h3 className="mb-2 font-semibold text-green-800">Resumen de Pago</h3>
+          <p className="text-sm text-green-700">
+            Al completar la orden, recibirás instrucciones para realizar el pago.
           </p>
         </div>
 
         <div className="flex gap-4">
           <Button type="button" variant="outline" onClick={onBack} disabled={isPending}>
-            Back
+            Atrás
           </Button>
           <Button
             type="button"
@@ -94,7 +87,7 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
             disabled={isPending}
             className="flex-1"
           >
-            {isPending ? "Processing..." : "Complete Order"}
+            {isPending ? "Procesando..." : "Completar Orden"}
           </Button>
         </div>
       </div>

@@ -4,17 +4,19 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useModalStore } from "stores/modal-store"
-import { login as loginAction, retrieveCustomer, signout, signup as signupAction } from "lib/medusa/data/customer"
-import type { HttpTypes } from "@medusajs/types"
+import { login as loginAction, retrieveCustomerWithGroups, signout, signup as signupAction } from "lib/medusa/data/customer"
+import type { CustomerGroup, CustomerWithGroups } from "types/medusa-extensions"
 
 interface AuthContextType {
-  customer: HttpTypes.StoreCustomer | null
+  customer: CustomerWithGroups | null
   isLoading: boolean
   isAuthenticated: boolean
+  customerGroups: CustomerGroup[]
+  hasCustomerGroups: boolean
   login: (email: string, password: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
   logout: () => Promise<void>
-  refreshCustomer: () => Promise<HttpTypes.StoreCustomer | null>
+  refreshCustomer: () => Promise<CustomerWithGroups | null>
 }
 
 interface RegisterData {
@@ -30,7 +32,7 @@ const AuthContext = createContext<AuthContextType | null>(null)
 const SESSION_REFRESH_INTERVAL = 5 * 60 * 1000 // 5 minutes
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [customer, setCustomer] = useState<HttpTypes.StoreCustomer | null>(null)
+  const [customer, setCustomer] = useState<CustomerWithGroups | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const openModal = useModalStore((s) => s.openModal)
@@ -39,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshCustomer = useCallback(async () => {
     try {
-      const customerData = await retrieveCustomer()
+      const customerData = await retrieveCustomerWithGroups()
       setCustomer(customerData)
       return customerData
     } catch (error) {
@@ -169,12 +171,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const customerGroups = customer?.groups || []
+  const hasCustomerGroups = customerGroups.length > 0
+
   return (
     <AuthContext.Provider
       value={{
         customer,
         isLoading,
         isAuthenticated: !!customer,
+        customerGroups,
+        hasCustomerGroups,
         login,
         register,
         logout,

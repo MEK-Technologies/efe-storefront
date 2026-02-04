@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import { notFound } from "next/navigation"
 
 import { slugToName } from "utils/slug-name"
-import { CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import {
   getCombinationByMultiOption,
@@ -16,7 +15,6 @@ import {
   removeMultiOptionFromSlug,
   removeVisualOptionFromSlug,
 } from "utils/visual-variant-utils"
-import { getVariantPrice } from "utils/medusa-product-helpers"
 
 import { Breadcrumbs } from "components/breadcrumbs"
 
@@ -38,8 +36,8 @@ import type { CommerceProduct } from "types"
 import { generateJsonLd } from "./metadata"
 import { getAllProductHandles, getProductByHandle } from "lib/medusa/data/product-queries"
 
-export const revalidate = 86400
-export const dynamic = "force-static"
+export const revalidate = 0 // Disable cache in development
+export const dynamic = "force-dynamic"
 export const dynamicParams = true
 
 interface ProductProps {
@@ -87,11 +85,6 @@ export default async function Product(props: ProductProps) {
 
   const hasOnlyOneVariant = variants.length <= 1
   
-  // Get price from variant using Medusa's calculated_price
-  const priceData = getVariantPrice(combination)
-  const combinationPrice = priceData?.amount ?? null
-  const currencyCode = priceData?.currencyCode ?? "USD"
-
   let visualValue: string | null = null
   if (Object.keys(multiOptions).length > 0) {
     if (multiOptions.color) {
@@ -127,16 +120,14 @@ export default async function Product(props: ProductProps) {
           <ProductTitle
             className="md:hidden"
             title={product.title ?? ""}
-            price={combinationPrice}
-            currency={mapCurrencyToSign(currencyCode as CurrencyType)}
+            variant={combination}
           />
           <ProductImages key={slug} images={imagesToShow as any} initialActiveIndex={activeIndex} />
           <RightSection className="md:col-span-6 md:col-start-8 md:mt-0">
             <ProductTitle
               className="hidden md:col-span-4 md:col-start-9 md:block"
               title={product.title ?? ""}
-              price={combinationPrice}
-              currency={mapCurrencyToSign(currencyCode as CurrencyType)}
+              variant={combination}
             />
             {!hasOnlyOneVariant && (
               <VariantDropdowns

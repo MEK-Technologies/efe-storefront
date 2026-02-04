@@ -7,7 +7,7 @@
 
 import { sdk } from "../config"
 import { HttpTypes } from "@medusajs/types"
-import { getCacheOptions } from "./cookies"
+import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { DEFAULT_COUNTRY_CODE } from "constants/index"
 import { getRegion } from "./regions"
 
@@ -15,6 +15,8 @@ import { getRegion } from "./regions"
  * Get a single product by its handle
  */
 export async function getProductByHandle(handle: string): Promise<HttpTypes.StoreProduct | null> {
+  console.log('[getProductByHandle] Fetching product with handle:', handle)
+  
   const next = {
     ...(await getCacheOptions("products")),
   }
@@ -26,23 +28,32 @@ export async function getProductByHandle(handle: string): Promise<HttpTypes.Stor
     return null
   }
 
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
   try {
-    const response = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
-      `/store/products`,
+    const response = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>
+      (`/store/products`,
       {
         method: "GET",
         query: {
           handle,
           region_id: region.id,
-          fields: "*variants,*variants.calculated_price,+variants.inventory_quantity,*variants.images,*images,*collection,+metadata,+tags",
-          limit: 1,
+          fields: "*variants,*variants.calculated_price,*variants.original_price,+variants.inventory_quantity,*variants.images,*images,*collection,+metadata,+tags",
+          limit: 100, // Increase limit to find the correct product
         },
+        headers,
         next,
-        cache: "force-cache",
+        cache: "no-cache",
       }
     )
 
-    return response.products[0] || null
+    // WORKAROUND: Backend is not filtering by handle correctly, so we filter here
+    const product = response.products.find(p => p.handle === handle) || null
+    console.log('[getProductByHandle] Received product:', product?.handle, product?.title)
+    
+    return product
   } catch (error) {
     console.error(`Error fetching product by handle: ${handle}`, error)
     return null

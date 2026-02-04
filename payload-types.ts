@@ -74,6 +74,7 @@ export interface Config {
     slides: Slide;
     products: Product;
     collections: Collection;
+    ordenes: Orden;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     slides: SlidesSelect<false> | SlidesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     collections: CollectionsSelect<false> | CollectionsSelect<true>;
+    ordenes: OrdenesSelect<false> | OrdenesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -570,6 +572,58 @@ export interface Collection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ordenes".
+ */
+export interface Orden {
+  id: number;
+  numero_orden: number;
+  email: string;
+  estado: 'pendiente' | 'procesando' | 'completado' | 'cancelado';
+  cart_id: string;
+  nombre_cliente?: string | null;
+  telefono?: string | null;
+  direccion_envio: {
+    first_name: string;
+    last_name: string;
+    address_1: string;
+    address_2?: string | null;
+    city: string;
+    province?: string | null;
+    postal_code?: string | null;
+    country_code: string;
+    phone?: string | null;
+    company?: string | null;
+  };
+  items: {
+    item_id: string;
+    title: string;
+    quantity: number;
+    unit_price: number;
+    variant_id?: string | null;
+    variant_title?: string | null;
+    product_id?: string | null;
+    product_handle?: string | null;
+    thumbnail?: string | null;
+    metadata?: Record<string, unknown> | null;
+    id?: string | null;
+  }[];
+  subtotal: number;
+  shipping_total?: number | null;
+  tax_total?: number | null;
+  discount_total?: number | null;
+  total: number;
+  moneda: string;
+  shipping_method?: {
+    name?: string | null;
+    price?: number | null;
+  };
+  notas?: string | null;
+  metadata?: Record<string, unknown> | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -899,6 +953,63 @@ export interface CollectionsSelect<T extends boolean = true> {
   img_url?: T;
   metadata?: T;
   products?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ordenes_select".
+ */
+export interface OrdenesSelect<T extends boolean = true> {
+  numero_orden?: T;
+  email?: T;
+  estado?: T;
+  cart_id?: T;
+  nombre_cliente?: T;
+  telefono?: T;
+  direccion_envio?:
+    | T
+    | {
+        first_name?: T;
+        last_name?: T;
+        address_1?: T;
+        address_2?: T;
+        city?: T;
+        province?: T;
+        postal_code?: T;
+        country_code?: T;
+        phone?: T;
+        company?: T;
+      };
+  items?:
+    | T
+    | {
+        item_id?: T;
+        title?: T;
+        quantity?: T;
+        unit_price?: T;
+        variant_id?: T;
+        variant_title?: T;
+        product_id?: T;
+        product_handle?: T;
+        thumbnail?: T;
+        metadata?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  shipping_total?: T;
+  tax_total?: T;
+  discount_total?: T;
+  total?: T;
+  moneda?: T;
+  shipping_method?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+      };
+  notas?: T;
+  metadata?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -4,7 +4,9 @@ import { cn } from "utils/cn"
 import { type CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import { createMultiOptionSlug } from "utils/visual-variant-utils"
 import { HttpTypes } from "@medusajs/types"
-import { getFeaturedImage, getMinPrice, getVariantPrice } from "utils/medusa-product-helpers"
+import { getFeaturedImage, getVariantPrice } from "utils/medusa-product-helpers"
+import { ProductPrice } from "./product/product-price"
+import type { VariantWithPricing } from "types/medusa-extensions"
 
 interface CompactProductCardProps {
   product: HttpTypes.StoreProduct
@@ -13,6 +15,7 @@ interface CompactProductCardProps {
   selectedVariant?: HttpTypes.StoreProductVariant
   variantOptions?: Record<string, string>
   loading?: "eager" | "lazy"
+  hasCustomerGroupPricing?: boolean
 }
 
 export const CompactProductCard = ({
@@ -22,14 +25,13 @@ export const CompactProductCard = ({
   selectedVariant,
   variantOptions,
   loading: _loading = "lazy",
+  hasCustomerGroupPricing = false,
 }: CompactProductCardProps) => {
   const { handle, title, variants } = product
   const featuredImage = getFeaturedImage(product)
   
-  // Get price from selected variant or compute min price
-  const selectedPrice = getVariantPrice(selectedVariant)
-  const minPriceData = getMinPrice(variants)
-  const priceData = selectedPrice || minPriceData
+  // Use selected variant or first variant for pricing
+  const displayVariant = (selectedVariant || variants?.[0]) as VariantWithPricing | undefined
 
   let href = `/product/${handle}`
   if (variantOptions && Object.keys(variantOptions).length > 0) {
@@ -60,13 +62,14 @@ export const CompactProductCard = ({
       <div className="flex flex-1 flex-col p-4">
         <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-foreground">{title}</h3>
 
-        {priceData && (
-          <div className="mt-auto flex items-baseline justify-between">
-            <span className="text-xs text-muted-foreground">From</span>
-            <span className="text-base font-bold text-primary">
-              {mapCurrencyToSign((priceData.currencyCode as CurrencyType) || "USD")}
-              {priceData.amount.toFixed(2)}
-            </span>
+        {displayVariant && (
+          <div className="mt-auto">
+            <span className="mb-1 block text-xs text-muted-foreground">From</span>
+            <ProductPrice
+              variant={displayVariant}
+              showBadge={true}
+              displayVariant="compact"
+            />
           </div>
         )}
       </div>

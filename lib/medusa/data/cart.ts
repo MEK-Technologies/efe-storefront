@@ -386,9 +386,10 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 }
 
 /**
- * Places an order for a cart. If no cart ID is provided, it will use the cart ID from the cookies.
+ * Places an order for a cart using the custom ordenes system.
+ * If no cart ID is provided, it will use the cart ID from the cookies.
  * @param cartId - optional - The ID of the cart to place an order for.
- * @returns The cart object if the order was successful, or null if not.
+ * @returns The orden object if successful.
  */
 export async function placeOrder(cartId?: string) {
   const id = cartId || (await getCartId())
@@ -397,37 +398,31 @@ export async function placeOrder(cartId?: string) {
     throw new Error("No existing cart found when placing an order")
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
   try {
-    console.log("[placeOrder] Completing cart without payment:", id)
+    console.log("[placeOrder] Completing cart with custom ordenes system:", id)
     
-    const cartRes = await sdk.store.cart
-      .complete(id, {}, headers)
-      .then(async (cartRes) => {
-        const cartCacheTag = await getCacheTag("carts")
-        revalidateTag(cartCacheTag)
-        return cartRes
-      })
+    // Use the custom ordenes endpoint
+    const { completeOrden } = await import("./ordenes")
+    const response = await completeOrden(id)
 
-    if (cartRes?.type === "order") {
-      const countryCode =
-        cartRes.order.shipping_address?.country_code?.toLowerCase()
-
-      const orderCacheTag = await getCacheTag("orders")
-      revalidateTag(orderCacheTag)
+    if (response.type === "orden") {
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
 
       removeCartId()
-      redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+      // Redirect sin country code - la ruta es /orden-confirmada/[id]
+      redirect(`/orden-confirmada/${response.orden.id}`)
     }
 
-    return cartRes.cart
+    throw new Error("Unexpected response from order completion")
   } catch (error: any) {
+    // Check if this is a Next.js redirect (which is expected on success)
+    if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error
+    }
+    
     console.error("[placeOrder] Cart completion failed:", error.message)
     
-    // Re-throw with simpler message - payment provider must be configured in backend
     throw new Error(
       error.message || "Failed to complete order. Contact administrator."
     )

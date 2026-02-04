@@ -43,30 +43,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className="@container">
         <NuqsAdapter>
-          <AuthWrapper>
-            <Script id="mobileMegaMenuLogic" strategy="lazyOnload">{`${mobileInlineScript}`}</Script>
+          <Suspense>
+            <AuthWrapper>
+              <Script id="mobileMegaMenuLogic" strategy="lazyOnload">{`${mobileInlineScript}`}</Script>
 
-            <NavigationBarWrapper fallbackData={navigationData} />
-            {children}
+              <NavigationBarWrapper fallbackData={navigationData} />
+              {children}
 
-            <Footer />
-            <Modals />
+              <Footer />
+              <Modals />
 
-            <CartView />
+              <CartView />
 
-            <Toaster position="bottom-left" />
+              <Toaster position="bottom-left" />
 
-            <DraftToolbar />
+              <DraftToolbar />
 
-            <Suspense>
-              <FlagValues />
-            </Suspense>
+              <Suspense>
+                <FlagValues />
+              </Suspense>
 
-            <ThirdParties />
+              <ThirdParties />
 
-            <GithubBadge />
-            <DemoModeAlert />
-          </AuthWrapper>
+              <GithubBadge />
+              <DemoModeAlert />
+            </AuthWrapper>
+          </Suspense>
         </NuqsAdapter>
       </body>
     </html>

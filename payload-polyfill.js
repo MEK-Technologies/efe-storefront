@@ -123,6 +123,5 @@
   }
 })()
 
-// CRITICAL: Export nothing to ensure this is a side-effect only module
-// This ensures the IIFE runs even if the import is tree-shaken
+// Export to make this a valid ES module for TypeScript
 export {}

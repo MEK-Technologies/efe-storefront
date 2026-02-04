@@ -76,7 +76,7 @@ export async function completePayment(): Promise<{
       id: cart.id,
       email: cart.email,
       hasShippingAddress: !!cart.shipping_address,
-      hasShippingMethod: cart.shipping_methods?.length > 0,
+      hasShippingMethod: (cart.shipping_methods?.length ?? 0) > 0,
       itemCount: cart.items?.length,
       total: cart.total,
     })

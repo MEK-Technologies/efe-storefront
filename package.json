@@ -22,8 +22,8 @@
     "e2e:ui": "playwright test --ui",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "postinstall": "npx patch-package -y",
-    "payload": "payload",
-    "generate:types": "payload generate:types",
+    "payload": "cross-env NODE_OPTIONS='--import tsx' payload",
+    "generate:types": "cross-env NODE_OPTIONS='--import tsx' payload generate:types",
     "codegen": "graphql-codegen && graphql-codegen -p admin && yarn build:scripts && node scripts/dist/codegen/remove-eslint-rules.mjs",
     "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg",
     "sync": "yarn build:scripts && node scripts/dist/sync/sync.mjs",
@@ -147,6 +147,7 @@
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "@vercel/style-guide": "^5.0.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "eslint": "8.57.0",
     "eslint-config-next": "15.0.3",
@@ -168,6 +169,7 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
+    "tsx": "^4.21.0",
     "typescript": "5.4.3",
     "zod": "^3.22.4"
   }
