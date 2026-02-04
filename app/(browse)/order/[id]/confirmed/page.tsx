@@ -38,12 +38,12 @@ export default async function OrderConfirmationPage({
               </svg>
             </div>
           </div>
-          <h1 className="mb-2 text-3xl font-bold">Order Confirmed!</h1>
+          <h1 className="mb-2 text-3xl font-bold">¡Pedido Confirmado!</h1>
           <p className="text-gray-600">
-            Thank you for your order. We&apos;ll send a confirmation email shortly.
+            Gracias por tu pedido. Enviaremos un correo de confirmación en breve.
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            Order Number: <span className="font-semibold">#{order.display_id}</span>
+            Número de Pedido: <span className="font-semibold">#{order.display_id}</span>
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export default async function OrderConfirmationPage({
         <div className="space-y-6">
           {/* Items */}
           <div className="rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold">Order Items</h2>
+            <h2 className="mb-4 text-xl font-semibold">Artículos del Pedido</h2>
             <div className="space-y-4">
               {order.items?.map((item) => (
                 <div key={item.id} className="flex gap-4">
@@ -69,7 +69,7 @@ export default async function OrderConfirmationPage({
                         <p className="text-sm text-gray-600">{item.variant.title}</p>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                    <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
@@ -87,11 +87,11 @@ export default async function OrderConfirmationPage({
                 <span>{formatPrice(order.subtotal || 0, order.currency_code)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Shipping</span>
+                <span>Envío</span>
                 <span>{formatPrice(order.shipping_total || 0, order.currency_code)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Tax</span>
+                <span>Impuesto</span>
                 <span>{formatPrice(order.tax_total || 0, order.currency_code)}</span>
               </div>
               <div className="flex justify-between border-t pt-2 text-lg font-bold">
@@ -105,7 +105,7 @@ export default async function OrderConfirmationPage({
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Shipping Address */}
             <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <h3 className="mb-3 font-semibold">Shipping Address</h3>
+              <h3 className="mb-3 font-semibold">Dirección de Envío</h3>
               {order.shipping_address ? (
                 <div className="text-sm text-gray-600">
                   <p className="font-medium text-gray-900">
@@ -122,16 +122,16 @@ export default async function OrderConfirmationPage({
                   {order.shipping_address.phone && <p className="mt-2">{order.shipping_address.phone}</p>}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No shipping address provided</p>
+                <p className="text-sm text-gray-500">No se proporcionó dirección de envío</p>
               )}
             </div>
 
             {/* Payment & Status */}
             <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <h3 className="mb-3 font-semibold">Order Status</h3>
+              <h3 className="mb-3 font-semibold">Estado del Pedido</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Payment Status:</span>
+                  <span className="text-gray-600">Estado del Pago:</span>
                   <span
                     className={`font-medium ${
                       order.payment_status === "captured"
@@ -141,11 +141,11 @@ export default async function OrderConfirmationPage({
                         : "text-gray-600"
                     }`}
                   >
-                    {order.payment_status === "captured" ? "✓ Paid" : "Pending"}
+                    {order.payment_status === "captured" ? "✓ Pagado" : "Pendiente"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Fulfillment Status:</span>
+                  <span className="text-gray-600">Estado del Envío:</span>
                   <span
                     className={`font-medium ${
                       order.fulfillment_status === "fulfilled"
@@ -156,15 +156,15 @@ export default async function OrderConfirmationPage({
                     }`}
                   >
                     {order.fulfillment_status === "fulfilled"
-                      ? "✓ Delivered"
+                      ? "✓ Entregado"
                       : order.fulfillment_status === "shipped"
-                      ? "Shipped"
-                      : "Processing"}
+                      ? "Enviado"
+                      : "Procesando"}
                   </span>
                 </div>
                 {order.email && (
                   <div className="mt-3 border-t pt-2">
-                    <p className="text-gray-600">Confirmation email sent to:</p>
+                    <p className="text-gray-600">Correo de confirmación enviado a:</p>
                     <p className="font-medium text-gray-900">{order.email}</p>
                   </div>
                 )}
@@ -175,10 +175,10 @@ export default async function OrderConfirmationPage({
           {/* Actions */}
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button asChild variant="outline" className="flex-1">
-              <Link href="/">Continue Shopping</Link>
+              <Link href="/">Continuar Comprando</Link>
             </Button>
             <Button asChild className="flex-1">
-              <Link href="/account/orders">View All Orders</Link>
+              <Link href="/account/orders">Ver Todos los Pedidos</Link>
             </Button>
           </div>
         </div>

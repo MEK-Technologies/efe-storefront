@@ -55,7 +55,7 @@ export function CartItem({ item, onProductClick, className, currencyCode = "USD"
       <div className="flex h-[115px] w-[90px] shrink-0 items-center bg-neutral-100">
         <Image
           src={displayImage || "/default-product-image.svg"}
-          alt={product?.title || title || "Product image"}
+          alt={product?.title || title || "Imagen del producto"}
           width={115}
           height={90}
           sizes="100px"

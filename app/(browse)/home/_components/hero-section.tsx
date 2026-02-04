@@ -36,7 +36,7 @@ function getCategoryCta(slide: CmsSlide): { href: string; text: string } {
     if (handle) {
       return {
         href: `/category/clp/${handle}`,
-        text: name || "Ver categoría",
+        text: name || "Ver Categoría",
       }
     }
 

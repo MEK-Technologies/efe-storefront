@@ -32,7 +32,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       if (result.ok) {
         setCurrentStep("shipping")
       } else {
-        toast.error(result.error || "Failed to update email")
+        toast.error(result.error || "Error al actualizar el correo electrónico")
       }
     })
   }
@@ -45,7 +45,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       const shippingResult = await updateShippingAddress(null, formData)
 
       if (!shippingResult.ok) {
-        toast.error(shippingResult.error || "Failed to update shipping address")
+        toast.error(shippingResult.error || "Error al actualizar la dirección de envío")
         return
       }
 
@@ -53,7 +53,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       if (!sameAsShipping) {
         const billingResult = await updateBillingAddress(null, formData)
         if (!billingResult.ok) {
-          toast.error(billingResult.error || "Failed to update billing address")
+          toast.error(billingResult.error || "Error al actualizar la dirección de facturación")
           return
         }
       }
@@ -79,7 +79,9 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
             >
               {index + 1}
             </div>
-            <span className="ml-2 capitalize">{step}</span>
+            <span className="ml-2 capitalize">
+              {step === "contact" ? "contacto" : step === "shipping" ? "envío" : "pago"}
+            </span>
             {index < 2 && <div className="mx-4 h-0.5 w-12 bg-gray-300" />}
           </div>
         ))}
@@ -88,10 +90,10 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       {/* Contact Information */}
       {currentStep === "contact" && (
         <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-semibold">Contact Information</h2>
+          <h2 className="mb-4 text-xl font-semibold">Información de Contacto</h2>
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo Electrónico</Label>
               <Input
                 id="email"
                 name="email"
@@ -103,7 +105,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               />
             </div>
             <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Saving..." : "Continue to Shipping"}
+              {isPending ? "Guardando..." : "Continuar a Envío"}
             </Button>
           </form>
         </div>
@@ -113,11 +115,11 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       {currentStep === "shipping" && (
         <div className="space-y-6">
           <div className="rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold">Shipping Address</h2>
+            <h2 className="mb-4 text-xl font-semibold">Dirección de Envío</h2>
             <form onSubmit={handleShippingSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="first_name">First Name</Label>
+                  <Label htmlFor="first_name">Nombre</Label>
                   <Input
                     id="first_name"
                     name="first_name"
@@ -127,7 +129,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="last_name">Last Name</Label>
+                  <Label htmlFor="last_name">Apellido</Label>
                   <Input
                     id="last_name"
                     name="last_name"
@@ -139,7 +141,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="address_1">Address</Label>
+                <Label htmlFor="address_1">Dirección</Label>
                 <Input
                   id="address_1"
                   name="address_1"
@@ -150,7 +152,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="address_2">Apartment, suite, etc. (optional)</Label>
+                <Label htmlFor="address_2">Apartamento, suite, etc. (opcional)</Label>
                 <Input
                   id="address_2"
                   name="address_2"
@@ -161,7 +163,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">Ciudad</Label>
                   <Input
                     id="city"
                     name="city"
@@ -171,7 +173,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="province">Province/State</Label>
+                  <Label htmlFor="province">Provincia/Estado</Label>
                   <Input
                     id="province"
                     name="province"
@@ -180,7 +182,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="postal_code">Postal Code</Label>
+                  <Label htmlFor="postal_code">Código Postal</Label>
                   <Input
                     id="postal_code"
                     name="postal_code"
@@ -192,7 +194,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="country_code">Country</Label>
+                <Label htmlFor="country_code">País</Label>
                 <Input
                   id="country_code"
                   name="country_code"
@@ -203,7 +205,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">Teléfono</Label>
                 <Input
                   id="phone"
                   name="phone"
@@ -220,16 +222,16 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   onCheckedChange={(checked) => setSameAsShipping(checked === true)}
                 />
                 <Label htmlFor="same-as-shipping" className="cursor-pointer">
-                  Billing address same as shipping
+                  Dirección de facturación igual a la de envío
                 </Label>
               </div>
 
               {!sameAsShipping && (
                 <div className="space-y-4 border-t pt-4">
-                  <h3 className="font-semibold">Billing Address</h3>
+                  <h3 className="font-semibold">Dirección de Facturación</h3>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="billing_first_name">First Name</Label>
+                      <Label htmlFor="billing_first_name">Nombre</Label>
                       <Input
                         id="billing_first_name"
                         name="billing_first_name"
@@ -238,7 +240,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="billing_last_name">Last Name</Label>
+                      <Label htmlFor="billing_last_name">Apellido</Label>
                       <Input
                         id="billing_last_name"
                         name="billing_last_name"
@@ -248,7 +250,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="billing_address_1">Address</Label>
+                    <Label htmlFor="billing_address_1">Dirección</Label>
                     <Input
                       id="billing_address_1"
                       name="billing_address_1"
@@ -258,7 +260,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-3">
                     <div>
-                      <Label htmlFor="billing_city">City</Label>
+                      <Label htmlFor="billing_city">Ciudad</Label>
                       <Input
                         id="billing_city"
                         name="billing_city"
@@ -267,7 +269,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="billing_postal_code">Postal Code</Label>
+                      <Label htmlFor="billing_postal_code">Código Postal</Label>
                       <Input
                         id="billing_postal_code"
                         name="billing_postal_code"
@@ -276,7 +278,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="billing_country_code">Country</Label>
+                      <Label htmlFor="billing_country_code">País</Label>
                       <Input
                         id="billing_country_code"
                         name="billing_country_code"
@@ -296,10 +298,10 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   onClick={() => setCurrentStep("contact")}
                   disabled={isPending}
                 >
-                  Back
+                  Atrás
                 </Button>
                 <Button type="submit" disabled={isPending} className="flex-1">
-                  {isPending ? "Saving..." : "Continue to Payment"}
+                  {isPending ? "Guardando..." : "Continuar a Pago"}
                 </Button>
               </div>
             </form>
@@ -312,7 +314,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       {/* Payment */}
       {currentStep === "payment" && (
         <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-semibold">Payment</h2>
+          <h2 className="mb-4 text-xl font-semibold">Pago</h2>
           <PaymentSection onBack={() => setCurrentStep("shipping")} />
         </div>
       )}

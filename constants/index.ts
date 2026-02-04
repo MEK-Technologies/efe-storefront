@@ -6,6 +6,11 @@ export const COOKIE_CACHE_ID = "_medusa_cache_id"
 export const COOKIE_FAVORITES = "ecom_favorites"
 
 /**
+ * Key for age verification in localStorage
+ */
+export const AGE_VERIFICATION_KEY = "age_verified"
+
+/**
  * Default country code for the store
  * This should match your Medusa backend region configuration
  */

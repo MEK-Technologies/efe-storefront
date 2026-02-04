@@ -44,8 +44,8 @@ function transformCategoriesToNavItems(
  */
 export async function getNavigationData(): Promise<NavigationData> {
   try {
-    // Fetch root categories from Medusa
-    const categories = await listRootCategories(6)
+    // Fetch root categories from Medusa - increased limit to show all categories
+    const categories = await listRootCategories(100)
     const items = transformCategoriesToNavItems(categories)
     
     return { items }

@@ -20,7 +20,7 @@ export function ShippingOptions() {
       if (result.ok && result.options) {
         setOptions(result.options)
       } else {
-        toast.error(result.error || "Failed to load shipping options")
+        toast.error(result.error || "Error al cargar opciones de envío")
       }
 
       setIsLoading(false)
@@ -36,10 +36,10 @@ export function ShippingOptions() {
       const result = await selectShippingMethod(null, optionId)
 
       if (!result.ok) {
-        toast.error(result.error || "Failed to select shipping method")
+        toast.error(result.error || "Error al seleccionar método de envío")
         setSelectedOption("")
       } else {
-        toast.success("Shipping method updated")
+        toast.success("Método de envío actualizado")
       }
     })
   }
@@ -47,8 +47,8 @@ export function ShippingOptions() {
   if (isLoading) {
     return (
       <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-semibold">Shipping Method</h3>
-        <p className="text-sm text-gray-600">Loading shipping options...</p>
+        <h3 className="mb-4 font-semibold">Método de Envío</h3>
+        <p className="text-sm text-gray-600">Cargando opciones de envío...</p>
       </div>
     )
   }
@@ -56,9 +56,9 @@ export function ShippingOptions() {
   if (options.length === 0) {
     return (
       <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-semibold">Shipping Method</h3>
+        <h3 className="mb-4 font-semibold">Método de Envío</h3>
         <p className="text-sm text-gray-600">
-          No shipping options available. Please check your address.
+          No hay opciones de envío disponibles. Por favor, verifica tu dirección.
         </p>
       </div>
     )
@@ -66,7 +66,7 @@ export function ShippingOptions() {
 
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
-      <h3 className="mb-4 font-semibold">Shipping Method</h3>
+      <h3 className="mb-4 font-semibold">Método de Envío</h3>
       <RadioGroup value={selectedOption} onValueChange={handleSelectOption} disabled={isPending}>
         {options.map((option) => (
           <div key={option.id} className="flex items-center space-x-2">

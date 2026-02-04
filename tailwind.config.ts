@@ -66,6 +66,10 @@ const config: Omit<Config, "content"> = {
           "0%": { opacity: 0 },
           "100%": { opacity: 1 },
         },
+        "scroll-x": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         slideOutLeft: "slideOutLeft 0.3s ease-out forwards",
@@ -76,6 +80,7 @@ const config: Omit<Config, "content"> = {
         wiggle: "wiggle .2s ease-out",
         "typing-dot-bounce": "typing-dot-bounce 1.25s ease-out infinite",
         enter: "enter 0.2s calc(20ms * var(--stagger)) ease-out forwards",
+        "scroll-x": "scroll-x 30s linear infinite",
       },
       colors: {
         sidebar: {

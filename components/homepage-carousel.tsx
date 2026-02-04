@@ -83,7 +83,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
       className={cn("relative bg-secondary/5", className)}
       role="region"
       aria-roledescription="carousel"
-      aria-label="Featured products carousel"
+      aria-label="Carrusel de productos destacados"
     >
       <div
         ref={emblaRef}
@@ -96,7 +96,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
               className="relative min-w-full flex-[0_0_100%] @container md:snap-start md:snap-always"
               role="group"
               aria-roledescription="slide"
-              aria-label={`Slide ${index + 1} of ${slides.length}`}
+              aria-label={`Diapositiva ${index + 1} de ${slides.length}`}
             >
               <div className="container mx-auto">
                 <div className="relative min-h-[500px] px-4 py-12 sm:min-h-[550px] sm:py-16 lg:grid lg:min-h-0 lg:grid-cols-2 lg:items-center lg:gap-12 lg:py-16 xl:gap-16">
@@ -134,7 +134,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                         asChild
                         className="w-full sm:w-auto lg:px-8 lg:py-6 lg:text-lg"
                       >
-                        <Link href="/search">Browse All Categories</Link>
+                        <Link href="/search">Explorar Todas las Categorías</Link>
                       </Button>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                           : "w-2 bg-foreground/30 hover:bg-foreground/50"
                       )}
                       onClick={() => scrollTo(index)}
-                      aria-label={`Go to slide ${index + 1}`}
+                      aria-label={`Ir a la diapositiva ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -201,7 +201,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     )}
                     onClick={scrollPrev}
-                    aria-label="Previous slide"
+                    aria-label="Diapositiva anterior"
                   >
                     <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -214,7 +214,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     )}
                     onClick={scrollNext}
-                    aria-label="Next slide"
+                    aria-label="Diapositiva siguiente"
                   >
                     <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

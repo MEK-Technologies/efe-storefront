@@ -19,7 +19,7 @@ export default async function CheckoutPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
+        <h1 className="mb-8 text-3xl font-bold">Finalizar Compra</h1>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main checkout form */}
@@ -30,7 +30,7 @@ export default async function CheckoutPage() {
           {/* Order summary sidebar */}
           <div className="lg:col-span-1">
             <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
+              <h2 className="mb-4 text-xl font-semibold">Resumen del Pedido</h2>
 
               <div className="space-y-4">
                 {cart.items.map((item) => (
@@ -44,7 +44,7 @@ export default async function CheckoutPage() {
                     )}
                     <div className="flex-1">
                       <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
                     </div>
                     <p className="font-medium">
                       {new Intl.NumberFormat("en-US", {
@@ -67,18 +67,18 @@ export default async function CheckoutPage() {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Shipping</span>
+                  <span>Envío</span>
                   <span>
                     {cart.shipping_total
                       ? new Intl.NumberFormat("en-US", {
                           style: "currency",
                           currency: cart.currency_code,
                         }).format(cart.shipping_total / 100)
-                      : "Calculated at next step"}
+                      : "Se calculará en el siguiente paso"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax</span>
+                  <span>Impuesto</span>
                   <span>
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",

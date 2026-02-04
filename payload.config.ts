@@ -13,6 +13,7 @@ import { Users } from './src/collections/User.ts'
 import { Categories } from './src/collections/Categories.ts'
 import { Banners } from './src/collections/Banners.ts'
 import { Slides } from './src/collections/Slides.ts'
+import { BrandsCarousel } from './src/collections/BrandsCarousel.ts'
 import { Products } from './src/collections/Products.ts'
 import { Collections } from './src/collections/Collections.ts'
 import { Ordenes } from './src/collections/Ordenes.ts'
@@ -103,6 +104,7 @@ export default buildConfig({
     Categories, // Required for Slides relationship
     Banners,
     Slides,
+    BrandsCarousel, // Marcas para carousel
     Products, // Productos del catálogo
     Collections, // Colecciones de productos
     Ordenes, // Órdenes de clientes
