@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import { notFound } from "next/navigation"
 
 import { slugToName } from "utils/slug-name"
-import { CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import {
   getCombinationByMultiOption,
@@ -16,7 +15,6 @@ import {
   removeMultiOptionFromSlug,
   removeVisualOptionFromSlug,
 } from "utils/visual-variant-utils"
-import { getVariantPrice } from "utils/medusa-product-helpers"
 
 import { Breadcrumbs } from "components/breadcrumbs"
 
@@ -28,18 +26,18 @@ import { ProductTitle } from "components/product/product-title"
 import { ProductImages } from "components/product/product-images"
 import { RightSection } from "components/product/right-section"
 import { FaqAccordionItem, FaqSectionClient } from "components/product/faq-section/faq-section-client"
-import { ShopifyRichText } from "components/product/faq-section/shopify-rich-text"
+import { RichText } from "components/product/faq-section/rich-text"
 import { nameToSlug } from "utils/slug-name"
 import { AddToCartButton } from "components/product/add-to-cart-button"
-
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
 
 import type { CommerceProduct } from "types"
 
 import { generateJsonLd } from "./metadata"
-import { getProduct, getProducts } from "lib/algolia"
+import { getAllProductHandles, getProductByHandle } from "lib/medusa/data/product-queries"
 
-export const revalidate = 86400
-export const dynamic = "force-static"
+export const revalidate = 0 // Disable cache in development
+export const dynamic = "force-dynamic"
 export const dynamicParams = true
 
 interface ProductProps {
@@ -47,13 +45,8 @@ interface ProductProps {
 }
 
 export async function generateStaticParams() {
-
-  const { hits } = await getProducts({
-    hitsPerPage: 50,
-    attributesToRetrieve: ["handle"],
-  })
-
-  return hits.map(({ handle }) => ({ slug: handle }))
+  const handles = await getAllProductHandles(100)
+  return handles.map((handle) => ({ slug: handle }))
 }
 
 export default async function Product(props: ProductProps) {
@@ -65,7 +58,7 @@ export default async function Product(props: ProductProps) {
   const baseHandle =
     Object.keys(multiOptions).length > 0 ? removeMultiOptionFromSlug(slug) : removeVisualOptionFromSlug(slug)
 
-  const product = await getProduct(baseHandle || removeOptionsFromUrl(slug))
+  const product = await getProductByHandle(baseHandle || removeOptionsFromUrl(slug))
 
   if (!product) {
     return notFound()
@@ -92,11 +85,6 @@ export default async function Product(props: ProductProps) {
 
   const hasOnlyOneVariant = variants.length <= 1
   
-  // Get price from variant using Medusa's calculated_price
-  const priceData = getVariantPrice(combination)
-  const combinationPrice = priceData?.amount ?? null
-  const currencyCode = priceData?.currencyCode ?? "USD"
-
   let visualValue: string | null = null
   if (Object.keys(multiOptions).length > 0) {
     if (multiOptions.color) {
@@ -110,7 +98,11 @@ export default async function Product(props: ProductProps) {
     visualValue = getVisualOptionFromSlug(slug)
   }
 
-  const { images: imagesToShow, activeIndex } = getImagesForCarousel(images, visualValue)
+  // Prefer images attached to the selected variant when available
+  const selectedVariant = combination
+  const variantImages = (selectedVariant as any)?.images ?? []
+  const imagesSource = variantImages && variantImages.length > 0 ? variantImages : images
+  const { images: imagesToShow, activeIndex } = getImagesForCarousel(imagesSource, visualValue)
 
   return (
     <div className="relative mx-auto max-w-container-md px-4 xl:px-0">
@@ -128,16 +120,14 @@ export default async function Product(props: ProductProps) {
           <ProductTitle
             className="md:hidden"
             title={product.title ?? ""}
-            price={combinationPrice}
-            currency={mapCurrencyToSign(currencyCode as CurrencyType)}
+            variant={combination}
           />
-          <ProductImages key={slug} images={imagesToShow} initialActiveIndex={activeIndex} />
+          <ProductImages key={slug} images={imagesToShow as any} initialActiveIndex={activeIndex} />
           <RightSection className="md:col-span-6 md:col-start-8 md:mt-0">
             <ProductTitle
               className="hidden md:col-span-4 md:col-start-9 md:block"
               title={product.title ?? ""}
-              price={combinationPrice}
-              currency={mapCurrencyToSign(currencyCode as CurrencyType)}
+              variant={combination}
             />
             {!hasOnlyOneVariant && (
               <VariantDropdowns
@@ -148,11 +138,11 @@ export default async function Product(props: ProductProps) {
               />
             )}
             <p>{product.description}</p>
-            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode="us" />
-            <FavoriteMarker handle={slug} />
+            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode={DEFAULT_COUNTRY_CODE} />
+            <FavoriteMarker handle={slug} variantId={combination?.id} />
             <FaqSectionClient defaultOpenSections={[nameToSlug(getDefaultFaqAccordionItemValue()[0])]}>
               <FaqAccordionItem title={getDefaultFaqAccordionItemValue()[0]}>
-                <ShopifyRichText
+                <RichText
                   data={getProductDetailsContent(product)}
                   className="prose prose-sm max-w-none"
                 />
@@ -191,7 +181,7 @@ export default async function Product(props: ProductProps) {
         </div>
 
         <Suspense fallback={<SimilarProductsSectionSkeleton />}>
-          <SimilarProductsSection objectID={product.objectID} slug={slug} />
+          <SimilarProductsSection productId={product.id} collectionHandle={product.collection?.handle} slug={slug} />
         </Suspense>
       </main>
     </div>

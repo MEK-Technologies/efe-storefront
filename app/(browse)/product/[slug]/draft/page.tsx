@@ -5,7 +5,7 @@ import type { CommerceProduct } from "types"
 import { Breadcrumbs } from "components/breadcrumbs"
 
 // Use Medusa data fetching instead of Shopify
-import { getProduct } from "lib/algolia"
+import { getProductByHandle } from "lib/medusa/data/product-queries"
 
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import {
@@ -28,10 +28,11 @@ import { RightSection } from "components/product/right-section"
 import { AddToCartButton } from "components/product/add-to-cart-button"
 import { FavoriteMarker } from "components/product/favorite-marker"
 import { FaqAccordionItem, FaqSectionClient } from "components/product/faq-section/faq-section-client"
-import { ShopifyRichText } from "components/product/faq-section/shopify-rich-text"
+import { RichText } from "components/product/faq-section/rich-text"
 
 import { slugToName } from "utils/slug-name"
 import { getVariantPrice } from "utils/medusa-product-helpers"
+import { DEFAULT_COUNTRY_CODE } from "constants/index"
 
 export const dynamic = "force-static"
 
@@ -57,9 +58,9 @@ export default async function DraftProduct(props: ProductProps) {
 
   const productHandle = baseHandle || removeOptionsFromUrl(slug)
   
-  // Replace getAdminProduct (Shopify) with getProduct (Medusa via Algolia lib wrapper)
+  // Replace getAdminProduct (Shopify) with getProductByHandle (Medusa)
   // Note: For actual draft products we might need a different fetching strategy with Medusa
-  const product = await getProduct(productHandle)
+  const product = await getProductByHandle(productHandle)
 
   if (!product) {
     return notFound()
@@ -103,7 +104,11 @@ export default async function DraftProduct(props: ProductProps) {
     visualValue = getVisualOptionFromSlug(slug)
   }
 
-  const { images: imagesToShow, activeIndex } = getImagesForCarousel(images, visualValue)
+  // Prefer images attached to the selected variant when available
+  const selectedVariant = combination
+  const variantImages = (selectedVariant as any)?.images ?? []
+  const imagesSource = variantImages && variantImages.length > 0 ? variantImages : images
+  const { images: imagesToShow, activeIndex } = getImagesForCarousel(imagesSource, visualValue)
 
   // Use metadata lookups for product details or fallback
   const productDetails = (product.metadata?.product_details as string) || getDefaultFaqAccordionItemRichText()
@@ -124,7 +129,7 @@ export default async function DraftProduct(props: ProductProps) {
             price={combinationPrice}
             currency={mapCurrencyToSign(currencyCode as CurrencyType)}
           />
-          <ProductImages key={slug} images={imagesToShow} initialActiveIndex={activeIndex} />
+          <ProductImages key={slug} images={imagesToShow as any} initialActiveIndex={activeIndex} />
           <RightSection className="md:col-span-6 md:col-start-8 md:mt-0">
             <ProductTitle
               className="hidden md:col-span-4 md:col-start-9 md:block"
@@ -141,14 +146,14 @@ export default async function DraftProduct(props: ProductProps) {
               />
             )}
             <p>{product.description}</p>
-            <AddToCartButton className="mt-4" product={product} combination={combination} />
-            <FavoriteMarker handle={slug} />
+            <AddToCartButton className="mt-4" product={product} combination={combination} countryCode={DEFAULT_COUNTRY_CODE} />
+            <FavoriteMarker handle={slug} variantId={combination?.id} />
 
             <FaqSectionClient
               defaultOpenSections={[slugToName(faqTitles[0])]}
             >
               <FaqAccordionItem title={faqTitles[0]}>
-                <ShopifyRichText
+                <RichText
                   data={productDetails}
                   className="prose prose-sm max-w-none"
                 />

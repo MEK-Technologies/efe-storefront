@@ -1,3 +1,4 @@
+import { describe, expect, test } from "@jest/globals"
 import {
   createMultiOptionSlug,
   createVisualOptionSlug,
@@ -160,7 +161,6 @@ describe("Visual Variant Utils", () => {
 
     test("should get all option values from combination", () => {
       expect(
-         // @ts-ignore
         getAllOptionValuesFromCombination(createMockVariant("1", "Red Large", { Color: "Red", Size: "Large" }))
       ).toEqual({
         color: "red",
@@ -168,7 +168,6 @@ describe("Visual Variant Utils", () => {
       })
 
       expect(
-         // @ts-ignore
         getAllOptionValuesFromCombination(createMockVariant("2", "Purple Large", { Color: "Purple", Size: "Large" }))
       ).toEqual({
         color: "purple",

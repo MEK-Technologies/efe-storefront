@@ -44,10 +44,6 @@ export function getDemoSingleCategory(handle: string) {
 
 export function isDemoMode(): boolean {
   return (
-    isDemoValue(process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN) ||
-    isDemoValue(process.env.SHOPIFY_ADMIN_ACCESS_TOKEN) ||
-    isDemoValue(process.env.SHOPIFY_APP_API_SECRET_KEY) ||
-    isDemoValue(process.env.SHOPIFY_STORE_DOMAIN) ||
     isDemoValue(process.env.ALGOLIA_APP_ID) ||
     isDemoValue(process.env.ALGOLIA_WRITE_API_KEY) ||
     isDemoValue(process.env.ALGOLIA_PRODUCTS_INDEX) ||

@@ -4,57 +4,69 @@ import { getCategories, getProducts } from "lib/algolia"
 import { HITS_PER_PAGE } from "constants/index"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = env.LIVE_URL || "https://commerce.blazity.com"
+
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${env.LIVE_URL}/`,
+      url: `${baseUrl}/`,
       lastModified: new Date(new Date().setHours(0, 0, 0, 0)),
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${env.LIVE_URL}/`,
+      url: `${baseUrl}/`,
       lastModified: new Date(new Date().setHours(0, 0, 0, 0)),
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${env.LIVE_URL}/terms-conditions`,
+      url: `${baseUrl}/terms-conditions`,
       lastModified: new Date(),
       priority: 0.1,
     },
     {
-      url: `${env.LIVE_URL}/privacy-policy`,
+      url: `${baseUrl}/privacy-policy`,
       lastModified: new Date(),
       priority: 0.1,
     },
   ]
 
-  const allHits = (
-    await getProducts({
-      hitsPerPage: 50,
-      attributesToRetrieve: ["handle", "updated_at"],
-    })
-  ).hits
+  // Algolia may be disabled or unreachable during builds; fall back to static routes.
+  let allHits: Array<{ handle?: string; updated_at?: string }> = []
+  let allCollections: Array<{ handle?: string; updated_at?: string }> = []
 
-  const allCollections = (
-    await getCategories({
-      hitsPerPage: 50,
-      attributesToRetrieve: ["handle", "updated_at"],
-    })
-  ).hits
+  try {
+    allHits = (
+      await getProducts({
+        hitsPerPage: 50,
+        attributesToRetrieve: ["handle", "updated_at"],
+      })
+    ).hits as any
 
-  const paginationRoutes = Array.from({ length: allHits.length / HITS_PER_PAGE }, (_, i) => {
+    allCollections = (
+      await getCategories({
+        hitsPerPage: 50,
+        attributesToRetrieve: ["handle", "updated_at"],
+      })
+    ).hits as any
+  } catch {
+    return staticRoutes
+  }
+
+  const paginationRoutes = Array.from({ length: Math.ceil(allHits.length / HITS_PER_PAGE) }, (_, i) => {
     const item: MetadataRoute.Sitemap[0] = {
-      url: `${env.LIVE_URL}/search?page=${i + 1}`,
+      url: `${baseUrl}/search?page=${i + 1}`,
       priority: 0.5,
       changeFrequency: "monthly",
     }
     return item
   })
 
-  const productRoutes = allHits.map((hit) => {
+  const productRoutes = allHits
+    .filter((hit): hit is { handle: string; updated_at?: string } => Boolean(hit?.handle))
+    .map((hit) => {
     const item: MetadataRoute.Sitemap[0] = {
-      url: `${env.LIVE_URL}/product/${hit.handle}`,
+      url: `${baseUrl}/product/${hit.handle}`,
       lastModified: hit.updated_at ?? new Date(),
       priority: 0.5,
       changeFrequency: "monthly",
@@ -62,9 +74,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return item
   })
 
-  const collectionsRoutes = allCollections.map(({ handle, updated_at }) => {
+  const collectionsRoutes = allCollections
+    .filter((c): c is { handle: string; updated_at?: string } => Boolean(c?.handle))
+    .map(({ handle, updated_at }) => {
     const item: MetadataRoute.Sitemap[0] = {
-      url: `${env.LIVE_URL}/category/${handle}`,
+      url: `${baseUrl}/category/${handle}`,
       lastModified: updated_at,
       priority: 0.5,
       changeFrequency: "monthly",

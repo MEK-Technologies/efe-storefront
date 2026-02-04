@@ -27,6 +27,19 @@ const ROUTES: Record<string, Route | undefined> = {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // Protected routes - require authentication
+  if (pathname.startsWith("/account")) {
+    const authToken = request.cookies.get("_medusa_jwt")
+    
+    if (!authToken) {
+      // Redirect to home and let the client-side handle opening the login modal
+      const url = request.nextUrl.clone()
+      url.pathname = "/"
+      url.searchParams.set("login", "required")
+      return NextResponse.redirect(url)
+    }
+  }
+
   const homeAwarePathname = pathname === "/" ? "/home" : pathname
 
   if (BLOOM_FILTER.has(homeAwarePathname)) {

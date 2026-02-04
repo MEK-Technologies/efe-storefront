@@ -3,8 +3,14 @@
 import Image from "next/image"
 import Link from "next/link"
 import { cn } from "utils/cn"
-import { PlatformCollection } from "lib/shopify/types"
 import { useState } from "react"
+
+type PlatformCollection = {
+  handle: string
+  title: string
+  description?: string | null
+  image?: { url: string } | null
+}
 
 interface EnterpriseCategoryCardProps {
   category: PlatformCollection

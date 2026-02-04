@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
 const AUDIO_CONFIG = {
   FFT_SIZE: 512,
@@ -15,6 +15,25 @@ const AUDIO_CONFIG = {
   },
 } as const
 
+function getBarColor(normalizedHeight: number) {
+  const intensity =
+    Math.floor(normalizedHeight * AUDIO_CONFIG.COLOR.INTENSITY_RANGE) + AUDIO_CONFIG.COLOR.MIN_INTENSITY
+  return `rgb(${intensity}, ${intensity}, ${intensity})`
+}
+
+function drawBar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  centerY: number,
+  width: number,
+  height: number,
+  color: string
+) {
+  ctx.fillStyle = color
+  ctx.fillRect(x, centerY - height, width, height)
+  ctx.fillRect(x, centerY, width, height)
+}
+
 interface AudioVisualizerProps {
   stream: MediaStream | null
   isRecording: boolean
@@ -25,7 +44,7 @@ export function AudioVisualizer({ stream, isRecording, onClick }: AudioVisualize
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const cleanup = () => {
@@ -37,85 +56,7 @@ export function AudioVisualizer({ stream, isRecording, onClick }: AudioVisualize
     }
   }
 
-  useEffect(() => {
-    return cleanup
-  }, [])
-
-  useEffect(() => {
-    if (stream && isRecording) {
-      startVisualization()
-    } else {
-      cleanup()
-    }
-  }, [stream, isRecording])
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (canvasRef.current && containerRef.current) {
-        const container = containerRef.current
-        const canvas = canvasRef.current
-        const dpr = window.devicePixelRatio || 1
-        const rect = container.getBoundingClientRect()
-
-        canvas.width = rect.width * dpr
-        canvas.height = rect.height * dpr
-
-        canvas.style.width = `${rect.width}px`
-        canvas.style.height = `${rect.height}px`
-
-        const ctx = canvas.getContext("2d")
-        if (ctx) {
-          ctx.setTransform(1, 0, 0, 1, 0, 0)
-          ctx.scale(dpr, dpr)
-        }
-      }
-    }
-
-    window.addEventListener("resize", handleResize)
-    handleResize()
-
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  const startVisualization = async () => {
-    try {
-      const audioContext = new AudioContext()
-      audioContextRef.current = audioContext
-
-      const analyser = audioContext.createAnalyser()
-      analyser.fftSize = AUDIO_CONFIG.FFT_SIZE
-      analyser.smoothingTimeConstant = AUDIO_CONFIG.SMOOTHING
-      analyserRef.current = analyser
-
-      const source = audioContext.createMediaStreamSource(stream!)
-      source.connect(analyser)
-
-      draw()
-    } catch (error) {
-      console.error("Error starting visualization:", error)
-    }
-  }
-
-  const getBarColor = (normalizedHeight: number) => {
-    const intensity =
-      Math.floor(normalizedHeight * AUDIO_CONFIG.COLOR.INTENSITY_RANGE) + AUDIO_CONFIG.COLOR.MIN_INTENSITY
-    return `rgb(${intensity}, ${intensity}, ${intensity})`
-  }
-
-  const drawBar = (
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    centerY: number,
-    width: number,
-    height: number,
-    color: string
-  ) => {
-    ctx.fillStyle = color
-    ctx.fillRect(x, centerY - height, width, height)
-    ctx.fillRect(x, centerY, width, height)
-  }
-
-  const draw = () => {
+  const draw = useCallback(() => {
     if (!isRecording) return
 
     const canvas = canvasRef.current
@@ -154,7 +95,68 @@ export function AudioVisualizer({ stream, isRecording, onClick }: AudioVisualize
     }
 
     drawFrame()
-  }
+  }, [isRecording])
+
+  const startVisualization = useCallback(async () => {
+    if (!stream) return
+
+    try {
+      const audioContext = new AudioContext()
+      audioContextRef.current = audioContext
+
+      const analyser = audioContext.createAnalyser()
+      analyser.fftSize = AUDIO_CONFIG.FFT_SIZE
+      analyser.smoothingTimeConstant = AUDIO_CONFIG.SMOOTHING
+      analyserRef.current = analyser
+
+      const source = audioContext.createMediaStreamSource(stream)
+      source.connect(analyser)
+
+      draw()
+    } catch (error) {
+      console.error("Error starting visualization:", error)
+    }
+  }, [draw, stream])
+
+  useEffect(() => {
+    return cleanup
+  }, [])
+
+  useEffect(() => {
+    if (stream && isRecording) {
+      startVisualization()
+    } else {
+      cleanup()
+    }
+  }, [isRecording, startVisualization, stream])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (canvasRef.current && containerRef.current) {
+        const container = containerRef.current
+        const canvas = canvasRef.current
+        const dpr = window.devicePixelRatio || 1
+        const rect = container.getBoundingClientRect()
+
+        canvas.width = rect.width * dpr
+        canvas.height = rect.height * dpr
+
+        canvas.style.width = `${rect.width}px`
+        canvas.style.height = `${rect.height}px`
+
+        const ctx = canvas.getContext("2d")
+        if (ctx) {
+          ctx.setTransform(1, 0, 0, 1, 0, 0)
+          ctx.scale(dpr, dpr)
+        }
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    handleResize()
+
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   return (
     <div ref={containerRef} className="size-full cursor-pointer rounded-lg backdrop-blur" onClick={onClick}>

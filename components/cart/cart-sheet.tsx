@@ -34,13 +34,13 @@ export function CartSheet({ cart, isOpen, onCartClose, isPending }: CartSheetPro
       <SheetContent className="size-full min-h-svh rounded-l-lg bg-white p-0">
         <SheetHeader className="flex w-full flex-row items-center justify-between">
           <SheetTitle className="flex items-center p-4 pb-0 text-[18px] font-medium">
-            Review your cart
+            Revisa tu carrito
             {isPending ? <LoadingDots className="ml-4" /> : null}
           </SheetTitle>
 
           <SheetClose className="absolute right-4 top-4 rounded-sm bg-white opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
             <CloseIcon className="size-4" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">Cerrar</span>
           </SheetClose>
         </SheetHeader>
 
@@ -66,8 +66,8 @@ export function CartSheet({ cart, isOpen, onCartClose, isPending }: CartSheetPro
                 <p className="text-right text-base text-black ">{subtotalFormatted}</p>
               </div>
               <div className="flex items-center justify-between border-b border-neutral-200 py-4 ">
-                <p>Shipping</p>
-                <p className="text-right">Calculated at checkout</p>
+                <p>Envío</p>
+                <p className="text-right">Se calculará al finalizar compra</p>
               </div>
               <div className="flex items-center justify-between border-neutral-200 py-4 ">
                 <p>Total</p>
@@ -79,7 +79,7 @@ export function CartSheet({ cart, isOpen, onCartClose, isPending }: CartSheetPro
                 size="lg"
                 onClick={() => router.push(checkoutUrl)}
               >
-                Proceed to Checkout
+                Proceder al Pago
               </Button>
             </div>
           </SheetFooter>
@@ -105,7 +105,7 @@ function CartEmptyState() {
           strokeLinecap="round"
         />
       </svg>
-      <p>Your cart is empty</p>
+      <p>Tu carrito está vacío</p>
     </div>
   )
 }

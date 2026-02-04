@@ -3,10 +3,16 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
-import type { PlatformCollection } from "lib/shopify/types"
 import type { CommerceProduct } from "types"
 import { ProductCard } from "components/product-card"
 import { Button } from "components/ui/button"
+
+type PlatformCollection = {
+  title: string
+  descriptionHtml?: string | null
+  handle: string
+  image?: { url: string; altText?: string | null } | null
+}
 
 interface CategoryLandingPageProps {
   collection: PlatformCollection

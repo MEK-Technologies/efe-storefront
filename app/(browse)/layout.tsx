@@ -17,6 +17,8 @@ import { Footer } from "components/footer"
 import { Modals } from "components/modals/modals"
 import DraftToolbar from "components/draft-toolbar"
 import { getNavigationData } from "lib/navigation.server"
+import { AuthWrapper } from "components/auth/auth-wrapper"
+import { AgeVerificationWrapper } from "components/age-verification/age-verification-wrapper"
 
 export const revalidate = 86400
 
@@ -42,28 +44,34 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className="@container">
         <NuqsAdapter>
-          <Script id="mobileMegaMenuLogic" strategy="lazyOnload">{`${mobileInlineScript}`}</Script>
-
-          <NavigationBarWrapper fallbackData={navigationData} />
-          {children}
-
-          <Footer />
-          <Modals />
-
-          <CartView />
-
-          <Toaster position="bottom-left" />
-
-          <DraftToolbar />
-
           <Suspense>
-            <FlagValues />
+            <AuthWrapper>
+              <AgeVerificationWrapper>
+                <Script id="mobileMegaMenuLogic" strategy="lazyOnload">{`${mobileInlineScript}`}</Script>
+
+                <NavigationBarWrapper fallbackData={navigationData} />
+                {children}
+
+                <Footer />
+                <Modals />
+
+                <CartView />
+
+                <Toaster position="bottom-left" />
+
+                <DraftToolbar />
+
+                <Suspense>
+                  <FlagValues />
+                </Suspense>
+
+                <ThirdParties />
+
+                <GithubBadge />
+                <DemoModeAlert />
+              </AgeVerificationWrapper>
+            </AuthWrapper>
           </Suspense>
-
-          <ThirdParties />
-
-          <GithubBadge />
-          <DemoModeAlert />
         </NuqsAdapter>
       </body>
     </html>

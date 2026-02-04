@@ -1,24 +1,12 @@
-import { cookies } from "next/headers"
 import { Suspense } from "react"
 import { Skeleton } from "components/ui/skeleton"
-import { COOKIE_FAVORITES } from "constants/index"
-import { getProduct } from "lib/algolia"
-import {
-  filterImagesByVisualOption,
-  getCombinationByMultiOption,
-  getCombinationByVisualOption,
-  getMultiOptionFromSlug,
-  getVisualOptionFromSlug,
-  removeMultiOptionFromSlug,
-  removeVisualOptionFromSlug,
-} from "utils/visual-variant-utils"
-import { removeOptionsFromUrl } from "utils/product-options-utils"
+import { getFavoritesVariantData, getFavoriteVariantIds } from "app/actions/favorites.actions"
 import Image from "next/image"
 import Link from "next/link"
 import { type CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import { StarIcon } from "components/icons/star-icon"
 import { HttpTypes } from "@medusajs/types"
-import { getFeaturedImage, getVariantPrice } from "utils/medusa-product-helpers"
+import { getVariantPrice } from "utils/medusa-product-helpers"
 import type { CommerceProduct } from "types"
 
 export const revalidate = 86400
@@ -35,7 +23,7 @@ function FavoriteProductCard({
 }: {
   product: CommerceProduct
   variant: HttpTypes.StoreProductVariant | undefined
-  featuredImage: HttpTypes.StoreProductImage | null
+  featuredImage: { url: string; alt: string } | null
   variantInfo: Array<{ name: string; value: string }>
   href: string
   priority?: boolean
@@ -128,117 +116,19 @@ export default async function Favorites() {
 }
 
 async function FavoritesView() {
-  let favoritesHandles: string[] = []
-  const favoritesCookie = (await cookies()).get(COOKIE_FAVORITES)?.value
+  const variantData = await getFavoritesVariantData()
 
-  if (favoritesCookie) {
-    favoritesHandles = JSON.parse(favoritesCookie) as string[]
-  }
-
-  const variantData: Array<{
-    product: CommerceProduct
-    variantHandle: string
-    variant: HttpTypes.StoreProductVariant | undefined
-    featuredImage: HttpTypes.StoreProductImage | null
-    variantInfo: Array<{ name: string; value: string }>
-  }> = []
-
-  for (const variantHandle of favoritesHandles) {
-    let baseHandle: string
-    let multiOptions: Record<string, string> = {}
-    let visualValue: string | null = null
-
-    if (variantHandle.includes("--")) {
-      multiOptions = getMultiOptionFromSlug(variantHandle)
-      baseHandle = removeMultiOptionFromSlug(variantHandle)
-    } else if (variantHandle.includes("-color_")) {
-      visualValue = getVisualOptionFromSlug(variantHandle)
-      baseHandle = removeVisualOptionFromSlug(variantHandle)
-    } else {
-      baseHandle = removeOptionsFromUrl(variantHandle)
-    }
-
-    try {
-      const product = await getProduct(baseHandle)
-      if (!product) continue
-
-      let combination: HttpTypes.StoreProductVariant | undefined
-      let variantInfo: Array<{ name: string; value: string }> = []
-      const variants = product.variants ?? []
-
-      if (Object.keys(multiOptions).length > 0) {
-        combination = getCombinationByMultiOption(variants, multiOptions)
-
-        if (combination) {
-          const variant = variants.find((v) => v.id === combination!.id)
-          if (variant?.options) {
-            variantInfo = variant.options.map((opt) => ({
-              name: opt.option?.title ?? "",
-              value: opt.value ?? "",
-            })).filter(info => info.name && info.value)
-          }
-        }
-      } else if (visualValue) {
-        combination = getCombinationByVisualOption(variants, visualValue)
-
-        if (combination) {
-          const variant = variants.find((v) => v.id === combination!.id)
-          if (variant?.options) {
-            variantInfo = variant.options.map((opt) => ({
-              name: opt.option?.title ?? "",
-              value: opt.value ?? "",
-            })).filter(info => info.name && info.value)
-          }
-        }
-      } else {
-        combination = variants[0]
-        if (combination) {
-          const variant = variants.find((v) => v.id === combination!.id)
-          if (variant?.options) {
-            variantInfo = variant.options.map((opt) => ({
-              name: opt.option?.title ?? "",
-              value: opt.value ?? "",
-            })).filter(info => info.name && info.value)
-          }
-        }
-      }
-
-      let featuredImage = getFeaturedImage(product)
-      
-      if (combination) {
-        const variant = variants.find((v) => v.id === combination!.id)
-
-        if (variant?.options) {
-          const visualOptions = ["Color", "Colour", "color", "colour"]
-          let filteredImages = product.images ?? []
-
-          for (const optionName of visualOptions) {
-            const option = variant.options.find(
-              (opt) => opt.option?.title?.toLowerCase() === optionName.toLowerCase()
-            )
-            if (option?.value) {
-              const variantImages = filterImagesByVisualOption(product.images ?? [], option.value, option.option?.title ?? "Color")
-              if (variantImages.length > 0 && variantImages !== product.images) {
-                filteredImages = variantImages
-                break
-              }
-            }
-          }
-
-          if (filteredImages.length > 0) {
-            featuredImage = filteredImages[0]
-          }
-        }
-      }
-
-      variantData.push({
-        product,
-        variantHandle,
-        variant: combination,
-        featuredImage,
-        variantInfo,
-      })
-    } catch (error) {}
+  // Debug logs: favorite variant ids from cookie and resolved variant data
+  try {
+    const favoriteIds = await getFavoriteVariantIds()
+    // server-side console logs — aparecerán en la terminal donde corras el servidor
+    console.log("Favorites cookie variantIds:", favoriteIds)
+    console.log(
+      "Favorites resolved variantData:",
+      variantData.map((v) => ({ variantHandle: v.variantHandle, variantId: v.variant?.id ?? null }))
+    )
+  } catch (e) {
+    console.log("Error logging favorite ids:", e)
   }
 
   return (

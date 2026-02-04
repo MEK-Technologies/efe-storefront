@@ -6,44 +6,53 @@ interface CategoryCardProps {
   title: string
   handle: string
   href: string
-  description: string
   index: number
   className?: string
+  imageUrl?: string
+  imageAlt?: string
 }
 
-export const CategoryCard = ({ title, href, description, index, className }: CategoryCardProps) => {
+export const CategoryCard = ({
+  title,
+  href,
+  index,
+  className,
+  imageUrl,
+  imageAlt,
+}: CategoryCardProps) => {
   return (
     <Link
       href={href}
       className={cn(
-        "group relative flex h-[320px] flex-col overflow-hidden rounded-lg border border-border bg-background transition-all duration-300 hover:border-foreground/20 hover:shadow-lg",
+        "group relative aspect-[4/3] overflow-hidden rounded-2xl transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-2xl",
         className
       )}
       prefetch={false}
     >
-      <div className="relative h-[200px] overflow-hidden bg-secondary/10">
+      {/* Background Image */}
+      <div className="absolute inset-0">
         <Image
-          src={`/category-placeholder-${index + 1}.png`}
-          alt={`${title} category`}
-          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          src={imageUrl || `/category-placeholder-${index + 1}.png`}
+          alt={imageAlt || `${title} category`}
+          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           priority={index < 4}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <div className="flex flex-1 flex-col justify-between p-6">
-        <div>
-          <h3 className="text-lg font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary">
-            {title}
-          </h3>
-          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{description}</p>
-        </div>
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-all duration-500 group-hover:from-black/80 group-hover:via-black/30" />
 
-        <div className="mt-4 flex items-center text-sm font-medium text-foreground">
-          <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-foreground after:transition-all after:duration-300 group-hover:after:w-full">
-            Shop Now
+      {/* Content Overlay */}
+      <div className="absolute inset-0 flex flex-col justify-end p-16">
+        <h3 className="mb-6 text-5xl font-bold text-white transition-all duration-300 group-hover:-translate-y-1 group-hover:text-orange-500">
+          {title}
+        </h3>
+        
+        <div className="flex items-center text-sm font-medium text-white/90 transition-colors duration-300 group-hover:text-orange-500">
+          <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full group-hover:after:bg-orange-500">
+            Comprar Ahora
           </span>
           <svg
             className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1"

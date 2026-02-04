@@ -3,8 +3,10 @@ import Link from "next/link"
 import { cn } from "utils/cn"
 import { type CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import type { CommerceProduct } from "types"
+import { ProductPrice } from "./product/product-price"
+import type { VariantWithPricing } from "types/medusa-extensions"
 
-import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
+import { getFeaturedImage } from "utils/medusa-product-helpers"
 
 interface UniformProductCardProps {
   product: CommerceProduct
@@ -12,6 +14,7 @@ interface UniformProductCardProps {
   prefetch?: boolean
   className?: string
   featured?: boolean
+  hasCustomerGroupPricing?: boolean
 }
 
 export const UniformProductCard = ({
@@ -20,14 +23,11 @@ export const UniformProductCard = ({
   priority,
   prefetch = false,
   featured = false,
+  hasCustomerGroupPricing = false,
 }: UniformProductCardProps) => {
   const { handle, title, variants } = product
   const featuredImage = getFeaturedImage(product)
-  const minPriceData = getMinPrice(variants)
-  
-  const currencySymbol = minPriceData 
-    ? mapCurrencyToSign((minPriceData.currencyCode as CurrencyType) || "USD") 
-    : "$"
+  const firstVariant = variants?.[0] as VariantWithPricing | undefined
 
   return (
     <Link
@@ -69,11 +69,12 @@ export const UniformProductCard = ({
 
         {}
         <div className="mt-auto">
-          {minPriceData && (
-            <p className={cn("font-bold", featured ? "text-lg" : "text-base")}>
-              {currencySymbol}
-              {minPriceData.amount.toFixed(2)}
-            </p>
+          {firstVariant && (
+            <ProductPrice
+              variant={firstVariant}
+              showBadge={true}
+              displayVariant="compact"
+            />
           )}
           {variants && variants.length > 1 && (
             <p className="text-xs text-muted-foreground">{variants.length} variants</p>

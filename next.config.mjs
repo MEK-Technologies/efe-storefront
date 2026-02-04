@@ -7,6 +7,7 @@ import withPlugins from "next-compose-plugins"
  */
 const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" })]], {
   reactStrictMode: true,
+  serverExternalPackages: [],
   logging: {
     fetches: {
       fullUrl: true,
@@ -55,6 +56,41 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
         destination: "/search?second=:second",
       },
     ]
+  },
+  webpack: (config, { isServer, webpack }) => {
+    // Fix for undici and File API in server environment
+    if (isServer) {
+      config.externals = config.externals || []
+      // Don't externalize these packages that need polyfills
+      config.resolve = config.resolve || {}
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+      
+      // CRITICAL: Ensure payload-polyfill.js loads FIRST
+      // Add it as an entry point to ensure it runs before any other code
+      config.plugins = config.plugins || []
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /^undici$/,
+          (_resource) => {
+            // Ensure polyfill is loaded before undici
+            if (!globalThis.File) {
+              try {
+                const path = require('path')
+                require(path.resolve('./payload-polyfill.js'))
+              } catch (e) {
+                console.warn('Could not preload polyfill:', e)
+              }
+            }
+          }
+        )
+      )
+    }
+    return config
   },
 })
 

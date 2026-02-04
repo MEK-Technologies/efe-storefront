@@ -1,0 +1,37 @@
+                                            Table "public.categories"
+       Column       |            Type             | Collation | Nullable |                Default                 
+--------------------+-----------------------------+-----------+----------+----------------------------------------
+ id                 | integer                     |           | not null | nextval('categories_id_seq'::regclass)
+ name               | character varying           |           | not null | 
+ handle             | character varying           |           | not null | 
+ medusa_id          | character varying           |           |          | 
+ description        | character varying           |           |          | 
+ image_id           | integer                     |           |          | 
+ parent_category_id | integer                     |           |          | 
+ is_active          | boolean                     |           |          | true
+ is_internal        | boolean                     |           |          | false
+ rank               | numeric                     |           |          | 0
+ metadata           | jsonb                       |           |          | 
+ backend_created_at | timestamp(3) with time zone |           | not null | now()
+ backend_updated_at | timestamp(3) with time zone |           | not null | now()
+ deleted_at         | timestamp(3) with time zone |           |          | 
+Indexes:
+    "categories_pkey" PRIMARY KEY, btree (id)
+    "categories_created_at_idx" btree (backend_created_at)
+    "categories_handle_idx" UNIQUE, btree (handle)
+    "categories_image_idx" btree (image_id)
+    "categories_medusa_id_idx" UNIQUE, btree (medusa_id)
+    "categories_parent_category_idx" btree (parent_category_id)
+    "categories_updated_at_idx" btree (backend_updated_at)
+Foreign-key constraints:
+    "categories_image_id_media_id_fk" FOREIGN KEY (image_id) REFERENCES media(id) ON DELETE SET NULL
+    "categories_parent_category_id_categories_id_fk" FOREIGN KEY (parent_category_id) REFERENCES categories(id) ON DELETE SET NULL
+Referenced by:
+    TABLE "_products_v_rels" CONSTRAINT "_products_v_rels_categories_fk" FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "categories" CONSTRAINT "categories_parent_category_id_categories_id_fk" FOREIGN KEY (parent_category_id) REFERENCES categories(id) ON DELETE SET NULL
+    TABLE "categories_rels" CONSTRAINT "categories_rels_categories_fk" FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "categories_rels" CONSTRAINT "categories_rels_parent_fk" FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "payload_locked_documents_rels" CONSTRAINT "payload_locked_documents_rels_categories_fk" FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "products_rels" CONSTRAINT "products_rels_categories_fk" FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "slides" CONSTRAINT "slides_action_boton_id_categories_id_fk" FOREIGN KEY (action_boton_id) REFERENCES categories(id) ON DELETE SET NULL
+

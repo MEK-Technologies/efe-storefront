@@ -19,7 +19,7 @@ const features: Record<Feature, Record<"message" | "predicate", unknown>> = {
   },
 }
 
-const optInNotification = ({ message, source }: { message: string; source?: string }) => {}
+const optInNotification = ({ message: _message, source: _source }: { message: string; source?: string }) => {}
 
 export const isOptIn = (feature: Feature) => {
   return features[feature].predicate

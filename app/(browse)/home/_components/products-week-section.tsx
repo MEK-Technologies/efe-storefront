@@ -14,7 +14,7 @@ export async function ProductsWeekSection() {
     <div className="overflow-hidden border-y border-black">
       <div className="mx-auto flex w-full max-w-container-md flex-col items-center gap-28 px-4 py-20 md:py-32 lg:flex-row xl:px-0">
         <div className="m-auto basis-1/3 text-center text-5xl font-normal tracking-tighter sm:min-w-[280px] md:text-left md:text-6xl">
-          <h2>Products of the week</h2>
+          <h2>Productos de la Semana</h2>
         </div>
         <div className="w-full">
           <Carousel opts={{ skipSnaps: true }}>
@@ -30,7 +30,7 @@ export async function ProductsWeekSection() {
                   >
                     <div className="flex h-[224px] min-w-[224px] max-w-[224px] items-center justify-center overflow-hidden rounded-full border border-black">
                       <Image
-                        alt={featuredImage?.alt || product.title || "Product image"}
+                        alt={featuredImage?.alt || product.title || "Imagen del producto"}
                         className="size-[150px] object-contain py-2 transition-transform hover:scale-110 group-hover:scale-105 md:size-[250px] md:py-16"
                         height={150}
                         src={featuredImage?.url || "/default-product-image.svg"}
@@ -54,7 +54,7 @@ export function ProductsWeekSectionSkeleton() {
     <div className="overflow-hidden border-y border-black">
       <div className="mx-auto flex w-full max-w-container-md flex-col items-center gap-28 px-4 py-20 md:py-32 lg:flex-row xl:px-0">
         <div className="m-auto basis-1/3 text-center text-5xl font-normal tracking-tighter sm:min-w-[280px] md:text-left md:text-6xl">
-          <h2>Products of the week</h2>
+          <h2>Productos de la Semana</h2>
         </div>
         <div className="w-full">
           <Carousel opts={{ containScroll: "keepSnaps", dragFree: true }}>

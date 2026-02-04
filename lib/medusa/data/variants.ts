@@ -10,7 +10,10 @@ export const retrieveVariant = async (
 ): Promise<HttpTypes.StoreProductVariant | null> => {
   const authHeaders = await getAuthHeaders()
 
-  if (!authHeaders) return null
+  if (!authHeaders) {
+    console.warn("[retrieveVariant] No auth headers available")
+    // Continue without auth headers for public endpoints
+  }
 
   const headers = {
     ...authHeaders,
@@ -26,13 +29,25 @@ export const retrieveVariant = async (
       {
         method: "GET",
         query: {
-          fields: "*images",
+          fields: "*images,*inventory_items.inventory.location_levels",
         },
         headers,
         next,
         cache: "force-cache",
       }
     )
-    .then(({ variant }) => variant)
-    .catch(() => null)
+    .then(({ variant }) => {
+      console.log("[retrieveVariant] Success:", {
+        variant_id,
+        manage_inventory: variant.manage_inventory,
+        inventory_quantity: variant.inventory_quantity,
+        // @ts-expect-error - inventory_items exists in response but not in types
+        has_inventory_items: !!variant.inventory_items,
+      })
+      return variant
+    })
+    .catch((error) => {
+      console.error("[retrieveVariant] Failed for variant", variant_id, error)
+      return null
+    })
 }

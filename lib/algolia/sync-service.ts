@@ -2,9 +2,10 @@
 import { isDeepEqual, omit } from "remeda"
 import { HIERARCHICAL_SEPARATOR } from "../../constants/index"
 import { sdk } from "../medusa/config"
-import { searchClient } from "./client"
+import { searchClient, writeClient } from "./client"
 import { env } from "../../env.mjs"
 import { ProductEnrichmentBuilder } from "../../utils/enrich-product"
+import { isAlgoliaConfigured, logAlgoliaOperation, requireAlgolia, validateAlgoliaIndices } from "./config"
 
 import { HttpTypes } from "@medusajs/types"
 
@@ -70,9 +71,25 @@ async function getAllCategoriesFromMedusa() {
 export async function syncMedusaToAlgolia() {
   console.log("🚀 Starting sync process (Medusa -> Algolia)...")
 
-  if (!env.ALGOLIA_PRODUCTS_INDEX || !env.ALGOLIA_CATEGORIES_INDEX) {
-     throw new Error("Missing required environment variables (ALGOLIA_PRODUCTS_INDEX, ALGOLIA_CATEGORIES_INDEX)")
+  // Validate Algolia configuration first
+  if (!isAlgoliaConfigured()) {
+    console.error("❌ Algolia is not properly configured")
+    console.log("Run 'npm run algolia:setup' to configure Algolia")
+    throw new Error("Algolia configuration incomplete")
   }
+
+  try {
+    requireAlgolia("sync operation")
+    validateAlgoliaIndices()
+  } catch (error) {
+    console.error("❌ Configuration error:", error)
+    throw error
+  }
+
+  logAlgoliaOperation("Starting sync", {
+    productsIndex: env.ALGOLIA_PRODUCTS_INDEX!,
+    categoriesIndex: env.ALGOLIA_CATEGORIES_INDEX!,
+  })
 
   const allProducts = await getAllProductsFromMedusa()
   console.log(`📦 Fetched ${allProducts.length} products from Medusa`)
@@ -96,12 +113,12 @@ export async function syncMedusaToAlgolia() {
   }))
 
   const { hits: algoliaProducts } = await searchClient.getAllResults({
-    indexName: env.ALGOLIA_PRODUCTS_INDEX,
+    indexName: env.ALGOLIA_PRODUCTS_INDEX!,
     browseParams: {},
   })
 
   const { hits: algoliaCategories } = await searchClient.getAllResults({
-    indexName: env.ALGOLIA_CATEGORIES_INDEX,
+    indexName: env.ALGOLIA_CATEGORIES_INDEX!,
   })
 
   const deltaProducts = calculateDelta(enrichedProducts, algoliaProducts, (item) => item.id)
@@ -109,16 +126,16 @@ export async function syncMedusaToAlgolia() {
 
   console.log(`🔍 Delta - products: ${deltaProducts.length}, categories: ${deltaCategories.length}`)
 
-  await updateAlgolia(env.ALGOLIA_PRODUCTS_INDEX, deltaProducts)
-  await updateAlgolia(env.ALGOLIA_CATEGORIES_INDEX, deltaCategories)
+  await updateAlgolia(env.ALGOLIA_PRODUCTS_INDEX!, deltaProducts)
+  await updateAlgolia(env.ALGOLIA_CATEGORIES_INDEX!, deltaCategories)
 
   await deleteObsolete(
-    env.ALGOLIA_PRODUCTS_INDEX,
+    env.ALGOLIA_PRODUCTS_INDEX!,
     allProducts.map((p) => p.id)
   )
 
   await deleteObsolete(
-    env.ALGOLIA_CATEGORIES_INDEX,
+    env.ALGOLIA_CATEGORIES_INDEX!,
     allCategories.map((c) => c.id)
   )
 
@@ -130,7 +147,7 @@ export async function syncMedusaToAlgolia() {
 async function updateAlgolia<T extends Record<string, any>>(indexName: string, docs: T[]) {
   if (!docs.length) return
   console.log(`📤 Updating ${docs.length} records in ${indexName}`)
-  await searchClient.batchUpdate({
+  await writeClient.batchUpdate({
     indexName,
     batchWriteParams: {
       requests: docs.map((doc) => ({
@@ -158,7 +175,7 @@ async function deleteObsolete(indexName: string, currentIds: string[]) {
 
   console.log(`🗑️ Deleting ${toRemove.length} obsolete entries from ${indexName}`)
   
-  await searchClient.batchUpdate({
+  await writeClient.batchUpdate({
     indexName,
     batchWriteParams: {
       requests: toRemove.map((id) => ({

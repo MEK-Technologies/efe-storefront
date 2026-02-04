@@ -3,6 +3,8 @@ import Link from "next/link"
 import { cn } from "utils/cn"
 import { type CurrencyType, mapCurrencyToSign } from "utils/map-currency-to-sign"
 import type { CommerceProduct } from "types"
+import { ProductPrice } from "./product/product-price"
+import type { VariantWithPricing } from "types/medusa-extensions"
 
 import { HttpTypes } from "@medusajs/types"
 
@@ -14,6 +16,7 @@ interface ProductCardProps {
   href?: string
   highlighted?: boolean
   variant?: "default" | "hero"
+  hasCustomerGroupPricing?: boolean
 }
 
 /**
@@ -31,35 +34,43 @@ function getFeaturedImage(product: CommerceProduct): { url: string; alt: string 
 }
 
 /**
- * Get the minimum price from product variants using calculated_price
+ * Get the minimum price variant from product variants.
+ * Used to display the lowest price with full pricing metadata.
+ * Handles both calculated prices and override price lists.
  */
-function getMinPrice(variants: HttpTypes.StoreProductVariant[] | null): {
-  amount: number
-  currencyCode: string
-} | null {
+function getMinPriceVariant(
+  variants: HttpTypes.StoreProductVariant[] | null
+): VariantWithPricing | null {
   if (!variants || variants.length === 0) return null
 
-  const pricesWithValues = variants
-    .filter((v) => v.calculated_price?.calculated_amount != null)
-    .map((v) => ({
-      amount: v.calculated_price!.calculated_amount!,
-      currencyCode: v.calculated_price!.currency_code || "USD",
-    }))
-
-  if (pricesWithValues.length === 0) return null
-
-  return pricesWithValues.reduce((min, current) =>
-    current.amount < min.amount ? current : min
+  // Try to find variants with calculated_price first
+  const variantsWithCalculatedPrice = variants.filter(
+    (v) => v.calculated_price?.calculated_amount != null
   )
-}
 
-/**
- * Format price with currency symbol
- */
-function formatPrice(amount: number, currencyCode: string): string {
-  const symbol = mapCurrencyToSign((currencyCode as CurrencyType) || "USD")
-  // Medusa prices are in cents, divide by 100
-  return `${symbol}${(amount).toFixed(0)}`
+  if (variantsWithCalculatedPrice.length > 0) {
+    return variantsWithCalculatedPrice.reduce((min, current) =>
+      current.calculated_price!.calculated_amount! < min.calculated_price!.calculated_amount!
+        ? current
+        : min
+    ) as VariantWithPricing
+  }
+
+  // Fallback: find variants with original_price (for override price lists)
+  const variantsWithOriginalPrice = variants.filter(
+    (v) => (v as any).original_price?.amount != null
+  )
+
+  if (variantsWithOriginalPrice.length > 0) {
+    return variantsWithOriginalPrice.reduce((min, current) => {
+      const minPrice = (min as any).original_price?.amount || Infinity
+      const currentPrice = (current as any).original_price?.amount || Infinity
+      return currentPrice < minPrice ? current : min
+    }) as VariantWithPricing
+  }
+
+  // Last resort: return first variant
+  return variants[0] as VariantWithPricing
 }
 
 export const ProductCard = ({
@@ -70,10 +81,11 @@ export const ProductCard = ({
   href = "",
   highlighted = false,
   variant = "default",
+  hasCustomerGroupPricing = false,
 }: ProductCardProps) => {
   const { handle, title, variants } = product
   const featuredImage = getFeaturedImage(product)
-  const minPriceData = getMinPrice(variants)
+  const minPriceVariant = getMinPriceVariant(variants)
   const noOfVariants = variants?.length ?? 0
   const path = href || `/product/${handle}`
   const linkAria = `Visit product: ${title}`
@@ -102,10 +114,13 @@ export const ProductCard = ({
           />
         </div>
         <h3 className="mb-1 line-clamp-2 text-sm font-semibold text-foreground">{title}</h3>
-        {minPriceData && (
-          <p className="text-sm font-medium text-primary">
-            {formatPrice(minPriceData.amount, minPriceData.currencyCode)}
-          </p>
+        {minPriceVariant && (
+          <ProductPrice
+            variant={minPriceVariant}
+            showBadge={true}
+            displayVariant="compact"
+            className="text-primary"
+          />
         )}
         <span className="mt-2 text-xs font-medium text-muted-foreground">Shop Now →</span>
       </Link>
@@ -150,18 +165,20 @@ export const ProductCard = ({
           </div>
         </div>
 
-        {minPriceData && (
+        {minPriceVariant && (
           <div className="mt-auto flex flex-col pt-10">
             {noOfVariants > 0 && (
               <p className={cn("text-sm text-gray-500", highlighted && "md:text-base")}>
                 {noOfVariants} variant{noOfVariants > 1 ? "s" : ""}
               </p>
             )}
-            <div className={cn("flex w-full items-baseline justify-between text-sm", highlighted && "md:text-base")}>
-              <span className="text-primary/50">From</span>
-              <span className={cn("text-base font-semibold md:text-lg", highlighted && "md:text-2xl")}>
-                {formatPrice(minPriceData.amount, minPriceData.currencyCode)}
-              </span>
+            <div className={cn("flex w-full flex-col gap-1", highlighted && "md:text-base")}>
+              <span className="text-sm text-primary/50">From</span>
+              <ProductPrice
+                variant={minPriceVariant}
+                showBadge={true}
+                displayVariant="compact"
+              />
             </div>
           </div>
         )}

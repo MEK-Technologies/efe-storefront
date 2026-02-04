@@ -1,15 +1,18 @@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "components/ui/carousel"
 import { ProductCard } from "components/product-card"
-import { getSimilarProducts } from "lib/algolia"
+import { getProductsByCollection } from "lib/medusa/data/product-queries"
 
 interface SimilarProductsSectionProps {
   slug: string
-  objectID: string
+  productId: string
+  collectionHandle?: string
   basePath?: string
 }
 
-export async function SimilarProductsSection({ slug, objectID, basePath }: SimilarProductsSectionProps) {
-  const items = await getSimilarProducts(slug, objectID)
+export async function SimilarProductsSection({ slug, productId, collectionHandle, basePath }: SimilarProductsSectionProps) {
+  if (!collectionHandle) return null
+  
+  const items = await getProductsByCollection(collectionHandle, 4, productId)
 
   if (items.length <= 0) {
     return null

@@ -9,7 +9,7 @@ import { HeartIcon } from "components/icons/heart-icon"
 import { Button } from "components/ui/button"
 import { cn } from "utils/cn"
 
-export function FavoriteMarker({ handle }: { handle: string }) {
+export function FavoriteMarker({ handle, variantId }: { handle: string; variantId?: string }) {
   const [isActive, setIsActive] = useState<boolean>(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -19,7 +19,9 @@ export function FavoriteMarker({ handle }: { handle: string }) {
       startTransition(async () => {
         const favorites = await getParsedFavoritesHandles()
 
-        setIsActive(favorites.includes(handle))
+        const exists = favorites.some((f) => f.variantHandle === handle && (variantId ? f.variantId === variantId : true))
+
+        setIsActive(exists)
       })
     }
 
@@ -28,7 +30,7 @@ export function FavoriteMarker({ handle }: { handle: string }) {
 
   const handleClick = async () => {
     setIsAnimating(true)
-    const isFavorite = await toggleFavoriteProduct(null, handle)
+    const isFavorite = await toggleFavoriteProduct(null, handle, variantId)
 
     setIsActive(isFavorite)
   }

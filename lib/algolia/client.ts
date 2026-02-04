@@ -12,6 +12,7 @@ import {
 } from "algoliasearch"
 
 import { env } from "../../env.mjs"
+import { logAlgoliaOperation, requireAlgolia } from "./config"
 
 import { FilterBuilder } from "./filter-builder"
 
@@ -144,8 +145,69 @@ const mapIndexToSort = (index: string, sortOption: SortType) => {
   }
 }
 
-export const searchClient: ReturnType<typeof algolia> = algolia({
-  applicationId: env.ALGOLIA_APP_ID || "",
+// Cliente de lectura (usa Search API Key - seguro para exponer al cliente)
+export const searchClient: ReturnType<typeof algolia> = (() => {
+  try {
+    requireAlgolia("searchClient initialization")
+    
+    // Priorizar SEARCH_API_KEY para operaciones de lectura (más seguro)
+    const apiKey = env.ALGOLIA_SEARCH_API_KEY || env.ALGOLIA_WRITE_API_KEY || ""
+    
+    logAlgoliaOperation("Initializing Algolia search client", {
+      appId: env.ALGOLIA_APP_ID,
+      hasSearchKey: !!env.ALGOLIA_SEARCH_API_KEY,
+      hasWriteKey: !!env.ALGOLIA_WRITE_API_KEY,
+      usingSearchKey: !!env.ALGOLIA_SEARCH_API_KEY,
+    })
+    
+    if (!env.ALGOLIA_SEARCH_API_KEY) {
+      console.warn(
+        "[Algolia] ⚠️ ALGOLIA_SEARCH_API_KEY not configured. " +
+        "Using WRITE_API_KEY which is less secure. " +
+        "Consider creating a Search-Only API key in Algolia dashboard."
+      )
+    }
+    
+    return algolia({
+      applicationId: env.ALGOLIA_APP_ID || "",
+      apiKey,
+    })
+  } catch (error) {
+    console.error("[Algolia] Configuration error:", error)
+    
+    // Return a mock client that throws errors on usage
+    return {
+      search: async () => { throw new Error("Algolia not configured") },
+      getAllResults: async () => { throw new Error("Algolia not configured") },
+      update: async () => { throw new Error("Algolia not configured") },
+      batchUpdate: async () => { throw new Error("Algolia not configured") },
+      delete: async () => { throw new Error("Algolia not configured") },
+      create: async () => { throw new Error("Algolia not configured") },
+      multiSearch: async () => { throw new Error("Algolia not configured") },
+      getRecommendations: async () => { throw new Error("Algolia not configured") },
+      getFacetValues: async () => { throw new Error("Algolia not configured") },
+      filterBuilder: () => new FilterBuilder(),
+      mapIndexToSort: (index: string, _sortOption: any) => index,
+    } as any
+  }
+})()
 
-  apiKey: env.ALGOLIA_WRITE_API_KEY || "",
-})
+// Cliente de escritura (usa Write API Key - solo para operaciones de servidor)
+export const writeClient: ReturnType<typeof algolia> = (() => {
+  try {
+    requireAlgolia("writeClient initialization")
+    
+    logAlgoliaOperation("Initializing Algolia write client", {
+      appId: env.ALGOLIA_APP_ID,
+      hasWriteKey: !!env.ALGOLIA_WRITE_API_KEY,
+    })
+    
+    return algolia({
+      applicationId: env.ALGOLIA_APP_ID || "",
+      apiKey: env.ALGOLIA_WRITE_API_KEY || "",
+    })
+  } catch (error) {
+    console.error("[Algolia] Write client configuration error:", error)
+    throw error
+  }
+})()

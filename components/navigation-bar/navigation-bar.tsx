@@ -15,6 +15,7 @@ import { CloseIcon } from "components/icons/close-icon"
 import { SearchButton } from "./search-button"
 import { NavigationItem } from "./navigation-item"
 import Link from "next/link"
+import { AuthButton } from "components/modals/auth-helpers"
 
 const ProductAddedAlert = dynamic(() =>
   import("components/product/product-added-alert").then((mod) => mod.ProductAddedAlert)
@@ -104,7 +105,7 @@ export function NavigationBar({ items }: NavigationBarProps) {
               <span className="menu__title"></span>
             </div>
             <div className="menu__inner flex w-full justify-between">
-              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@7xl:px-0">
+              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:md:gap-3 not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@3xl:gap-3 supports-[container-type]:@7xl:px-0">
                 {itemsMarkup}
               </ul>
               <div className="relative ml-auto flex items-center">
@@ -117,6 +118,7 @@ export function NavigationBar({ items }: NavigationBarProps) {
                 </button>
                 <Autocomplete className="mr-6" />
                 <div className="flex gap-2">
+                  <AuthButton />
                   <Favorites className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
                   <Cart className="not-supports-[container-type]:md:flex hidden supports-[container-type]:@3xl:flex" />
                   <ProductAddedAlert className="not-supports-[container-type]:md:block hidden supports-[container-type]:@3xl:block" />

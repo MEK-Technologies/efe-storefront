@@ -4,13 +4,27 @@ import { ProductCard } from "components/product-card"
 import { CommerceProduct } from "types"
 import { useEffect, useRef, useState } from "react"
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
 export const ModernNewArrivalsSection = ({
   products,
 }: {
   products: CommerceProduct[]
 }) => {
   const [visibleProducts, setVisibleProducts] = useState<Set<number>>(new Set())
+  const [shuffledProducts, setShuffledProducts] = useState<CommerceProduct[]>([])
   const productRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    setShuffledProducts(shuffleArray(products).slice(0, 8))
+  }, [products])
 
   useEffect(() => {
     const observers: IntersectionObserver[] = []
@@ -42,24 +56,24 @@ export const ModernNewArrivalsSection = ({
     return () => {
       observers.forEach((observer) => observer.disconnect())
     }
-  }, [products.length])
+  }, [shuffledProducts.length])
 
   if (products.length < 8) return null
 
   return (
-    <section className="relative w-full py-16 sm:py-20 lg:py-24">
+    <section className="relative w-full py-8 sm:py-10 lg:py-12">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         {}
         <div className="mb-12">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            New Arrivals
+            Productos Destacados
           </h2>
-          <p className="mt-2 text-base text-muted-foreground lg:text-lg">Fresh styles, just dropped</p>
+          <p className="mt-2 text-base text-muted-foreground lg:text-lg"></p>
         </div>
 
         {}
         <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-          {products.slice(0, 8).map((product, index) => (
+          {shuffledProducts.map((product, index) => (
             <div
               key={product.id}
               ref={(el) => {
@@ -79,7 +93,7 @@ export const ModernNewArrivalsSection = ({
                   {index < 3 && (
                     <div className="absolute left-3 top-3 z-10">
                       <span className="inline-flex items-center rounded-full bg-foreground px-2 py-1 text-xs font-medium text-background">
-                        NEW
+                        DESTACADO
                       </span>
                     </div>
                   )}
@@ -97,7 +111,7 @@ export const ModernNewArrivalsSection = ({
             href="/search?sort=created_at_desc"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 transition-all hover:underline"
           >
-            View all new arrivals
+            Ver Todos Nuestros Productos Destacados
             <svg
               className="size-4 transition-transform group-hover:translate-x-1"
               fill="none"

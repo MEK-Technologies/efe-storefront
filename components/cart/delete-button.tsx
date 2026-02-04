@@ -30,7 +30,7 @@ export function DeleteButton({ id }: DeleteButtonProps) {
         onClick={handleClick}
         disabled={isPending}
       >
-        Delete
+        Eliminar
       </button>
       {isPending && <LoadingDots />}
     </div>

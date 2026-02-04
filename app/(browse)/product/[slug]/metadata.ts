@@ -1,4 +1,4 @@
-import { getProduct } from "lib/algolia"
+import { getProductByHandle } from "lib/medusa/data/product-queries"
 import { env } from "env.mjs"
 import { Metadata } from "next"
 import { Product, WithContext } from "schema-dts"
@@ -6,14 +6,14 @@ import type { CommerceProduct } from "types"
 import { makeKeywords } from "utils/make-keywords"
 import { removeOptionsFromUrl } from "utils/product-options-utils"
 import { slugToName } from "utils/slug-name"
-import { getMinPrice, getFeaturedImage } from "utils/medusa-product-helpers"
+import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
 
 interface ProductProps {
   params: { slug: string }
 }
 
 export async function generateMetadata({ params: { slug } }: ProductProps): Promise<Metadata> {
-  const product = await getProduct(removeOptionsFromUrl(slug))
+  const product = await getProductByHandle(removeOptionsFromUrl(slug))
 
   // Use product title/description directly (Medusa doesn't have separate SEO fields)
   const keywords = makeKeywords(product?.title)
@@ -43,13 +43,17 @@ export function generateJsonLd(product: CommerceProduct, slug: string) {
   
   // Get brand from metadata or product type
   const brand = (product.metadata?.brand as string) || product.type?.value
+  const imageUrls = [
+    featuredImage?.url,
+    ...images.map((image) => image.url),
+  ].filter((url): url is string => Boolean(url))
 
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    description: product.description,
-    image: images.map((image) => image.url),
+    description: product.description ?? undefined,
+    image: imageUrls,
     ...(brand && {
       brand: {
         "@type": "Brand",

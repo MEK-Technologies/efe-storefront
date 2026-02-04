@@ -2,11 +2,20 @@
 
 import { useEffect, useTransition } from "react"
 import dynamic from "next/dynamic"
-import { getOrCreateCart } from "app/actions/cart.actions"
+import { getCart } from "app/actions/cart.actions"
 import { useCartStore } from "stores/cart-store"
 
 const CartSheet = dynamic(() => import("components/cart/cart-sheet").then((mod) => mod.CartSheet))
 
+/**
+ * CartView component handles cart state synchronization.
+ * 
+ * LAZY INITIALIZATION FLOW:
+ * 1. Initial mount: getCart() returns null (no cart exists yet)
+ * 2. User adds first item: addCartItem() creates cart and sets cookie
+ * 3. refresh() triggers: getCart() now finds the cart
+ * 4. Cart displays with items
+ */
 export function CartView() {
   const [isPending, startTransition] = useTransition()
 
@@ -18,10 +27,12 @@ export function CartView() {
   const cart = useCartStore((s) => s.cart)
   const lastUpdatedAt = useCartStore((s) => s.lastUpdatedAt)
 
+  // Sync cart state from backend whenever it's updated
+  // lastUpdatedAt changes when: items added/removed, quantities changed, checkout completed
   useEffect(() => {
     startTransition(async () => {
-      const { cart } = await getOrCreateCart()
-      cart && setCart(cart)
+      const { cart } = await getCart()
+      setCart(cart || null)
     })
   }, [lastUpdatedAt, setCart])
 
