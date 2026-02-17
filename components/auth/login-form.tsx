@@ -12,8 +12,8 @@ import { useModalStore } from "stores/modal-store"
 import { Spinner } from "components/spinner"
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email("Por favor ingresa un correo electrónico válido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
@@ -52,18 +52,18 @@ export function LoginForm() {
     // TODO: Implement password reset flow
     // For now, show a toast notification
     import("sonner").then(({ toast }) => {
-      toast.info("Password reset feature coming soon!")
+      toast.info("¡La función de restablecimiento de contraseña estará disponible pronto!")
     })
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Correo Electrónico</Label>
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="tu@ejemplo.com"
           autoComplete="email"
           disabled={isLoading}
           {...register("email")}
@@ -72,11 +72,11 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
           id="password"
           type="password"
-          placeholder="Enter your password"
+          placeholder="Ingresa tu contraseña"
           autoComplete="current-password"
           disabled={isLoading}
           {...register("password")}
@@ -90,7 +90,7 @@ export function LoginForm() {
           onClick={handleForgotPassword}
           className="text-sm text-blue-600 hover:underline"
         >
-          Forgot password?
+          ¿Olvidaste tu contraseña?
         </button>
       </div>
 
@@ -98,22 +98,22 @@ export function LoginForm() {
         {isLoading ? (
           <span className="flex items-center gap-2">
             <Spinner className="size-4" />
-            Logging in...
+            Iniciando sesión...
           </span>
         ) : (
-          "Login"
+          "Iniciar Sesión"
         )}
       </Button>
 
       <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
+        ¿No tienes una cuenta?{" "}
         <button
           type="button"
           onClick={handleSwitchToRegister}
           className="text-blue-600 hover:underline"
           disabled={isLoading}
         >
-          Create one
+          Crea una
         </button>
       </div>
     </form>

@@ -9,15 +9,15 @@
 // Execute immediately, even before module evaluation
 (function applyFilePolyfill() {
   'use strict'
-  
+
   // Only apply in Node.js server environment
   if (typeof window !== 'undefined') return
-  
+
   // CRITICAL: Check and apply File polyfill IMMEDIATELY
   // Don't skip if File exists - ensure it's properly defined
-  const needsPolyfill = typeof globalThis.File === 'undefined' || 
-                        typeof globalThis.File.prototype === 'undefined' ||
-                        !globalThis.File.prototype.stream
+  const needsPolyfill = typeof globalThis.File === 'undefined' ||
+    typeof globalThis.File.prototype === 'undefined' ||
+    !globalThis.File.prototype.stream
 
   // If File already exists and is complete, skip
   if (!needsPolyfill) {
@@ -61,15 +61,15 @@
 
   // Apply to globalThis IMMEDIATELY (synchronous)
   const FileConstructor = FilePolyfill
-  
+
   // Force override File if it exists but is incomplete
   try {
-  Object.defineProperty(globalThis, 'File', {
-    value: FileConstructor,
-    writable: true,
-    enumerable: false,
-    configurable: true
-  })
+    Object.defineProperty(globalThis, 'File', {
+      value: FileConstructor,
+      writable: true,
+      enumerable: false,
+      configurable: true
+    })
   } catch (e) {
     // If defineProperty fails, try direct assignment
     try {
@@ -89,12 +89,12 @@
   // Also apply to global for compatibility
   if (typeof global !== 'undefined') {
     try {
-    Object.defineProperty(global, 'File', {
-      value: FileConstructor,
-      writable: true,
-      enumerable: false,
-      configurable: true
-    })
+      Object.defineProperty(global, 'File', {
+        value: FileConstructor,
+        writable: true,
+        enumerable: false,
+        configurable: true
+      })
     } catch (e) {
       try {
         global.File = FileConstructor
@@ -115,7 +115,7 @@
       console.error('❌ File API polyfill failed:', error)
     }
   }
-  
+
   // CRITICAL: Ensure File is available for undici/webidl
   // This is a workaround for modules that check File during module evaluation
   if (typeof globalThis.File === 'undefined') {
@@ -124,4 +124,4 @@
 })()
 
 // Export to make this a valid ES module for TypeScript
-export {}
+export { }

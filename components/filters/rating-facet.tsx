@@ -22,7 +22,7 @@ export function RatingFacet({ id, title, distribution, isChecked, onCheckedChang
       <AccordionTrigger className="py-2 text-base">{title}</AccordionTrigger>
       <AccordionContent>
         {hasNoResults ? (
-          <p className="text-sm text-neutral-500">No {title.toLowerCase()} found</p>
+          <p className="text-sm text-neutral-500">No se encontraron resultados para {title.toLowerCase()}</p>
         ) : (
           <div className="grid gap-2">
             {distributionsEntries.map(([value], index) => (
@@ -32,7 +32,7 @@ export function RatingFacet({ id, title, distribution, isChecked, onCheckedChang
                   checked={isChecked(value)}
                   onCheckedChange={(checked) => onCheckedChange(!!checked, value)}
                 />
-                <StarRating rating={parseInt(value)} /> {parseInt(value) !== 5 && `& up`}{" "}
+                <StarRating rating={parseInt(value)} /> {parseInt(value) !== 5 && `o más`}{" "}
               </Label>
             ))}
           </div>

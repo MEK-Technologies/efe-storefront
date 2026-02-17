@@ -1,12 +1,14 @@
-import { Suspense } from "react"
-import { listProductsWithSort } from "lib/medusa/data/products"
 import { HitsSection } from "components/filters/hits-section"
 import { PaginationSection } from "components/filters/pagination-section"
 import { SearchParamsType } from "types"
 import { Sorter } from "./filters/sorter"
-import { SortOptions } from "lib/medusa/util"
+import { SortOptions, sortProducts } from "lib/medusa/util"
 import { HttpTypes } from "@medusajs/types"
 import { DEFAULT_COUNTRY_CODE } from "constants/index"
+import { sdk } from "lib/medusa/config"
+import { getRegion } from "lib/medusa/data/regions"
+import { getAuthHeaders, getCacheOptions } from "lib/medusa/data/cookies"
+import { getProductsBySearch } from "lib/medusa/data/product-queries"
 
 interface SearchViewProps {
   searchParams: SearchParamsType
@@ -31,44 +33,45 @@ export async function SearchView({
   const currentPage = page ? parseInt(page as string) : 1
   const sort = (sortBy as SortOptions) || "created_at"
   const searchQuery = q as string | undefined
+  const limit = 12
 
   let products = initialProducts
   let count = initialCount || 0
 
   // Only fetch if initial data wasn't provided
   if (!products) {
-    const queryParams: any = {
-      limit: 12,
-    }
+    const region = await getRegion(DEFAULT_COUNTRY_CODE)
+    
+    if (!region) {
+      products = []
+      count = 0
+    } else {
+      const headers = {
+        ...(await getAuthHeaders()),
+      }
 
-    // Add search query if provided
-    if (searchQuery) {
-      queryParams.q = searchQuery
-    }
+      const next = {
+        ...(await getCacheOptions("products")),
+      }
 
-    if (category) {
-      queryParams.category_id = [category.id]
-    }
+      // Utilizar la nueva función que descompone productos en variantes y aplica filtrado estricto
+      const variantProducts = await getProductsBySearch(searchQuery || "", 1000)
 
-    if (collection) {
-      queryParams.collection_id = [collection.id]
-    }
+      // Apply sorting to all products
+      const sortedProducts = sortProducts(variantProducts, sort)
 
-    const { response } = await listProductsWithSort({
-      page: currentPage,
-      countryCode: DEFAULT_COUNTRY_CODE,
-      sortBy: sort,
-      queryParams
-    })
-    products = response.products
-    count = response.count
+      // Apply client-side pagination
+      const pageParam = (currentPage - 1) * limit
+      products = sortedProducts.slice(pageParam, pageParam + limit)
+      count = sortedProducts.length // Use total variants count for pagination
+    }
   }
 
   // Mocking facets for now as Medusa requires specific logic for various aggregations
-  const facets = {} 
+  // const facets = {} 
   const title = searchQuery 
-    ? `Search results for "${searchQuery}"`
-    : category?.name || collection?.title || "Search"
+    ? `Resultados de búsqueda para "${searchQuery}"`
+    : category?.name || collection?.title || "Búsqueda"
 
   return (
     <div className="px-4 pb-10">

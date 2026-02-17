@@ -21,7 +21,7 @@ export const ReviewCard = ({ created_at, author, rating, body }: ReviewCardProps
       <div className="mt-6 flex w-full flex-col items-center justify-between gap-2">
         <h3 className="font-semibold">{author}</h3>
         <span className="text-xs text-gray-500">
-          {new Date(created_at).toLocaleDateString("en-US", {
+          {new Date(created_at).toLocaleDateString("es-ES", {
             year: "numeric",
             month: "long",
             day: "numeric",

@@ -45,7 +45,7 @@ export function AuthButton() {
           onClick={() => openModal("login")}
           className="text-sm font-medium"
         >
-          Login
+          Iniciar Sesión
         </Button>
         <Button
           variant="default"
@@ -53,7 +53,7 @@ export function AuthButton() {
           onClick={() => openModal("register")}
           className="text-sm font-medium"
         >
-          Sign Up
+          Registrarse
         </Button>
       </div>
     )
@@ -61,7 +61,7 @@ export function AuthButton() {
 
   const displayName = customer?.first_name
     ? `${customer.first_name}${customer.last_name ? ` ${customer.last_name.charAt(0)}.` : ""}`
-    : customer?.email?.split("@")[0] || "Account"
+    : customer?.email?.split("@")[0] || "Cuenta"
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -93,28 +93,28 @@ export function AuthButton() {
                 onClick={() => setIsDropdownOpen(false)}
                 className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
               >
-                Account Dashboard
+                Mi Cuenta
               </Link>
               <Link
                 href="/account/profile"
                 onClick={() => setIsDropdownOpen(false)}
                 className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
               >
-                Profile Settings
+                Ajustes de Perfil
               </Link>
               <Link
                 href="/account/orders"
                 onClick={() => setIsDropdownOpen(false)}
                 className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
               >
-                My Orders
+                Mis Pedidos
               </Link>
               <Link
                 href="/account/addresses"
                 onClick={() => setIsDropdownOpen(false)}
                 className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
               >
-                Addresses
+                Direcciones
               </Link>
 
               <div className="border-t border-gray-100 pt-1">
@@ -125,7 +125,7 @@ export function AuthButton() {
                   }}
                   className="block w-full rounded-md px-3 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                 >
-                  Logout
+                  Cerrar Sesión
                 </button>
               </div>
             </nav>

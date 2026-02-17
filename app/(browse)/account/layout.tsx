@@ -12,10 +12,10 @@ interface AccountLayoutProps {
 }
 
 const accountLinks = [
-  { href: "/account", label: "Dashboard", icon: "📊" },
-  { href: "/account/profile", label: "Profile", icon: "👤" },
-  { href: "/account/orders", label: "Orders", icon: "📦" },
-  { href: "/account/addresses", label: "Addresses", icon: "📍" },
+  { href: "/account", label: "Panel", icon: "📊" },
+  { href: "/account/profile", label: "Perfil", icon: "👤" },
+  { href: "/account/orders", label: "Órdenes", icon: "📦" },
+  { href: "/account/addresses", label: "Direcciones", icon: "📍" },
 ]
 
 export default function AccountLayout({ children }: AccountLayoutProps) {
@@ -26,10 +26,10 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Mi Cuenta</h1>
         {customer && (
           <p className="mt-1 text-sm text-gray-600">
-            Welcome back, {customer.first_name || customer.email}
+            Bienvenido de nuevo, {customer.first_name || customer.email}
           </p>
         )}
       </div>
@@ -43,7 +43,7 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
             className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left font-medium text-gray-900 shadow-sm"
             aria-expanded={isMobileMenuOpen ? ("true" as const) : ("false" as const)}
           >
-            <span>Menu</span>
+            <span>Menú</span>
             <ChevronIcon
               className={cn("size-5 transition-transform", {
                 "rotate-180": isMobileMenuOpen,
@@ -87,7 +87,7 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >
               <span className="text-lg">🚪</span>
-              Logout
+              Cerrar Sesión
             </button>
           </nav>
         </aside>

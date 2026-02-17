@@ -20,13 +20,13 @@ export function HitsSection({ hits, basePath }: HitsSectionProps) {
   if (!hits.length) {
     return (
       <div className="mt-2 flex h-[400px] w-full flex-col items-center justify-center rounded-xl bg-gray-50">
-        <p className="text-2xl font-medium text-gray-800">Oops! Nothing matches your search</p>
-        <p className="font-medium text-gray-400">Explore our full collection to find what you’re looking for</p>
+        <p className="text-2xl font-medium text-gray-800">¡Vaya! No hay resultados para tu búsqueda</p>
+        <p className="font-medium text-gray-400">Explora nuestra colección completa para encontrar lo que buscas</p>
         <Link
           href={isAiPath ? "/ai/search" : "/search"}
           className="mt-3 rounded-md bg-black px-4 py-1.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-black/85"
         >
-          See all products
+          Ver todos los productos
         </Link>
       </div>
     )
@@ -35,7 +35,7 @@ export function HitsSection({ hits, basePath }: HitsSectionProps) {
   return (
     <div
       className={cn(
-        "-px-4 grid w-full auto-rows-fr grid-cols-2 items-start gap-2 gap-y-4 sm:grid-cols-3 sm:gap-4 xl:grid-cols-3",
+        "-px-4 grid w-full auto-rows-fr grid-cols-2 items-stretch gap-2 gap-y-4 sm:grid-cols-3 sm:gap-4 xl:grid-cols-3",
         isAiPath && "sm:grid-cols-2"
       )}
     >

@@ -12,7 +12,7 @@ export function RegisterModal() {
     <Dialog open={!!modals["register"]} onOpenChange={() => closeModal("register")}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Create Account</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Crear Cuenta</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <RegisterForm />

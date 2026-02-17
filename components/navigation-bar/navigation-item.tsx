@@ -21,12 +21,15 @@ export function NavigationItem({ singleMenuItem }: { singleMenuItem: NavItem }) 
       prefetch={false}
       onClick={handleClick}
       href={`${isAi ? "/ai" : ""}${singleMenuItem.href}`}
-      className="menu__link h-full text-[22px] md:text-sm/[18px]"
+      className="group relative flex h-full items-center gap-1.5 py-4 text-[18px] font-medium transition-colors hover:text-primary md:text-sm"
     >
-      {singleMenuItem.text}
+      <span className="relative whitespace-nowrap">
+        {singleMenuItem.text}
+        <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+      </span>
       {!!singleMenuItem.submenu && (
-        <i>
-          <ChevronIcon />
+        <i className="transition-transform duration-300 group-hover:rotate-180">
+          <ChevronIcon className="size-3" />
         </i>
       )}
     </Link>

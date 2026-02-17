@@ -76,8 +76,8 @@ export function ShippingOptions() {
               <span className="font-medium">
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
-                  currency: option.amount ? "usd" : "usd", // TODO: Get currency from cart
-                }).format((option.amount || 0) / 100)}
+                  currency: option.amount ? "dop" : "dop", // TODO: Get currency from cart
+                }).format(option.amount || 0)}
               </span>
             </Label>
           </div>

@@ -12,7 +12,7 @@ export function LoginModal() {
     <Dialog open={!!modals["login"]} onOpenChange={() => closeModal("login")}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Welcome Back</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">¡Bienvenido de nuevo!</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <LoginForm />

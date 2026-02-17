@@ -1,26 +1,15 @@
 import { Button } from "components/ui/button"
 import { Input } from "components/ui/input"
 import Link from "next/link"
+import { BrandsCarouselSection } from "app/(browse)/home/_components/brands-carousel-section"
 
-export function Footer() {
+export async function Footer() {
   return (
     <footer className="border-t bg-white text-muted-foreground">
       <div className="mx-auto max-w-container-md px-6 py-12">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-4 lg:col-span-2">
-            <h3 className="text-lg font-semibold text-primary">Mantente Conectado</h3>
-            <p className="text-sm">Suscríbete para recibir actualizaciones sobre nuevos productos y ofertas exclusivas.</p>
-            <div className="space-y-2 sm:max-w-md">
-              <Input type="email" placeholder="Tu correo electrónico" aria-label="Email para newsletter" />
-              <Button
-                type="submit"
-                className="w-full transition-[transform,background] duration-200 hover:bg-black/85 active:scale-[0.99]"
-              >
-                Suscribirse
-              </Button>
-            </div>
-          </div>
-          
+        <BrandsCarouselSection className="mb-12" />
+        
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary">Tienda</h3>
             <ul className="space-y-2 text-sm">

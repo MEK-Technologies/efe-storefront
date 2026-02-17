@@ -37,7 +37,7 @@ export const ReviewsSection = async ({
         <div className="container mx-auto max-w-5xl px-4 md:px-6 xl:px-0">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <h2 className="text-xl font-semibold sm:text-2xl">
-              Have this product? Help others by sharing your experience
+              ¿Tienes este producto? Ayuda a otros compartiendo tu experiencia
             </h2>
             <ReviewButton productId={productId} />
           </div>
@@ -52,7 +52,7 @@ export const ReviewsSection = async ({
         <div className="space-y-4">
           <div className="mb-10 flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center justify-center">
-              <h2 className="text-xl font-semibold sm:text-xl">Customer Reviews</h2>
+              <h2 className="text-xl font-semibold sm:text-xl">Reseñas de clientes</h2>
               <span className="ml-1 text-sm font-normal text-gray-500">({total})</span>
               {!!avgRating && (
                 <div className="ml-1 inline-flex items-center">
@@ -68,7 +68,7 @@ export const ReviewsSection = async ({
             <div className="rounded bg-gray-300/25 p-4">
               <div className="mb-2 flex items-center space-x-2">
                 <RobotIcon className="size-4" />
-                <h3 className="text-base font-semibold">AI Summary</h3>
+                <h3 className="text-base font-semibold">Resumen de IA</h3>
               </div>
               <p className="text-sm text-gray-600">{summary}</p>
             </div>
@@ -90,7 +90,7 @@ export const ReviewsSection = async ({
             className={cn(buttonVariants({ variant: "outline" }), "w-full bg-white transition-all hover:scale-105")}
             prefetch={false}
           >
-            See all reviews
+            Ver todas las reseñas
           </Link>
         </div>
       </div>

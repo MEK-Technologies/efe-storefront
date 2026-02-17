@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 
 import { getPayloadClient } from "lib/payload-client"
-import { getProductsByCollectionId } from "lib/medusa/data/product-queries"
+import { getProductsByCollectionId, getProductsBySearch } from "lib/medusa/data/product-queries"
 import { ProductCard } from "components/product-card"
 
 interface CollectionPageProps {
@@ -105,17 +105,43 @@ export default async function CollectionPage(props: CollectionPageProps) {
     notFound()
   }
 
-  // Get products from Medusa using backend_collection_id
+  // Get products from Medusa using backend_collection_id OR search by name
   let products: any[] = []
+  
+  // Strategy 1: Try exact match by collection ID if it exists
   if (collection.backend_collection_id) {
     console.log('[Collections Page] Fetching products for collection ID:', collection.backend_collection_id)
     products = await getProductsByCollectionId(collection.backend_collection_id, 24)
-    console.log('[Collections Page] Found products count:', products.length)
-    if (products.length > 0) {
-      console.log('[Collections Page] First product:', products[0])
+  } 
+  
+  // Strategy 2: If no products found via ID (or no ID), try partial name search
+  // This matches the user request: "WHERE LOWER(p.title) LIKE '%mints%'"
+  if (products.length === 0) {
+    // Prefer title, fall back to handle. Ensure it's lowercase for fuzzy search.
+    const rawQuery = collection.title || decodedHandle
+    const searchQuery = rawQuery.trim() // Medusa q is case-insensitive, but cleaner to trim
+    
+    console.log(`[Collections Page] No products found by ID. Strategy 2: Search by name.`)
+    console.log(`[Collections Page] Raw Query: "${rawQuery}", Search Query: "${searchQuery}"`)
+    
+    // Using the new search function
+    if (searchQuery) {
+      products = await getProductsBySearch(searchQuery, 100)
+      console.log(`[Collections Page] Search for "${searchQuery}" found ${products.length} products`)
+      
+      // DEBUG: Log the first match titles to verify relevance
+      if (products.length > 0) {
+        console.log(`[Collections Page] First 3 matches:`, products.slice(0, 3).map(p => p.title))
+      }
+    } else {
+      console.warn('[Collections Page] Search query is empty, skipping search.')
     }
+  }
+
+  if (products.length > 0) {
+      console.log('[Collections Page] First product:', products[0])
   } else {
-    console.log('[Collections Page] No backend_collection_id set for this collection')
+    console.log('[Collections Page] No backend_collection_id set and no search results found')
   }
 
   // Get banner image
@@ -173,7 +199,7 @@ export default async function CollectionPage(props: CollectionPageProps) {
             </h2>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:gap-6">
+          <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:gap-6">
             {products.map((product: any) => (
               <ProductCard
                 key={product.id}
@@ -191,7 +217,7 @@ export default async function CollectionPage(props: CollectionPageProps) {
           <p className="mt-2 text-sm text-muted-foreground">
             {collection.backend_collection_id 
               ? "This collection doesn't have any products yet." 
-              : "This collection is not linked to a backend collection."}
+              : `No products found matching "${collection.title || decodedHandle}".`}
           </p>
         </div>
       )}

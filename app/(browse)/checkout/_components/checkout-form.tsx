@@ -80,7 +80,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               {index + 1}
             </div>
             <span className="ml-2 capitalize">
-              {step === "contact" ? "contacto" : step === "shipping" ? "envío" : "pago"}
+              {step === "contact" ? "contacto" : step === "shipping" ? "envío" : "confirmación"}
             </span>
             {index < 2 && <div className="mx-4 h-0.5 w-12 bg-gray-300" />}
           </div>
@@ -100,7 +100,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                 type="email"
                 defaultValue={cart.email || ""}
                 required
-                placeholder="your@email.com"
+                placeholder="tu@email.com"
                 disabled={isPending}
               />
             </div>
@@ -198,7 +198,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                 <Input
                   id="country_code"
                   name="country_code"
-                  defaultValue={cart.shipping_address?.country_code || cart.region?.countries?.[0]?.iso_2 || "us"}
+                  defaultValue={cart.shipping_address?.country_code || cart.region?.countries?.[0]?.iso_2 || "do"}
                   required
                   disabled={isPending}
                 />
@@ -282,7 +282,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                       <Input
                         id="billing_country_code"
                         name="billing_country_code"
-                        defaultValue={cart.region?.countries?.[0]?.iso_2 || "us"}
+                        defaultValue={cart.region?.countries?.[0]?.iso_2 || "do"}
                         required={!sameAsShipping}
                         disabled={isPending}
                       />
@@ -301,7 +301,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   Atrás
                 </Button>
                 <Button type="submit" disabled={isPending} className="flex-1">
-                  {isPending ? "Guardando..." : "Continuar a Pago"}
+                  {isPending ? "Guardando..." : "Continuar a Confirmación"}
                 </Button>
               </div>
             </form>
@@ -314,7 +314,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       {/* Payment */}
       {currentStep === "payment" && (
         <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-semibold">Pago</h2>
+          <h2 className="mb-4 text-xl font-semibold">Confirmación</h2>
           <PaymentSection onBack={() => setCurrentStep("shipping")} />
         </div>
       )}

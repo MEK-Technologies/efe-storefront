@@ -12,7 +12,7 @@ export const FeaturedProductsSection = ({
   return (
     <div className="mx-auto my-4 w-full max-w-container-sm space-y-4 px-4">
       <h2 className="mb-8 text-4xl font-semibold">Productos Destacados</h2>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-1">
+      <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-4 md:grid-rows-1">
         {highlightedProducts.map((product, index) => (
           <ProductCard
             highlighted={index < 2}
@@ -23,7 +23,7 @@ export const FeaturedProductsSection = ({
           />
         ))}
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-1">
+      <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 md:grid-rows-1">
         {restProducts.map((product) => (
           <ProductCard prefetch className="" key={product.id} product={product} />
         ))}

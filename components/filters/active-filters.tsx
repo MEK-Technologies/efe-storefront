@@ -27,7 +27,7 @@ export function ActiveFilters({
     <>
       <div className="flex items-baseline justify-between pb-1 tracking-tight">
         <p className="text-sm font-medium">
-          {filtersCount === 0 ? "No filters selected" : `Active filters (${filtersCount})`}
+          {filtersCount === 0 ? "No hay filtros seleccionados" : `Filtros activos (${filtersCount})`}
         </p>
         <button
           className={cn(
@@ -36,7 +36,7 @@ export function ActiveFilters({
           )}
           onClick={() => setShowFilterTags(!showFilterTags)}
         >
-          {showFilterTags ? "Hide" : "Show"}
+          {showFilterTags ? "Ocultar" : "Mostrar"}
         </button>
       </div>
       <motion.div

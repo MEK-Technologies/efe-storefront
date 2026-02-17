@@ -61,7 +61,7 @@ export function AddToCartButton({
 
       if (!res.ok) {
         console.warn("[AddToCartButton] addCartItem failed:", res.message)
-        toast.error(res.message || "Out of stock")
+        toast.error(res.message || "Agotado")
       } else {
         console.log("[AddToCartButton] Successfully added to cart")
         // Show product added animation
@@ -70,7 +70,7 @@ export function AddToCartButton({
       }
     } catch (error) {
       console.error("[AddToCartButton] Error in handleClick:", error)
-      toast.error("Error adding to cart")
+      toast.error("Error al añadir al carrito")
     } finally {
       // Reset states after operation completes
       setTimeout(() => setIsPending(false), 300)
@@ -142,7 +142,7 @@ export function AddToCartButton({
       )}
     >
       <BagIcon className="mr-2 size-5 text-white" />
-      Add to Bag
+      Añadir al Carrito
     </Button>
   )
 }

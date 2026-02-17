@@ -10,7 +10,7 @@ export function SearchButton() {
 
   return (
     <Button
-      aria-label="Launch search modal"
+      aria-label="Abrir búsqueda"
       variant="ghost"
       className="ml-3 flex items-center justify-center p-1"
       onClick={() => openModal("search")}

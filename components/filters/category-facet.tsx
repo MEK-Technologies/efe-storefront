@@ -34,7 +34,7 @@ export function CategoryFacet({ id, title, distribution, isChecked, onCheckedCha
       <AccordionTrigger className="py-2 text-base">{title}</AccordionTrigger>
       <AccordionContent className="max-h-[250px] overflow-y-auto">
         {items.length === 0 ? (
-          <p className="text-sm/5 text-neutral-500">No categories found</p>
+          <p className="text-sm/5 text-neutral-500">No se encontraron categorías</p>
         ) : (
           <CategoryTree items={items} parent={null} level={0} onClick={handleClick} isChecked={isChecked} />
         )}

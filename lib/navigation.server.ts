@@ -44,9 +44,38 @@ function transformCategoriesToNavItems(
  */
 export async function getNavigationData(): Promise<NavigationData> {
   try {
-    // Fetch root categories from Medusa - increased limit to show all categories
+    // Fetch root categories from Medusa
     const categories = await listRootCategories(100)
-    const items = transformCategoriesToNavItems(categories)
+    
+    // Transform categories to TextGridItems for the megamenu
+    const categorySubmenuItems: TextGridItem[] = categories.map((category) => ({
+      text: category.name,
+      href: `/category/${slugify(category.handle)}`,
+      items: category.category_children?.map((child) => ({
+        text: child.name,
+        href: `/category/${slugify(child.handle)}`,
+      })) || [],
+    }))
+
+    // Create a single "Categorías" NavItem containing all categories
+    const items: NavItem[] = [
+      {
+        text: "Categorías",
+        href: "/search",
+        submenu: {
+          variant: "text-grid",
+          items: categorySubmenuItems,
+        },
+      },
+      {
+        text: "Sobre Nosotros",
+        href: "/about-us",
+      },
+      {
+        text: "Contacto",
+        href: "/contact",
+      },
+    ]
     
     return { items }
   } catch (error) {

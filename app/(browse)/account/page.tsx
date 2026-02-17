@@ -9,27 +9,27 @@ export default function AccountPage() {
   if (!customer) {
     return (
       <div className="py-12 text-center">
-        <p className="text-gray-600">Loading your account...</p>
+        <p className="text-gray-600">Cargando tu cuenta...</p>
       </div>
     )
   }
 
   const stats = [
     {
-      label: "Total Orders",
+      label: "Total de Órdenes",
       value: 0, // Orders would come from separate API call
       icon: "📦",
       href: "/account/orders",
     },
     {
-      label: "Saved Addresses",
+      label: "Direcciones Guardadas",
       value: customer.addresses?.length || 0,
       icon: "📍",
       href: "/account/addresses",
     },
     {
-      label: "Account Status",
-      value: "Active",
+      label: "Estado de la Cuenta",
+      value: "Activa",
       icon: "✅",
       href: "/account/profile",
     },
@@ -38,9 +38,9 @@ export default function AccountPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Panel</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Welcome back, {customer.first_name || "there"}!
+          Bienvenido de nuevo, {customer.first_name || "estimado cliente"}!
         </p>
       </div>
 
@@ -63,9 +63,9 @@ export default function AccountPage() {
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/* Acciones Rápidas */}
       <div>
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-900">Acciones Rápidas</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
             href="/account/profile"
@@ -73,8 +73,8 @@ export default function AccountPage() {
           >
             <span className="text-2xl">✏️</span>
             <div>
-              <p className="font-medium text-gray-900">Edit Profile</p>
-              <p className="text-sm text-gray-600">Update your personal information</p>
+              <p className="font-medium text-gray-900">Editar Perfil</p>
+              <p className="text-sm text-gray-600">Actualiza tu información personal</p>
             </div>
           </Link>
 
@@ -84,8 +84,8 @@ export default function AccountPage() {
           >
             <span className="text-2xl">📋</span>
             <div>
-              <p className="font-medium text-gray-900">View Orders</p>
-              <p className="text-sm text-gray-600">Track your order history</p>
+              <p className="font-medium text-gray-900">Ver Órdenes</p>
+              <p className="text-sm text-gray-600">Rastrea tu historial de órdenes</p>
             </div>
           </Link>
 
@@ -95,8 +95,8 @@ export default function AccountPage() {
           >
             <span className="text-2xl">🏠</span>
             <div>
-              <p className="font-medium text-gray-900">Manage Addresses</p>
-              <p className="text-sm text-gray-600">Update shipping addresses</p>
+              <p className="font-medium text-gray-900">Gestionar Direcciones</p>
+              <p className="text-sm text-gray-600">Actualiza tus direcciones de envío</p>
             </div>
           </Link>
 
@@ -106,40 +106,40 @@ export default function AccountPage() {
           >
             <span className="text-2xl">🛍️</span>
             <div>
-              <p className="font-medium text-gray-900">Continue Shopping</p>
-              <p className="text-sm text-gray-600">Browse our products</p>
+              <p className="font-medium text-gray-900">Continuar Comprando</p>
+              <p className="text-sm text-gray-600">Explora nuestros productos</p>
             </div>
           </Link>
         </div>
       </div>
 
-      {/* Account Info */}
+      {/* Info de la Cuenta */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900">Account Information</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-900">Información de la Cuenta</h3>
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm font-medium text-gray-600">Email</dt>
+            <dt className="text-sm font-medium text-gray-600">Correo Electrónico</dt>
             <dd className="mt-1 text-sm text-gray-900">{customer.email}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-gray-600">Name</dt>
+            <dt className="text-sm font-medium text-gray-600">Nombre</dt>
             <dd className="mt-1 text-sm text-gray-900">
               {customer.first_name && customer.last_name
                 ? `${customer.first_name} ${customer.last_name}`
-                : customer.first_name || "Not set"}
+                : customer.first_name || "No establecido"}
             </dd>
           </div>
           {customer.phone && (
             <div>
-              <dt className="text-sm font-medium text-gray-600">Phone</dt>
+              <dt className="text-sm font-medium text-gray-600">Teléfono</dt>
               <dd className="mt-1 text-sm text-gray-900">{customer.phone}</dd>
             </div>
           )}
           {customer.created_at && (
             <div>
-              <dt className="text-sm font-medium text-gray-600">Member Since</dt>
+              <dt className="text-sm font-medium text-gray-600">Miembro Desde</dt>
               <dd className="mt-1 text-sm text-gray-900">
-                {new Date(customer.created_at).toLocaleDateString("en-US", {
+                {new Date(customer.created_at).toLocaleDateString("es-DO", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

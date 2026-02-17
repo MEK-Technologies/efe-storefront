@@ -31,7 +31,7 @@ export function SearchFacet({ className }: { className?: string }) {
     <div className={cn("relative flex items-center justify-center", className)}>
       <input
         className="relative w-full appearance-none rounded-md border border-neutral-300 bg-neutral-100 px-2.5 py-1.5 pl-4 text-black focus:border-blue-500 focus:ring-blue-500"
-        placeholder="Search..."
+        placeholder="Buscar..."
         type="text"
         value={localQuery || ""}
         onChange={(event) => {

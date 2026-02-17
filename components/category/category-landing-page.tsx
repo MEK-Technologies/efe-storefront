@@ -71,7 +71,7 @@ export function CategoryLandingPage({ collection, products, basePath }: Category
           <h2 className="mb-6 text-2xl font-semibold tracking-tight md:text-3xl">Featured Products</h2>
 
           {}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 items-stretch md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {displayedProducts.map((product) => (
               <ProductCard key={product.id} product={product} className="h-full" prefetch={false} />
             ))}

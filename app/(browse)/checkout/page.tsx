@@ -50,7 +50,7 @@ export default async function CheckoutPage() {
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: cart.currency_code,
-                      }).format((item.total || 0) / 100)}
+                      }).format(item.total || 0)}
                     </p>
                   </div>
                 ))}
@@ -63,7 +63,7 @@ export default async function CheckoutPage() {
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: cart.currency_code,
-                    }).format((cart.subtotal || 0) / 100)}
+                    }).format(cart.subtotal || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -73,7 +73,7 @@ export default async function CheckoutPage() {
                       ? new Intl.NumberFormat("en-US", {
                           style: "currency",
                           currency: cart.currency_code,
-                        }).format(cart.shipping_total / 100)
+                        }).format(cart.shipping_total)
                       : "Se calculará en el siguiente paso"}
                   </span>
                 </div>
@@ -83,7 +83,7 @@ export default async function CheckoutPage() {
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: cart.currency_code,
-                    }).format((cart.tax_total || 0) / 100)}
+                    }).format(cart.tax_total || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between border-t pt-2 text-lg font-bold">
@@ -92,7 +92,7 @@ export default async function CheckoutPage() {
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: cart.currency_code,
-                    }).format((cart.total || 0) / 100)}
+                    }).format(cart.total || 0)}
                   </span>
                 </div>
               </div>

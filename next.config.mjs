@@ -69,7 +69,7 @@ const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: 
         net: false,
         tls: false,
       }
-      
+
       // CRITICAL: Ensure payload-polyfill.js loads FIRST
       // Add it as an entry point to ensure it runs before any other code
       config.plugins = config.plugins || []

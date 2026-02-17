@@ -120,7 +120,7 @@ export function VariantDropdowns({ variants, className, handle, combination, cur
 
   return (
     <div ref={dropdownContainerRef} className={cn("flex flex-col gap-4", className)}>
-      <p className="text-center text-sm text-neutral-500 md:text-left">Select options</p>
+      <p className="text-center text-sm text-neutral-500 md:text-left">Seleccionar opciones</p>
       <div className="flex flex-col gap-3">
         {optionsData.map((option) => (
           <div key={option.name} className="flex flex-col gap-2">
@@ -128,7 +128,7 @@ export function VariantDropdowns({ variants, className, handle, combination, cur
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full justify-between" size="sm">
-                  {option.currentValue || `Select ${option.name}`}
+                  {option.currentValue || `Seleccionar ${option.name}`}
                   <ChevronDown className="ml-2 size-4" />
                 </Button>
               </DropdownMenuTrigger>

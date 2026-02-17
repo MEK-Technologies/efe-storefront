@@ -1,41 +1,12 @@
-import { getProductByHandle } from "lib/medusa/data/product-queries"
+// DEPRECATED: This metadata generation is not used with the new variant-only approach
+// Metadata is now handled directly in page.tsx using the variant.product data
+
 import { env } from "env.mjs"
-import { Metadata } from "next"
 import { Product, WithContext } from "schema-dts"
 import type { CommerceProduct } from "types"
-import { makeKeywords } from "utils/make-keywords"
-import { removeOptionsFromUrl } from "utils/product-options-utils"
-import { slugToName } from "utils/slug-name"
 import { getFeaturedImage, getMinPrice } from "utils/medusa-product-helpers"
 
-interface ProductProps {
-  params: { slug: string }
-}
-
-export async function generateMetadata({ params: { slug } }: ProductProps): Promise<Metadata> {
-  const product = await getProductByHandle(removeOptionsFromUrl(slug))
-
-  // Use product title/description directly (Medusa doesn't have separate SEO fields)
-  const keywords = makeKeywords(product?.title)
-  // Use Medusa's collection (singular) instead of collections (plural)
-  const collection = product?.collection
-
-  return {
-    title: `${product?.title || "Product"} | Blazity`,
-    description: product?.description,
-    generator: "Next.js",
-    applicationName: "Next.js",
-    referrer: "origin-when-cross-origin",
-    keywords: keywords,
-    category: collection ? slugToName(collection.handle ?? "") : "Search",
-    creator: "Blazity",
-    alternates: {
-      canonical: `/product/${slug}`,
-    },
-    publisher: "Blazity",
-  }
-}
-
+// The generateJsonLd function is still used in page.tsx for structured data
 export function generateJsonLd(product: CommerceProduct, slug: string) {
   const images = product.images ?? []
   const minPriceData = getMinPrice(product.variants)

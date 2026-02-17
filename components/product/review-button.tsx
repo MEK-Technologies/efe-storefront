@@ -21,7 +21,7 @@ export const ReviewButton = ({ productId }: ReviewButtonProps) => {
         openModal("review")
       }}
     >
-      Leave a Review
+      Escribir una reseña
     </Button>
   )
 }

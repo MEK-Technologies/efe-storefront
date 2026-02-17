@@ -293,10 +293,25 @@ export async function createOrdenFromCart(cartId: string): Promise<CompleteOrden
 export async function getOrdenById(ordenId: string): Promise<Orden | null> {
   try {
     const payload = await getPayloadClient()
+
+    // Intentar convertir a número si es string
+    // Payload usa IDs numéricos por defecto con Postgres
+    const numericId = Number(ordenId)
+    const isValidId = !isNaN(numericId)
+    
+    console.log("[getOrdenById] Fetching order:", { 
+      ordenId, 
+      numericId, 
+      isValidId, 
+      usingId: isValidId ? numericId : ordenId 
+    })
+
     const result = await payload.findByID({
       collection: "ordenes",
-      id: ordenId,
+      id: isValidId ? numericId : ordenId,
     })
+
+    console.log("[getOrdenById] Result found:", !!result)
 
     if (!result) {
       return null

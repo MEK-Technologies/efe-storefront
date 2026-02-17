@@ -17,6 +17,7 @@ interface ProductCardProps {
   highlighted?: boolean
   variant?: "default" | "hero"
   hasCustomerGroupPricing?: boolean
+  activeVariant?: HttpTypes.StoreProductVariant
 }
 
 /**
@@ -82,13 +83,50 @@ export const ProductCard = ({
   highlighted = false,
   variant = "default",
   hasCustomerGroupPricing = false,
+  activeVariant,
 }: ProductCardProps) => {
   const { handle, title, variants } = product
   const featuredImage = getFeaturedImage(product)
   const minPriceVariant = getMinPriceVariant(variants)
   const noOfVariants = variants?.length ?? 0
-  const path = href || `/product/${handle}`
-  const linkAria = `Visit product: ${title}`
+  
+  // Logic to determine if we should show "From" / "Desde"
+  // 1. If activeVariant is provided, NEVER show "From" (we show that specific variant's price)
+  // 2. If all variants have the same price, NEVER show "From"
+  // 3. Otherwise (multiple variants with diff prices), show "From"
+  
+  // Calculate if we have a price range
+  const priceValues = variants?.map(v => {
+    // Try calculated price first, then original price
+    if (v.calculated_price?.calculated_amount != null) return v.calculated_price.calculated_amount
+    if ((v as any).original_price?.amount != null) return (v as any).original_price.amount
+    return null
+  }).filter(p => p !== null) || []
+  
+  // Check if all valid prices are the same (using a small epsilon for float comparison if needed, but integers usually fine for cents)
+  const allPricesAreSame = priceValues.length > 0 && priceValues.every(p => p === priceValues[0])
+  
+  // Valid price range exists if we have multiple prices AND they are not all the same
+  const hasPriceRange = priceValues.length > 1 && !allPricesAreSame
+  
+  // Determine which variant to display price for
+  // Priority: activeVariant > minPriceVariant > first variant
+  const priceVariant = activeVariant || minPriceVariant || variants?.[0]
+  
+  // Show "From" label ONLY if we have a range AND no specific variant is active
+  const showFromLabel = hasPriceRange && !activeVariant
+
+  // Use the minimum price variant as the default variant to link to
+  // If activeVariant is present, link to that specific variant
+  const defaultVariant = activeVariant || minPriceVariant || variants?.[0]
+  const path = href || (defaultVariant?.id ? `/product/${handle}?variant=${defaultVariant.id}` : `/product/${handle}`)
+  
+  // Logic to determine display title: prefer variant title unless it's "Default Variant"
+  const displayTitle = (defaultVariant?.title && defaultVariant.title !== "Default Variant") 
+    ? defaultVariant.title 
+    : title
+
+  const linkAria = `Visitar producto: ${displayTitle}`
 
 
 
@@ -107,50 +145,51 @@ export const ProductCard = ({
           <Image
             priority={priority}
             src={featuredImage?.url || "/default-product-image.svg"}
-            alt={featuredImage?.alt || title}
+            alt={featuredImage?.alt || displayTitle}
             fill
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             sizes="240px"
           />
         </div>
-        <h3 className="mb-1 line-clamp-2 text-sm font-semibold text-foreground">{title}</h3>
-        {minPriceVariant && (
+        <h3 className="mb-1 line-clamp-2 text-sm font-semibold text-foreground">{displayTitle}</h3>
+        {priceVariant && (
           <ProductPrice
-            variant={minPriceVariant}
+            variant={priceVariant}
             showBadge={true}
             displayVariant="compact"
             className="text-primary"
           />
         )}
-        <span className="mt-2 text-xs font-medium text-muted-foreground">Shop Now →</span>
+        <span className="mt-2 text-xs font-medium text-muted-foreground">Comprar ahora →</span>
       </Link>
     )
   }
 
   return (
     <Link
-      className={cn("group flex h-full w-full flex-col overflow-hidden rounded-lg", className)}
+      className={cn("group flex h-full w-full flex-col overflow-hidden rounded-lg bg-white shadow-sm border border-black/5", className)}
       aria-label={linkAria}
       href={path}
       prefetch={prefetch}
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
         <Image
           priority={priority}
           src={featuredImage?.url || "/default-product-image.svg"}
-          alt={featuredImage?.alt || title}
+          alt={featuredImage?.alt || displayTitle}
           fill
-          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+          className="object-contain p-2 transition-transform duration-300 ease-out group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
-      <div className="bg-size-200 bg-pos-0 hover:bg-pos-100 flex shrink-0 grow flex-col text-pretty bg-gradient-to-b from-transparent to-primary/5 p-4 transition-all duration-200">
+      <div className="bg-size-200 bg-pos-0 hover:bg-pos-100 flex min-h-[14rem] shrink-0 grow flex-col text-pretty bg-gradient-to-b from-transparent to-primary/5 p-4 transition-all duration-200">
         <h3
           className={cn(
-            "line-clamp-2 text-lg font-semibold transition-colors data-[featured]:text-2xl",
+            "line-clamp-2 min-h-[3.5rem] text-lg font-semibold transition-colors data-[featured]:text-2xl",
             highlighted && "md:text-2xl"
           )}
         >
-          {title}
+          {displayTitle}
         </h3>
         <div className="flex flex-col pt-1">
           {/* Product type as subtitle if available */}
@@ -165,17 +204,19 @@ export const ProductCard = ({
           </div>
         </div>
 
-        {minPriceVariant && (
-          <div className="mt-auto flex flex-col pt-10">
+        {priceVariant && (
+          <div className="mt-auto flex flex-col pt-4">
             {noOfVariants > 0 && (
               <p className={cn("text-sm text-gray-500", highlighted && "md:text-base")}>
-                {noOfVariants} variant{noOfVariants > 1 ? "s" : ""}
+                {noOfVariants} {noOfVariants > 1 ? "variantes" : "variante"}
               </p>
             )}
             <div className={cn("flex w-full flex-col gap-1", highlighted && "md:text-base")}>
-              <span className="text-sm text-primary/50">From</span>
+              {showFromLabel && (
+                <span className="text-sm text-primary/50">Desde</span>
+              )}
               <ProductPrice
-                variant={minPriceVariant}
+                variant={priceVariant}
                 showBadge={true}
                 displayVariant="compact"
               />

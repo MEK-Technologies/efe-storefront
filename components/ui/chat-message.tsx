@@ -161,14 +161,14 @@ const NavigationToolResult = ({ animation, result, toolCallId }) => {
   }, [result, router, toolCallId, hasToolCallExecuted, markToolCallAsExecuted])
 
   const navigationMessages = {
-    "/search": "Searched for products",
-    "/product": "Navigated to product page",
-    "/category": "Navigated to category",
+    "/search": "Buscando productos",
+    "/product": "Navegando a la página del producto",
+    "/category": "Navegando a la categoría",
   }
 
   const message = Object.keys(navigationMessages).reduce(
     (defaultMessage, path) => (result.includes(path) ? navigationMessages[path] : defaultMessage),
-    "Navigated to page"
+    "Navegando a la página"
   )
 
   return (
@@ -202,7 +202,7 @@ const AddedToCart = ({ variant, product, animation, toolCallId }) => {
   return (
     <div className={cn("flex flex-col items-start")}>
       <div className={cn(chatBubbleVariants({ role: "toolInvocation", animation }), "hover:no-underline")}>
-        <ShoppingCart size={16} className="text-gray-400" /> Added product to cart
+        <ShoppingCart size={16} className="text-gray-400" /> Producto añadido al carrito
       </div>
     </div>
   )
@@ -222,7 +222,7 @@ const MoveToCheckout = ({ checkoutUrl, animation, toolCallId }) => {
   return (
     <div className={cn("flex flex-col", "items-start")}>
       <Link prefetch={false} href={checkoutUrl} className={chatBubbleVariants({ role: "toolInvocation", animation })}>
-        <CreditCard size={16} className="text-gray-400" /> Navigated to checkout
+        <CreditCard size={16} className="text-gray-400" /> Navegando al proceso de pago
       </Link>
     </div>
   )

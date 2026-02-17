@@ -69,7 +69,7 @@ export const PriceFacet = ({ minPrice, maxPrice, setFacet }: PriceFacetProps) =>
       <div className="flex gap-2 lg:flex-col">
         <PriceInput
           id="min-price"
-          label="Min price"
+          label="Precio mín"
           value={minInput ?? ""}
           onChange={(e) => handlePriceChange(e, "min")}
           onKeyDown={handleKeyDown}
@@ -77,7 +77,7 @@ export const PriceFacet = ({ minPrice, maxPrice, setFacet }: PriceFacetProps) =>
 
         <PriceInput
           id="max-price"
-          label="Max price"
+          label="Precio máx"
           value={maxInput ?? ""}
           onChange={(e) => handlePriceChange(e, "max")}
           onKeyDown={handleKeyDown}
@@ -95,10 +95,10 @@ export const PriceFacet = ({ minPrice, maxPrice, setFacet }: PriceFacetProps) =>
             })
           }}
         >
-          Reset
+          Restablecer
         </Button>
         <Button className="w-full border-none bg-gray-200 text-xs  font-medium hover:bg-gray-300" onClick={applyPrices}>
-          Apply
+          Aplicar
         </Button>
       </div>
     </div>

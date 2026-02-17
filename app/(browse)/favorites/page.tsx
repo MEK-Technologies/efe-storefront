@@ -28,7 +28,7 @@ function FavoriteProductCard({
   href: string
   priority?: boolean
 }) {
-  const linkAria = `Visit product: ${product.title}`
+  const linkAria = `Visitar producto: ${product.title}`
   const variantPrice = getVariantPrice(variant)
 
   return (
@@ -42,7 +42,7 @@ function FavoriteProductCard({
         <Image
           priority={priority}
           src={featuredImage?.url || "/default-product-image.svg"}
-          alt={product.title || "Product image"}
+          alt={product.title || "Imagen del producto"}
           fill
           className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
         />
@@ -77,7 +77,7 @@ function FavoriteProductCard({
                   <div className="flex items-center gap-0.5 text-sm font-medium">
                     <div>{product.avgRating.toFixed(2)}</div>
                     <span className="text-xs text-gray-500">
-                      ({product.totalReviews} review{product.totalReviews !== 1 && "s"})
+                      ({product.totalReviews} reseña{product.totalReviews !== 1 && "s"})
                     </span>
                   </div>
                 </div>
@@ -89,7 +89,7 @@ function FavoriteProductCard({
         {!!variantPrice && (
           <div className="mt-auto flex flex-col pt-10">
             <div className="flex w-full items-baseline justify-between text-sm">
-              <span className="text-primary/50">Price</span>
+              <span className="text-primary/50">Precio</span>
               <span className="text-base font-semibold md:text-lg">
                 {mapCurrencyToSign((variantPrice.currencyCode as CurrencyType) || "USD") +
                   Number(variantPrice.amount).toFixed(2)}
@@ -106,7 +106,7 @@ export default async function Favorites() {
   return (
     <div className="mx-auto flex max-w-container-md flex-col gap-16 px-4 py-20 md:pb-32 md:pt-24 xl:px-0">
       <div className="basis-1/3 text-center font-medium tracking-tighter sm:min-w-[280px] md:text-left md:text-6xl">
-        <h2 className="text-5xl">Favorite products</h2>
+        <h2 className="text-5xl">Productos favoritos</h2>
       </div>
       <Suspense fallback={<FavoritesSkeleton />}>
         <FavoritesView />
@@ -135,7 +135,7 @@ async function FavoritesView() {
     <>
       {variantData.length === 0 ? (
         <p className="text-lg tracking-tight">
-          No favorite products. You can add them by clicking on a heart icon on product page
+          No tienes productos favoritos. Puedes agregarlos haciendo clic en el icono del corazón en la página del producto.
         </p>
       ) : null}
       <div className="grid w-full grid-cols-[repeat(_auto-fill,minmax(140px,1fr)_)] items-start gap-4 gap-y-8 md:grid-cols-[repeat(_auto-fill,minmax(280px,1fr)_)]">

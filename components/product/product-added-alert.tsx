@@ -51,14 +51,14 @@ export function ProductAddedAlert({ className }: { className?: string }) {
         className
       )}
     >
-      <AlertTitle>Product has been added to the cart!</AlertTitle>
+      <AlertTitle>¡El producto ha sido añadido al carrito!</AlertTitle>
       <AlertDescription className="mt-6 flex flex-col">
         <div className="mb-6 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Image
               width={48}
               height={48}
-              alt={product.title || "Product image"}
+              alt={product.title || "Imagen del producto"}
               className="z-0 select-none rounded object-cover transition-transform group-hover:scale-105"
               src={displayImage?.url || "/default-product-image.svg"}
               sizes="(max-width: 450px) 150px, 300px"
@@ -82,7 +82,7 @@ export function ProductAddedAlert({ className }: { className?: string }) {
             variant="outline"
             className="bg-white transition-all hover:scale-105"
           >
-            View cart
+            Ver carrito
           </Button>
           <Button
             variant="default"
@@ -90,7 +90,7 @@ export function ProductAddedAlert({ className }: { className?: string }) {
             className="rounded-md px-10 py-4 transition-all hover:scale-105"
             disabled={!checkoutReady}
           >
-            Checkout
+            Finalizar compra
           </Button>
         </div>
       </AlertDescription>

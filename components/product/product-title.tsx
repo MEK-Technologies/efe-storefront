@@ -13,7 +13,9 @@ type ProductTitleProps = {
 export const ProductTitle = ({ title, variant: productVariant, currency, price, className }: ProductTitleProps) => {
   return (
     <div className={className}>
-      <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">{title}</h1>
+      <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">
+        {productVariant?.title || title}
+      </h1>
       {productVariant ? (
         <div className="mt-2">
           <ProductPrice variant={productVariant} displayVariant="detailed" />

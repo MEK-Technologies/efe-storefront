@@ -35,7 +35,7 @@ export function FacetsMobile({
         className="border-none bg-transparent px-2 py-1.5 text-sm font-medium hover:bg-gray-100 hover:text-inherit"
         onClick={() => openModal("facets-mobile")}
       >
-        Filters
+        Filtros
       </Button>
 
       {!!modals["facets-mobile"] && (

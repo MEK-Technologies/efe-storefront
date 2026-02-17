@@ -25,7 +25,7 @@ export const Collections: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Título de la colección de productos',
+        description: 'Nombre de la colección. Se usará para buscar productos si no se especifica un Backend ID.',
       },
     },
     {
@@ -68,7 +68,7 @@ export const Collections: CollectionConfig = {
       unique: true,
       index: true,
       admin: {
-        description: 'ID de la colección en el backend de Medusa',
+        description: 'ID de la colección en Medusa (Opcional). Si se deja vacío, se usarán productos que coincidan con el Título.',
       },
     },
     {

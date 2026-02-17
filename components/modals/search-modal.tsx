@@ -42,7 +42,7 @@ export function SearchModal() {
             <DialogTitle>
               <Input
                 className="text-md my-4 block w-full border-0 bg-transparent px-2.5 py-3.5 font-normal text-black"
-                placeholder="Search"
+                placeholder="Buscar"
                 type="search"
                 name="search"
                 onChange={onChange}
@@ -51,8 +51,8 @@ export function SearchModal() {
               />
             </DialogTitle>
             <DialogClose className="bg-transparent ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-              <span className="font-bold tracking-tight text-neutral-800">Close</span>
-              <span className="sr-only">Close</span>
+              <span className="font-bold tracking-tight text-neutral-800">Cerrar</span>
+              <span className="sr-only">Cerrar</span>
             </DialogClose>
           </div>
         </DialogHeader>
@@ -67,7 +67,7 @@ export function SearchModal() {
               className="w-3/4 items-center justify-center text-sm"
               onClick={handleButtonClick}
             >
-              See more
+              Ver más
             </Button>
           </div>
         )}
@@ -86,10 +86,10 @@ interface ResultsProps {
 function Results({ results, query, status, closeModal }: ResultsProps) {
   switch (status) {
     case "idle": {
-      const SEARCH_TERMS = ["Black Shoes", "Makeup", "Laptop", "Smartphone"]
+      const SEARCH_TERMS = ["Vapes", "Liquidos", "Pods", "Resistencias"]
       return (
         <div className="flex flex-col gap-2">
-          <p className="text-[18px] text-neutral-400">Popular search terms</p>
+          <p className="text-[18px] text-neutral-400">Términos de búsqueda populares</p>
           <ul className="flex flex-col gap-1 text-[20px]">
             {SEARCH_TERMS.map((term) => (
               <li key={term}>
@@ -107,21 +107,21 @@ function Results({ results, query, status, closeModal }: ResultsProps) {
         </div>
       )
     case "error":
-      return <p className="text-center text-red-500">Sorry, something went wrong, please try again later</p>
+      return <p className="text-center text-red-500">Lo sentimos, algo salió mal. Intenta de nuevo más tarde.</p>
 
     case "done": {
       const hasResults = !!results && results?.length > 0
       if (!hasResults) {
         return (
           <div className="flex w-full items-center justify-center">
-            <p className="text-base text-neutral-500">No results found</p>
+            <p className="text-base text-neutral-500">No se encontraron resultados</p>
           </div>
         )
       }
       return (
         <>
           <div className="flex flex-col gap-2">
-            <p className="text-[18px] text-neutral-400">Top suggestions</p>
+            <p className="text-[18px] text-neutral-400">Sugerencias principales</p>
             <ul className="mb-6 flex max-w-72 flex-col gap-1 text-[20px]">
               {results.slice(0, 5).map((singleResult) => (
                 <Link key={singleResult.id} href={`/product/${singleResult.handle}`}>

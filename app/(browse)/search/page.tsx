@@ -5,8 +5,8 @@ import { PageSkeleton } from "components/category/page-skeleton"
 import { SearchView } from "components/search-view"
 
 export const metadata: Metadata = {
-  title: "Search | Enterprise Commerce",
-  description: "Search for products in our store.",
+  title: "Buscar | Enterprise Commerce",
+  description: "Busca productos en nuestra tienda.",
 }
 
 export const revalidate = 86400

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "components/ui/button"
 
 function formatPrice(amount: number, currency: string): string {
-  return `${currency.toUpperCase()} $${(amount / 100).toFixed(2)}`
+  return `${currency.toUpperCase()} $${amount.toFixed(2)}`
 }
 
 function getEstadoBadgeClasses(estado: string): string {
@@ -143,7 +143,7 @@ export default async function OrdenConfirmadaPage({
               <span>{formatPrice(orden.subtotal, orden.moneda)}</span>
             </div>
             <div className="flex justify-between border-t pt-2 text-lg font-bold">
-              <span>Total</span>
+              <span>Total del Pedido</span>
               <span>{formatPrice(orden.total, orden.moneda)}</span>
             </div>
           </div>

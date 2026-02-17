@@ -28,15 +28,15 @@ export default function AddressesPage() {
   }
 
   const handleDeleteAddress = async (addressId: string) => {
-    if (!confirm("Are you sure you want to delete this address?")) return
+    if (!confirm("¿Estás seguro de que deseas eliminar esta dirección?")) return
 
     setIsDeleting(addressId)
     try {
       await deleteCustomerAddress(addressId)
       await refreshCustomer()
-      toast.success("Address deleted successfully")
+      toast.success("Dirección eliminada con éxito")
     } catch (error: any) {
-      toast.error(error.message || "Failed to delete address")
+      toast.error(error.message || "Error al eliminar la dirección")
     } finally {
       setIsDeleting(null)
     }
@@ -45,7 +45,7 @@ export default function AddressesPage() {
   if (!customer) {
     return (
       <div className="py-12 text-center">
-        <p className="text-gray-600">Loading addresses...</p>
+        <p className="text-gray-600">Cargando direcciones...</p>
       </div>
     )
   }
@@ -56,22 +56,22 @@ export default function AddressesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Addresses</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Direcciones</h2>
           <p className="mt-1 text-sm text-gray-600">
-            Manage your shipping and billing addresses
+            Gestiona tus direcciones de envío y facturación
           </p>
         </div>
-        <Button onClick={handleAddAddress}>Add Address</Button>
+        <Button onClick={handleAddAddress}>Agregar Dirección</Button>
       </div>
 
       {addresses.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
           <div className="mx-auto mb-4 text-6xl">📍</div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">No addresses saved</h3>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">No hay direcciones guardadas</h3>
           <p className="mb-6 text-sm text-gray-600">
-            Add an address to speed up checkout
+            Agrega una dirección para agilizar el proceso de compra
           </p>
-          <Button onClick={handleAddAddress}>Add Your First Address</Button>
+          <Button onClick={handleAddAddress}>Agregar tu primera dirección</Button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -106,7 +106,7 @@ export default function AddressesPage() {
                   onClick={() => handleEditAddress(address)}
                   className="flex-1"
                 >
-                  Edit
+                  Editar
                 </Button>
                 <Button
                   variant="outline"
@@ -118,7 +118,7 @@ export default function AddressesPage() {
                   {isDeleting === address.id ? (
                     <Spinner className="size-4" />
                   ) : (
-                    "Delete"
+                    "Eliminar"
                   )}
                 </Button>
               </div>
@@ -175,16 +175,16 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
       if (address?.id) {
         formDataObj.append("addressId", address.id)
         await updateCustomerAddress({}, formDataObj)
-        toast.success("Address updated successfully")
+        toast.success("Dirección actualizada con éxito")
       } else {
         await addCustomerAddress({}, formDataObj)
-        toast.success("Address added successfully")
+        toast.success("Dirección agregada con éxito")
       }
 
       await onSuccess()
       onClose()
     } catch (error: any) {
-      toast.error(error.message || "Failed to save address")
+      toast.error(error.message || "Error al guardar la dirección")
     } finally {
       setIsLoading(false)
     }
@@ -201,13 +201,13 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{address ? "Edit Address" : "Add New Address"}</DialogTitle>
+          <DialogTitle>{address ? "Editar Dirección" : "Agregar Nueva Dirección"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">First Name</Label>
+              <Label htmlFor="first_name">Nombre</Label>
               <Input
                 id="first_name"
                 name="first_name"
@@ -219,7 +219,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
+              <Label htmlFor="last_name">Apellido</Label>
               <Input
                 id="last_name"
                 name="last_name"
@@ -232,7 +232,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="company">Company (Optional)</Label>
+            <Label htmlFor="company">Empresa (Opcional)</Label>
             <Input
               id="company"
               name="company"
@@ -243,7 +243,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address_1">Address Line 1</Label>
+            <Label htmlFor="address_1">Dirección Línea 1</Label>
             <Input
               id="address_1"
               name="address_1"
@@ -255,7 +255,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address_2">Address Line 2 (Optional)</Label>
+            <Label htmlFor="address_2">Dirección Línea 2 (Opcional)</Label>
             <Input
               id="address_2"
               name="address_2"
@@ -267,7 +267,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="city">Ciudad</Label>
               <Input
                 id="city"
                 name="city"
@@ -279,7 +279,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="postal_code">Postal Code</Label>
+              <Label htmlFor="postal_code">Código Postal</Label>
               <Input
                 id="postal_code"
                 name="postal_code"
@@ -293,7 +293,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="province">State/Province</Label>
+              <Label htmlFor="province">Estado/Provincia</Label>
               <Input
                 id="province"
                 name="province"
@@ -305,7 +305,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="country_code">Country Code</Label>
+              <Label htmlFor="country_code">Código de País</Label>
               <Input
                 id="country_code"
                 name="country_code"
@@ -319,7 +319,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone (Optional)</Label>
+            <Label htmlFor="phone">Teléfono (Opcional)</Label>
             <Input
               id="phone"
               name="phone"
@@ -331,19 +331,19 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
+            <button type="button" onClick={onClose} className="flex-1 rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Cancelar
+            </button>
             <Button type="submit" disabled={isLoading} className="flex-1">
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <Spinner className="size-4" />
-                  Saving...
+                  Guardando...
                 </span>
               ) : address ? (
-                "Update Address"
+                "Actualizar Dirección"
               ) : (
-                "Add Address"
+                "Agregar Dirección"
               )}
             </Button>
           </div>

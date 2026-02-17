@@ -210,7 +210,7 @@ export function ProductPrice(props: ProductPriceProps) {
       {/* Discount Badge */}
       {hasDiscount && savingsData && showBadge && (
         <span className="rounded bg-green-500 px-2 py-1 text-xs font-bold text-white">
-          {savingsData.savingsPercent}% OFF
+          {savingsData.savingsPercent}% DTO.
         </span>
       )}
 

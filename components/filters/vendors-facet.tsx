@@ -68,7 +68,7 @@ export function VendorsFacet({ id, title, distribution, isChecked, onCheckedChan
             <SearchIcon className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <Input
               type="text"
-              placeholder="Search vendors..."
+              placeholder="Buscar marcas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 pl-8 text-sm"
@@ -78,9 +78,9 @@ export function VendorsFacet({ id, title, distribution, isChecked, onCheckedChan
 
         <div className="h-[250px] overflow-y-auto">
           {hasNoResults ? (
-            <p className="text-sm text-neutral-500">No {title.toLowerCase()} found</p>
+            <p className="text-sm text-neutral-500">No se encontraron resultados para {title.toLowerCase()}</p>
           ) : filteredVendors.length === 0 ? (
-            <p className="text-sm text-neutral-500">No matching vendors found</p>
+            <p className="text-sm text-neutral-500">No se encontraron marcas coincidentes</p>
           ) : (
             <div className="grid gap-2 pr-2">
               {filteredVendors.map(([value], index) => (

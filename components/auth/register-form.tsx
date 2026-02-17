@@ -12,10 +12,10 @@ import { useModalStore } from "stores/modal-store"
 import { Spinner } from "components/spinner"
 
 const registerSchema = z.object({
-  first_name: z.string().min(2, "First name must be at least 2 characters"),
-  last_name: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  first_name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  last_name: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
+  email: z.string().email("Por favor ingresa un correo electrónico válido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
   phone: z.string().optional(),
 })
 
@@ -55,11 +55,11 @@ export function RegisterForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="first_name">First Name</Label>
+          <Label htmlFor="first_name">Nombre</Label>
           <Input
             id="first_name"
             type="text"
-            placeholder="John"
+            placeholder="Juan"
             autoComplete="given-name"
             disabled={isLoading}
             {...register("first_name")}
@@ -68,11 +68,11 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="last_name">Last Name</Label>
+          <Label htmlFor="last_name">Apellido</Label>
           <Input
             id="last_name"
             type="text"
-            placeholder="Doe"
+            placeholder="Pérez"
             autoComplete="family-name"
             disabled={isLoading}
             {...register("last_name")}
@@ -82,11 +82,11 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Correo Electrónico</Label>
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="tu@ejemplo.com"
           autoComplete="email"
           disabled={isLoading}
           {...register("email")}
@@ -95,7 +95,7 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone (Optional)</Label>
+        <Label htmlFor="phone">Teléfono (Opcional)</Label>
         <Input
           id="phone"
           type="tel"
@@ -108,11 +108,11 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
           id="password"
           type="password"
-          placeholder="Create a password (min. 8 characters)"
+          placeholder="Crea una contraseña (mín. 8 caracteres)"
           autoComplete="new-password"
           disabled={isLoading}
           {...register("password")}
@@ -124,22 +124,22 @@ export function RegisterForm() {
         {isLoading ? (
           <span className="flex items-center gap-2">
             <Spinner className="size-4" />
-            Creating account...
+            Creando cuenta...
           </span>
         ) : (
-          "Create Account"
+          "Crear Cuenta"
         )}
       </Button>
 
       <div className="text-center text-sm">
-        Already have an account?{" "}
+        ¿Ya tienes una cuenta?{" "}
         <button
           type="button"
           onClick={handleSwitchToLogin}
           className="text-blue-600 hover:underline"
           disabled={isLoading}
         >
-          Login
+          Iniciar Sesión
         </button>
       </div>
     </form>

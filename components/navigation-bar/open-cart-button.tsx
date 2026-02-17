@@ -7,7 +7,7 @@ export function OpenCartButton() {
 
   return (
     <button className="absolute inset-0 size-full bg-transparent" onClick={() => openCart()}>
-      <span className="sr-only">open cart</span>
+      <span className="sr-only">abrir carrito</span>
     </button>
   )
 }

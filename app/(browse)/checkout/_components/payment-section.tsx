@@ -71,9 +71,9 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
 
       <div className="space-y-4">
         <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-          <h3 className="mb-2 font-semibold text-green-800">Resumen de Pago</h3>
+          <h3 className="mb-2 font-semibold text-green-800">Confirmación de Pedido</h3>
           <p className="text-sm text-green-700">
-            Al completar la orden, recibirás instrucciones para realizar el pago.
+            Al confirmar la orden, recibirás instrucciones para completar el pago y el envío.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
             disabled={isPending}
             className="flex-1"
           >
-            {isPending ? "Procesando..." : "Completar Orden"}
+            {isPending ? "Procesando..." : "Confirmar Orden"}
           </Button>
         </div>
       </div>

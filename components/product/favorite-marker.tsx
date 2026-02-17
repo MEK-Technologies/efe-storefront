@@ -26,7 +26,7 @@ export function FavoriteMarker({ handle, variantId }: { handle: string; variantI
     }
 
     checkIsFavorite()
-  }, [handle])
+  }, [handle, variantId])
 
   const handleClick = async () => {
     setIsAnimating(true)
@@ -38,7 +38,7 @@ export function FavoriteMarker({ handle, variantId }: { handle: string; variantI
   return (
     <>
       <Button
-        aria-label="Favorite this item"
+        aria-label="Marcar como favorito"
         type="submit"
         onClick={handleClick}
         variant="outline"
@@ -60,7 +60,7 @@ export function FavoriteMarker({ handle, variantId }: { handle: string; variantI
                 isAnimating && "animate-single-bounce"
               )}
             />
-            {isActive ? "Saved to Favorites" : "Add to Favorites"}
+            {isActive ? "Guardado en favoritos" : "Añadir a favoritos"}
           </>
         )}
       </Button>

@@ -55,7 +55,7 @@ export function Autocomplete({ className }: AutocompleteProps) {
         <input
           type="search"
           className="block w-full rounded-md border border-neutral-300 bg-neutral-100 px-2.5 py-1.5 pl-10 text-sm text-black focus:border-blue-500 focus:ring-blue-500  "
-          placeholder="Search..."
+          placeholder="Buscar..."
           onChange={onChange}
           onFocus={handleOnInputFocus}
           onKeyDown={handleOnKeyDown}
@@ -78,7 +78,7 @@ export function Autocomplete({ className }: AutocompleteProps) {
             </Link>
           ))}
         {status === "error" && (
-          <p className="p-4 text-xs text-red-500">Sorry, something went wrong, please try again later</p>
+          <p className="p-4 text-xs text-red-500">Lo sentimos, algo salió mal. Inténtalo de nuevo más tarde.</p>
         )}
       </div>
     </div>

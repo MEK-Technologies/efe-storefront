@@ -65,24 +65,24 @@ export function NavigationBar({ items }: NavigationBarProps) {
   ))
 
   return (
-    <header className="mega-navbar sticky top-0 z-50 mx-auto my-0 flex w-full flex-wrap content-center items-center justify-between border-b border-black/10 bg-white p-4 py-6">
-      <div className="not-supports-[container-type]:md:mx-auto not-supports-[container-type]:md:w-full not-supports-[container-type]:md:max-w-container-md not-supports-[container-type]:md:px-0 flex justify-start px-4 supports-[container-type]:@3xl:mx-auto supports-[container-type]:@3xl:w-full supports-[container-type]:@3xl:max-w-container-md supports-[container-type]:@3xl:px-0">
+    <header className="mega-navbar sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-xl transition-all duration-300">
+      <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:py-5">
         <Link
           prefetch={false}
           href="/"
-          className="brand not-supports-[container-type]:md:flex mr-20 hidden items-center text-xl font-bold supports-[container-type]:@3xl:flex"
+          className="brand mr-12 hidden items-center text-2xl font-black tracking-tighter text-foreground transition-opacity hover:opacity-80 md:flex"
         >
-          Acme
+          EFE<span className="font-light text-muted-foreground ml-1">Storefront</span>
         </Link>
 
         <section className="navbar__left not-supports-[container-type]:md:hidden flex w-full justify-between supports-[container-type]:@3xl:hidden">
-          <button className="burger" id="burger" aria-label="open menu" aria-controls="menu">
+          <button className="burger" id="burger" aria-label="abrir menú" aria-controls="menu">
             <span className="burger-line"></span>
             <span className="burger-line"></span>
             <span className="burger-line"></span>
           </button>
           <Link prefetch={false} href="/" className="brand flex items-center text-xl font-bold">
-            Acme
+            EFE Storefront
           </Link>
           <div className="menu-actions absolute right-4 flex items-center justify-center gap-2">
             <Favorites className="not-supports-[container-type]:md:hidden flex supports-[container-type]:@3xl:hidden" />
@@ -105,13 +105,13 @@ export function NavigationBar({ items }: NavigationBarProps) {
               <span className="menu__title"></span>
             </div>
             <div className="menu__inner flex w-full justify-between">
-              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:md:gap-3 not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@3xl:gap-3 supports-[container-type]:@7xl:px-0">
+              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:md:gap-10 not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@3xl:gap-10 supports-[container-type]:@7xl:px-0">
                 {itemsMarkup}
               </ul>
               <div className="relative ml-auto flex items-center">
                 <button
                   className="menu-close-button not-supports-[container-type]:md:hidden absolute right-3 top-0 bg-transparent supports-[container-type]:@3xl:hidden"
-                  aria-label="close menu"
+                  aria-label="cerrar menú"
                   aria-controls="menu"
                 >
                   <CloseIcon className="size-5" />

@@ -14,12 +14,12 @@ export enum Sorting {
 }
 
 const LABELS = {
-  [Sorting.PRICE_DESC]: "Price: High to Low",
-  [Sorting.PRICE_ASC]: "Price: Low to High",
-  [Sorting.RATING]: "Customer Reviews",
-  [Sorting.DATE_ASC]: "Newest",
-  [Sorting.DATE_DESC]: "Oldest",
-  [Sorting.RELEVANCY]: "Relevancy",
+  [Sorting.PRICE_DESC]: "Precio: Mayor a Menor",
+  [Sorting.PRICE_ASC]: "Precio: Menor a Mayor",
+  [Sorting.RATING]: "Valoración de Clientes",
+  [Sorting.DATE_ASC]: "Más antiguos",
+  [Sorting.DATE_DESC]: "Más recientes",
+  [Sorting.RELEVANCY]: "Relevancia",
 }
 
 interface SorterProps {
@@ -44,7 +44,7 @@ export function Sorter({ className }: SorterProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex cursor-pointer flex-nowrap items-center justify-center gap-1 px-2 py-1.5 font-medium text-black [&[data-state=open]>svg]:rotate-180">
-            <span>{sortBy ? LABELS[sortBy as keyof typeof LABELS] : "Sort by"}</span>
+            <span>{sortBy ? LABELS[sortBy as keyof typeof LABELS] : "Ordenar por"}</span>
             <ChevronIcon />
           </div>
         </DropdownMenuTrigger>

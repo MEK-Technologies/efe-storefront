@@ -95,7 +95,7 @@ export default async function OrderConfirmationPage({
                 <span>{formatPrice(order.tax_total || 0, order.currency_code)}</span>
               </div>
               <div className="flex justify-between border-t pt-2 text-lg font-bold">
-                <span>Total</span>
+                <span>Total del Pedido</span>
                 <span>{formatPrice(order.total || 0, order.currency_code)}</span>
               </div>
             </div>

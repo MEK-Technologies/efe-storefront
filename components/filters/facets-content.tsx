@@ -169,14 +169,14 @@ export function FacetsContent({
           className="my-3 inline-flex cursor-pointer bg-white text-xs text-black underline underline-offset-2"
           onClick={() => resetAllFilters()}
         >
-          Clear filters
+          Borrar filtros
         </button>
       </div>
 
       {!disabledFacets?.includes("categories") && (
         <CategoryFacet
           id="categories"
-          title="Categories"
+          title="Categorías"
           distribution={collections}
           isChecked={(category) => {
             return selectedCategories.some((el) => el.split(HIERARCHICAL_SEPARATOR).includes(category))
@@ -199,7 +199,7 @@ export function FacetsContent({
       {!disabledFacets?.includes("vendors") && (
         <VendorsFacet
           id="vendors"
-          title="Vendors"
+          title="Marcas"
           distribution={vendors}
           isChecked={(vendor) => selectedVendors.includes(vendor)}
           onCheckedChange={(checked, vendor) => {
@@ -213,7 +213,7 @@ export function FacetsContent({
       {!disabledFacets?.includes("colors") && (
         <Facet
           id="colors"
-          title="Colors"
+          title="Colores"
           distribution={colors}
           isChecked={(color) => selectedColors.includes(color)}
           onCheckedChange={(checked, color) => {
@@ -227,7 +227,7 @@ export function FacetsContent({
       {!disabledFacets?.includes("avgRating") && (
         <RatingFacet
           id="avgRating"
-          title="Rating"
+          title="Valoración"
           distribution={roundedRatings}
           isChecked={(rating) => selectedRating === parseInt(rating)}
           onCheckedChange={(checked, rating) => {
@@ -239,7 +239,7 @@ export function FacetsContent({
       )}
 
       <AccordionItem value="price">
-        <AccordionTrigger className="py-2 text-base">Price</AccordionTrigger>
+        <AccordionTrigger className="py-2 text-base">Precio</AccordionTrigger>
         <AccordionContent className="py-2">
           <PriceFacet
             minPrice={minPrice}
