@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await refreshCustomer()
       closeModal("login")
       toast.success("Welcome back!")
-      router.refresh()
+      window.location.reload()
     } catch (error: any) {
       const message = error.message || "Invalid email or password"
       toast.error(message)
@@ -139,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await refreshCustomer()
       closeModal("register")
       toast.success("Account created successfully!")
-      router.refresh()
+      window.location.reload()
     } catch (error: any) {
       const message = error.message || "Failed to create account"
       toast.error(message)
