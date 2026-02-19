@@ -17,6 +17,7 @@ import { BrandsCarousel } from './src/collections/BrandsCarousel.ts'
 import { Products } from './src/collections/Products.ts'
 import { Collections } from './src/collections/Collections.ts'
 import { Ordenes } from './src/collections/Ordenes.ts'
+import { Addresses } from './src/collections/Addresses.ts'
 
 // Import Bytescale plugin
 import { bytescaleUploadPlugin } from './src/plugins/bytescale-upload/index.ts'
@@ -108,6 +109,7 @@ export default buildConfig({
     Products, // Productos del catálogo
     Collections, // Colecciones de productos
     Ordenes, // Órdenes de clientes
+    Addresses, // Direcciones de clientes
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'TEMP_SECRET_PLEASE_CONFIGURE_ENV_VARIABLES_12345678901234567890',
@@ -118,7 +120,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.PAYLOAD_DATABASE_URL || 'postgres://admin:password@127.0.0.1:5432/payload',
     },
-    push: false, // DISABLED: Prevent Payload from modifying existing tables (products, etc.)
+    push: true, // ENABLED: Allow Payload to modify tables to fix schema mismatch (UUID vs Int)
   }),
   sharp,
   plugins: [

@@ -149,7 +149,17 @@ function handlePLPMiddleware(request: NextRequest) {
 
 export const config = {
   unstable_allowDynamic: ["**/node_modules/lodash/lodash.js", "**/node_modules/reflect-metadata/Reflect.js"],
-  matcher: ["/", "/((?!api|_next|cache-healthcheck|health|_vercel|.*\\..*).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - admin (Payload Admin)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|admin|favicon.ico).*)",
+  ],
 }
 
 function isCLP(request: NextRequest): boolean {

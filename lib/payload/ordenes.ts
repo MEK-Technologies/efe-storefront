@@ -92,11 +92,13 @@ export async function createOrdenFromCart(cartId: string): Promise<CompleteOrden
     // Expandir variant.product con todos sus campos para capturar información completa
     const cart = await retrieveCart(
       cartId,
-      "*items, *region, *items.product, *items.variant, *items.variant.product, *items.variant.product.collection, *items.variant.product.tags, *items.variant.product.images, +items.variant.product.description, +items.variant.product.metadata, +items.variant.sku, +items.variant.manage_inventory, +items.variant.inventory_quantity, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
+      "*items, *region, *items.product, *items.variant, *items.variant.product, *items.variant.product.collection, *items.variant.product.tags, *items.variant.product.images, +items.variant.product.description, +items.variant.product.metadata, +items.variant.sku, +items.variant.manage_inventory, +items.variant.inventory_quantity, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, +metadata, +context"
     )
 
     console.log("[createOrdenFromCart] Cart retrieved with items:", {
       itemCount: cart?.items?.length || 0,
+      hasMetadata: !!cart?.metadata,
+      hasContext: !!(cart as any)?.context,
       firstItemSample: cart?.items?.[0] ? {
         title: cart.items[0].title,
         hasVariant: !!cart.items[0].variant,
@@ -190,9 +192,22 @@ export async function createOrdenFromCart(cartId: string): Promise<CompleteOrden
       }
     }
 
+    // Generate items summary for metadata
+    const itemsSummary = cart.items.map((item) => ({
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      variant_id: item.variant?.id,
+      product_id: item.variant?.product?.id,
+      product_title: item.variant?.product?.title,
+      product_collection: item.variant?.product?.collection?.title || null,
+      variant_sku: item.variant?.sku,
+    }))
+
     // Preparar datos para Payload
     // NOTA: numero_orden NO debe incluirse aquí, se genera automáticamente en beforeChange hook
     const ordenData: any = {
+      id: randomUUID(),
       email: cart.email,
       cart_id: cart.id,
       nombre_cliente: `${direccion_envio.first_name} ${direccion_envio.last_name}`.trim(),
@@ -206,7 +221,12 @@ export async function createOrdenFromCart(cartId: string): Promise<CompleteOrden
       total: cart.total || 0,
       moneda: cart.currency_code?.toUpperCase() || "DOP",
       estado: "pendiente" as const,
-      metadata: null,
+      metadata: {
+        ...(cart.metadata || {}),
+        ...((cart as any).context || {}),
+        medusa_cart_id: cart.id,
+        items_summary: itemsSummary,
+      },
     }
 
     // Solo agregar shipping_method si existe y es válido
@@ -294,39 +314,37 @@ export async function getOrdenById(ordenId: string): Promise<Orden | null> {
   try {
     const payload = await getPayloadClient()
 
-    // Intentar convertir a número si es string
-    // Payload usa IDs numéricos por defecto con Postgres
-    const numericId = Number(ordenId)
-    const isValidId = !isNaN(numericId)
-    
-    console.log("[getOrdenById] Fetching order:", { 
-      ordenId, 
-      numericId, 
-      isValidId, 
-      usingId: isValidId ? numericId : ordenId 
-    })
+    console.log("[getOrdenById] Fetching order with ID:", ordenId)
 
-    const result = await payload.findByID({
+    // Usar payload.find para mayor flexibilidad con IDs (numéricos o UUIDs)
+    const result = await payload.find({
       collection: "ordenes",
-      id: isValidId ? numericId : ordenId,
+      where: {
+        id: {
+          equals: ordenId as any,
+        },
+      },
+      limit: 1,
     })
 
-    console.log("[getOrdenById] Result found:", !!result)
+    const doc = result.docs[0]
 
-    if (!result) {
+    console.log("[getOrdenById] Result found:", !!doc)
+
+    if (!doc) {
       return null
     }
 
     // Mapear de Payload al formato esperado
     const orden: Orden = {
-      id: String(result.id),
-      numero_orden: Number(result.numero_orden),
-      email: result.email as string,
-      estado: result.estado as "pendiente" | "procesando" | "completado" | "cancelado",
-      nombre_cliente: result.nombre_cliente as string | undefined,
-      telefono: result.telefono as string | undefined,
-      direccion_envio: result.direccion_envio as DireccionEnvio,
-      items: (result.items as any[]).map((item) => ({
+      id: String(doc.id),
+      numero_orden: Number(doc.numero_orden),
+      email: doc.email as string,
+      estado: doc.estado as "pendiente" | "procesando" | "completado" | "cancelado",
+      nombre_cliente: doc.nombre_cliente as string | undefined,
+      telefono: doc.telefono as string | undefined,
+      direccion_envio: doc.direccion_envio as DireccionEnvio,
+      items: (doc.items as any[]).map((item) => ({
         id: item.item_id,
         title: item.title,
         quantity: item.quantity,
@@ -348,11 +366,11 @@ export async function getOrdenById(ordenId: string): Promise<Orden | null> {
           : undefined,
         thumbnail: item.thumbnail,
       })),
-      subtotal: result.subtotal as number,
-      total: result.total as number,
-      moneda: result.moneda as string,
-      created_at: result.createdAt as string,
-      updated_at: result.updatedAt as string,
+      subtotal: doc.subtotal as number,
+      total: doc.total as number,
+      moneda: doc.moneda as string,
+      created_at: doc.createdAt as string,
+      updated_at: doc.updatedAt as string,
     }
 
     return orden

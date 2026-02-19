@@ -23,6 +23,16 @@ export const Ordenes: CollectionConfig = {
   },
   fields: [
     {
+      name: 'id',
+      type: 'text',
+      required: true,
+      unique: true,
+      admin: {
+        description: 'ID único de la orden (UUID)',
+        readOnly: true,
+      },
+    },
+    {
       name: 'numero_orden',
       type: 'number',
       required: true,
