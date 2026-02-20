@@ -38,7 +38,7 @@ export function BrandsCarouselClient({ brands, className }: BrandsCarouselClient
   const duplicatedBrands = [...sequence, ...sequence]
 
   return (
-    <section className={cn("relative w-full bg-muted/30 py-8", className)}>
+    <section className={cn("relative w-full py-8", className)}>
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Nuestras Marcas</h2>
