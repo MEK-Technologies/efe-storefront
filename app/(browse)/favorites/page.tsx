@@ -146,7 +146,7 @@ async function FavoritesView() {
             variant={item.variant}
             featuredImage={item.featuredImage}
             variantInfo={item.variantInfo}
-            href={`/product/${item.variantHandle}`}
+            href={item.variant?.id ? `/product/${item.product.handle}?variant=${item.variant.id}` : `/product/${item.product.handle}`}
             priority={[0, 1].includes(idx)}
           />
         ))}

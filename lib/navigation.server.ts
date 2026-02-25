@@ -60,6 +60,10 @@ export async function getNavigationData(): Promise<NavigationData> {
     // Create a single "Categorías" NavItem containing all categories
     const items: NavItem[] = [
       {
+        text: "Catalogo",
+        href: "/search",
+      },
+      {
         text: "Categorías",
         href: "/search",
         submenu: {

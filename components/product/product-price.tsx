@@ -87,6 +87,16 @@ export function ProductPrice(props: ProductPriceProps) {
     const variantData = props.variant as any
     calculatedPrice = normalizePrice(variantData.calculated_price)
     originalPrice = normalizePrice(variantData.original_price)
+    
+    // Fallback: if no separate original_price, extract from calculated_price.original_amount
+    // This is where Medusa stores the base price when price_rules modify the calculated amount
+    if (!originalPrice && variantData.calculated_price?.original_amount != null) {
+      originalPrice = {
+        amount: variantData.calculated_price.original_amount,
+        currency_code: variantData.calculated_price.currency_code || 'DOP'
+      }
+    }
+    
     hasCustomerGroupPricing = hasGroupPricing(variantData)
   } else {
     calculatedPrice = normalizePrice(props.calculatedPrice)
@@ -168,24 +178,15 @@ export function ProductPrice(props: ProductPriceProps) {
           )}
         </div>
 
-        {/* Savings and Badges */}
-        {(hasDiscount || hasCustomerGroupPricing) && (
+        {/* Savings Badge */}
+        {hasDiscount && savingsData && (
           <div className="flex flex-wrap items-center gap-2">
-            {hasDiscount && savingsData && (
-              <div className="rounded-md bg-green-50 px-3 py-1.5 border border-green-200">
-                <p className="text-sm font-semibold text-green-700">
-                  Ahorras {formatPrice(savingsData.savings, currency)} (
-                  {savingsData.savingsPercent}%)
-                </p>
-              </div>
-            )}
-            {hasCustomerGroupPricing && showBadge && (
-              <div className="rounded-md bg-blue-50 px-3 py-1.5 border border-blue-200">
-                <p className="text-sm font-medium text-blue-700">
-                  {hasDiscount ? "Precio de grupo" : "Precio exclusivo"}
-                </p>
-              </div>
-            )}
+            <div className="rounded-md bg-green-50 px-3 py-1.5 border border-green-200">
+              <p className="text-sm font-semibold text-green-700">
+                Ahorras {formatPrice(savingsData.savings, currency)} (
+                {savingsData.savingsPercent}%)
+              </p>
+            </div>
           </div>
         )}
       </div>

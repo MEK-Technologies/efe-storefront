@@ -10,14 +10,16 @@ import { Input } from "components/ui/input"
 import { Label } from "components/ui/label"
 import { Checkbox } from "components/ui/checkbox"
 import { toast } from "sonner"
+import type { PayloadAddress } from "lib/payload/addresses"
 
 interface CheckoutFormProps {
   cart: HttpTypes.StoreCart
+  defaultAddress?: PayloadAddress | null
 }
 
 type CheckoutStep = "contact" | "shipping" | "payment"
 
-export function CheckoutForm({ cart }: CheckoutFormProps) {
+export function CheckoutForm({ cart, defaultAddress }: CheckoutFormProps) {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("contact")
   const [sameAsShipping, setSameAsShipping] = useState(true)
   const [isPending, startTransition] = useTransition()
@@ -123,7 +125,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   <Input
                     id="first_name"
                     name="first_name"
-                    defaultValue={cart.shipping_address?.first_name || ""}
+                    defaultValue={cart.shipping_address?.first_name || defaultAddress?.first_name || ""}
                     required
                     disabled={isPending}
                   />
@@ -133,7 +135,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   <Input
                     id="last_name"
                     name="last_name"
-                    defaultValue={cart.shipping_address?.last_name || ""}
+                    defaultValue={cart.shipping_address?.last_name || defaultAddress?.last_name || ""}
                     required
                     disabled={isPending}
                   />
@@ -145,7 +147,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                 <Input
                   id="address_1"
                   name="address_1"
-                  defaultValue={cart.shipping_address?.address_1 || ""}
+                  defaultValue={cart.shipping_address?.address_1 || defaultAddress?.address_1 || ""}
                   required
                   disabled={isPending}
                 />
@@ -156,7 +158,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                 <Input
                   id="address_2"
                   name="address_2"
-                  defaultValue={cart.shipping_address?.address_2 || ""}
+                  defaultValue={cart.shipping_address?.address_2 || defaultAddress?.address_2 || ""}
                   disabled={isPending}
                 />
               </div>
@@ -167,7 +169,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   <Input
                     id="city"
                     name="city"
-                    defaultValue={cart.shipping_address?.city || ""}
+                    defaultValue={cart.shipping_address?.city || defaultAddress?.city || ""}
                     required
                     disabled={isPending}
                   />
@@ -177,7 +179,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   <Input
                     id="province"
                     name="province"
-                    defaultValue={cart.shipping_address?.province || ""}
+                    defaultValue={cart.shipping_address?.province || defaultAddress?.province || ""}
                     disabled={isPending}
                   />
                 </div>
@@ -186,7 +188,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   <Input
                     id="postal_code"
                     name="postal_code"
-                    defaultValue={cart.shipping_address?.postal_code || ""}
+                    defaultValue={cart.shipping_address?.postal_code || defaultAddress?.postal_code || ""}
                     required
                     disabled={isPending}
                   />
@@ -194,13 +196,18 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="country_code">País</Label>
+                <Label htmlFor="country_display">País</Label>
                 <Input
-                  id="country_code"
-                  name="country_code"
-                  defaultValue={cart.shipping_address?.country_code || cart.region?.countries?.[0]?.iso_2 || "do"}
-                  required
+                  id="country_display"
+                  value="República Dominicana"
+                  readOnly
                   disabled={isPending}
+                  className="bg-gray-50 cursor-not-allowed"
+                />
+                <input
+                  type="hidden"
+                  name="country_code"
+                  value="do"
                 />
               </div>
 
@@ -210,7 +217,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                   id="phone"
                   name="phone"
                   type="tel"
-                  defaultValue={cart.shipping_address?.phone || ""}
+                  defaultValue={cart.shipping_address?.phone || defaultAddress?.phone || ""}
                   disabled={isPending}
                 />
               </div>
@@ -278,13 +285,18 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="billing_country_code">País</Label>
+                      <Label htmlFor="billing_country_display">País</Label>
                       <Input
-                        id="billing_country_code"
-                        name="billing_country_code"
-                        defaultValue={cart.region?.countries?.[0]?.iso_2 || "do"}
-                        required={!sameAsShipping}
+                        id="billing_country_display"
+                        value="República Dominicana"
+                        readOnly
                         disabled={isPending}
+                        className="bg-gray-50 cursor-not-allowed"
+                      />
+                      <input
+                        type="hidden"
+                        name="billing_country_code"
+                        value="do"
                       />
                     </div>
                   </div>
@@ -315,7 +327,7 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       {currentStep === "payment" && (
         <div className="rounded-lg border bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-xl font-semibold">Confirmación</h2>
-          <PaymentSection onBack={() => setCurrentStep("shipping")} />
+          <PaymentSection onBack={() => setCurrentStep("shipping")} cart={cart} />
         </div>
       )}
     </div>

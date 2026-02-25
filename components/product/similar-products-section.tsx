@@ -39,49 +39,64 @@ export async function SimilarProductsSection({
         className="w-full"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
-          {otherVariants.map((variant, idx) => {
-            // Image resolution logic (parity with search and product page)
-            let variantImage = product.thumbnail // Default to product thumbnail
-            const variantMetadata = (variant as any).metadata || {}
-            
-            // Priority 1: Direct variant images
-            if ((variant as any).images && (variant as any).images.length > 0) {
-              variantImage = (variant as any).images[0].url
-            }
-            // Priority 2: Direct variant thumbnail
-            else if ((variant as any).thumbnail) {
-              variantImage = (variant as any).thumbnail
-            }
-            // Priority 3: Metadata image_ids
-            else if (variantMetadata.image_ids && Array.isArray(variantMetadata.image_ids) && variantMetadata.image_ids.length > 0) {
-               const foundImage = product.images?.find((img: any) => variantMetadata.image_ids.includes(img.id))
-               if (foundImage) {
-                 variantImage = foundImage.url
-               }
-            }
-            // Priority 4: Metadata image_url
-            else if (variantMetadata.image_url) {
-              variantImage = variantMetadata.image_url
-            }
+          {(() => {
+            // Calculate parent product's min price once before the loop
+            const allVariants = product.variants || []
+            const parentMinVariant = allVariants.length > 0 ? allVariants.reduce((min, v) => {
+              const minPrice = min?.calculated_price?.calculated_amount ?? Infinity
+              const curPrice = v.calculated_price?.calculated_amount ?? Infinity
+              return curPrice < minPrice ? v : min
+            }, allVariants[0]) : null
+            const parentPrice = parentMinVariant?.calculated_price
+            const parentOriginalPrice = (parentMinVariant as any)?.original_price
 
-            // Create a product-like structure for ProductCard
-            // Each card represents the same product but with a different default variant
-            const variantProduct = {
-              ...product,
-              thumbnail: variantImage, // Use resolved image
-              // Use variant as the default variant for this card
-              variants: [variant],
-            }
-            
-            return (
-              <CarouselItem className="basis-full md:basis-1/3 lg:basis-1/4" key={"variant_" + variant.id + idx}>
-                <ProductCard
-                  product={variantProduct as any}
-                  prefetch
-                />
-              </CarouselItem>
-            )
-          })}
+            return otherVariants.map((variant, idx) => {
+              // Image resolution logic (parity with search and product page)
+              let variantImage = product.thumbnail // Default to product thumbnail
+              const variantMetadata = (variant as any).metadata || {}
+              
+              // Priority 1: Direct variant images
+              if ((variant as any).images && (variant as any).images.length > 0) {
+                variantImage = (variant as any).images[0].url
+              }
+              // Priority 2: Direct variant thumbnail
+              else if ((variant as any).thumbnail) {
+                variantImage = (variant as any).thumbnail
+              }
+              // Priority 3: Metadata image_ids
+              else if (variantMetadata.image_ids && Array.isArray(variantMetadata.image_ids) && variantMetadata.image_ids.length > 0) {
+                 const foundImage = product.images?.find((img: any) => variantMetadata.image_ids.includes(img.id))
+                 if (foundImage) {
+                   variantImage = foundImage.url
+                 }
+              }
+              // Priority 4: Metadata image_url
+              else if (variantMetadata.image_url) {
+                variantImage = variantMetadata.image_url
+              }
+
+              // Create a product-like structure for ProductCard
+              // Inject parent price + original_price so ProductCard shows correct group pricing
+              const variantProduct = {
+                ...product,
+                thumbnail: variantImage,
+                variants: [{
+                  ...variant,
+                  calculated_price: parentPrice || variant.calculated_price,
+                  original_price: parentOriginalPrice || (variant as any).original_price,
+                }],
+              }
+              
+              return (
+                <CarouselItem className="basis-full md:basis-1/3 lg:basis-1/4" key={"variant_" + variant.id + idx}>
+                  <ProductCard
+                    product={variantProduct as any}
+                    prefetch
+                  />
+                </CarouselItem>
+              )
+            })
+          })()}
         </CarouselContent>
         <CarouselPrevious className="-left-4 top-1/2 hidden shadow-sm md:flex" />
         <CarouselNext className="-right-4 top-1/2 hidden shadow-sm md:flex" />

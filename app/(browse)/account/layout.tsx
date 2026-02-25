@@ -6,16 +6,17 @@ import { usePathname } from "next/navigation"
 import { useAuth } from "hooks/useAuth"
 import { cn } from "utils/cn"
 import { ChevronIcon } from "components/icons/chevron-icon"
+import { LayoutDashboard, LogOut, MapPin, Package, User } from "lucide-react"
 
 interface AccountLayoutProps {
   children: React.ReactNode
 }
 
 const accountLinks = [
-  { href: "/account", label: "Panel", icon: "📊" },
-  { href: "/account/profile", label: "Perfil", icon: "👤" },
-  { href: "/account/orders", label: "Órdenes", icon: "📦" },
-  { href: "/account/addresses", label: "Direcciones", icon: "📍" },
+  { href: "/account", label: "Panel", icon: LayoutDashboard },
+  { href: "/account/profile", label: "Perfil", icon: User },
+  { href: "/account/orders", label: "Órdenes", icon: Package },
+  { href: "/account/addresses", label: "Direcciones", icon: MapPin },
 ]
 
 export default function AccountLayout({ children }: AccountLayoutProps) {
@@ -74,7 +75,9 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
                       : "text-gray-700 hover:bg-gray-100"
                   )}
                 >
-                  <span className="text-lg">{link.icon}</span>
+                  <link.icon
+                    className={cn("size-5", isActive ? "text-white" : "text-orange-600")}
+                  />
                   {link.label}
                 </Link>
               )
@@ -86,7 +89,7 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
               onClick={logout}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >
-              <span className="text-lg">🚪</span>
+              <LogOut className="size-5 text-red-600" />
               Cerrar Sesión
             </button>
           </nav>

@@ -12,7 +12,6 @@ import { GithubBadge } from "components/github-badge"
 import { DemoModeAlert } from "components/demo-mode-alert"
 import { CartView } from "components/cart/cart-view"
 import { NavigationBarWrapper } from "components/navigation-bar/navigation-bar-wrapper"
-import { mobileInlineScript } from "components/navigation-bar/mobile-inline-script"
 import { Footer } from "components/footer"
 import { Modals } from "components/modals/modals"
 import DraftToolbar from "components/draft-toolbar"
@@ -47,8 +46,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Suspense>
             <AuthWrapper>
               <AgeVerificationWrapper>
-                <Script id="mobileMegaMenuLogic" strategy="lazyOnload">{`${mobileInlineScript}`}</Script>
-
                 <NavigationBarWrapper fallbackData={navigationData} />
                 {children}
 

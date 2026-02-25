@@ -6,9 +6,9 @@ import { ModernNewArrivalsSection } from "app/(browse)/home/_components/modern-n
 import { listProducts } from "lib/medusa/data/products"
 import { CategoriesSection } from "../_components/categories-section"
 
-export const revalidate = 86400
+export const revalidate = 0
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export const dynamicParams = true
 

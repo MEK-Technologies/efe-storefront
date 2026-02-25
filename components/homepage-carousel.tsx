@@ -144,7 +144,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                           selectedVariant={slide.product.selectedVariant}
                           variantOptions={slide.variantOptions}
                           priority={index === 0}
-                          className="w-[180px] border-none bg-background/95 shadow-2xl ring-1 ring-black/5 backdrop-blur-md transition-transform hover:scale-105 sm:w-[200px]"
+                          className="w-[180px] border-none bg-background/95 shadow-md hover:shadow-2xl ring-1 ring-black/5 backdrop-blur-md transition-all hover:scale-105 sm:w-[200px]"
                         />
                       </div>
                     )}
@@ -170,7 +170,7 @@ export function HomepageCarousel({ slides = [], className }: HomepageCarouselPro
                             selectedVariant={slide.product.selectedVariant}
                             variantOptions={slide.variantOptions}
                             priority={index === 0}
-                            className="rotate-2 border-none bg-background/95 shadow-2xl ring-1 ring-black/5 backdrop-blur-md transition-transform duration-500 hover:rotate-0"
+                            className="rotate-2 border-none bg-background/95 shadow-sm hover:shadow-2xl ring-1 ring-black/5 backdrop-blur-md transition-all duration-500 hover:rotate-0"
                           />
                         </div>
                       )}

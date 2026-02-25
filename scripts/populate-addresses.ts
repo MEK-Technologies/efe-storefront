@@ -33,10 +33,10 @@ async function populateAddresses() {
         direccion_envio_phone,
         direccion_envio_company
       FROM "ordenes" 
+      WHERE email = 'juanperez@gmail.com'
       ORDER BY "created_at" DESC 
-      LIMIT 100
     `
-    // Reduced limit for testing, increase later if working
+    // Filter applied for testing with specific email
 
     const ordersRes = await client.query(query)
     const orders = ordersRes.rows

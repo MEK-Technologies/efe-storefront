@@ -1,28 +1,52 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "hooks/useAuth"
-import { addCustomerAddress, deleteCustomerAddress, updateCustomerAddress } from "lib/medusa/data/customer"
+import { getCustomerAddressesAction, addPayloadAddressAction, updatePayloadAddressAction, deletePayloadAddressAction } from "app/actions/address.actions"
+import type { PayloadAddress } from "lib/payload/addresses"
 import { Button } from "components/ui/button"
 import { Input } from "components/ui/input"
 import { Label } from "components/ui/label"
 import { Spinner } from "components/spinner"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "components/ui/dialog"
-import type { HttpTypes } from "@medusajs/types"
 
 export default function AddressesPage() {
-  const { customer, refreshCustomer } = useAuth()
+  const { customer, isLoading } = useAuth()
+  const [addresses, setAddresses] = useState<PayloadAddress[]>([])
+  const [isFetching, setIsFetching] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingAddress, setEditingAddress] = useState<HttpTypes.StoreCustomerAddress | null>(null)
+  const [editingAddress, setEditingAddress] = useState<PayloadAddress | null>(null)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  
+  // Fetch addresses on page load
+  const loadAddresses = async () => {
+    setIsFetching(true)
+    try {
+        const data = await getCustomerAddressesAction()
+        setAddresses(data)
+    } catch (error) {
+        console.error("Error cargando direcciones:", error)
+        toast.error("Error al cargar libretas de direcciones")
+    } finally {
+        setIsFetching(false)
+    }
+  }
+
+  useEffect(() => {
+    if (customer?.email) {
+      loadAddresses()
+    } else if (!isLoading) {
+      setIsFetching(false)
+    }
+  }, [customer?.email, isLoading])
 
   const handleAddAddress = () => {
     setEditingAddress(null)
     setIsModalOpen(true)
   }
 
-  const handleEditAddress = (address: HttpTypes.StoreCustomerAddress) => {
+  const handleEditAddress = (address: PayloadAddress) => {
     setEditingAddress(address)
     setIsModalOpen(true)
   }
@@ -32,8 +56,10 @@ export default function AddressesPage() {
 
     setIsDeleting(addressId)
     try {
-      await deleteCustomerAddress(addressId)
-      await refreshCustomer()
+      const result = await deletePayloadAddressAction(addressId)
+      if (!result.success) throw new Error(result.error || "Fallo eliminando la dirección")
+
+      await loadAddresses()
       toast.success("Dirección eliminada con éxito")
     } catch (error: any) {
       toast.error(error.message || "Error al eliminar la dirección")
@@ -42,7 +68,7 @@ export default function AddressesPage() {
     }
   }
 
-  if (!customer) {
+  if (isLoading || isFetching) {
     return (
       <div className="py-12 text-center">
         <p className="text-gray-600">Cargando direcciones...</p>
@@ -50,7 +76,13 @@ export default function AddressesPage() {
     )
   }
 
-  const addresses = customer.addresses || []
+  if (!customer) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-gray-600">Debes iniciar sesión para ver tus direcciones.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -127,14 +159,14 @@ export default function AddressesPage() {
         </div>
       )}
 
-      <AddressModal
+  <AddressModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false)
           setEditingAddress(null)
         }}
         address={editingAddress}
-        onSuccess={refreshCustomer}
+        onSuccess={loadAddresses}
       />
     </div>
   )
@@ -143,7 +175,7 @@ export default function AddressesPage() {
 interface AddressModalProps {
   isOpen: boolean
   onClose: () => void
-  address: HttpTypes.StoreCustomerAddress | null
+  address: PayloadAddress | null
   onSuccess: () => void
 }
 
@@ -158,7 +190,7 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
     city: address?.city || "",
     province: address?.province || "",
     postal_code: address?.postal_code || "",
-    country_code: address?.country_code || "us",
+    country_code: address?.country_code || "do",
     phone: address?.phone || "",
   })
 
@@ -174,10 +206,12 @@ function AddressModal({ isOpen, onClose, address, onSuccess }: AddressModalProps
 
       if (address?.id) {
         formDataObj.append("addressId", address.id)
-        await updateCustomerAddress({}, formDataObj)
+        const result = await updatePayloadAddressAction({}, formDataObj)
+        if (!result.success) throw new Error(result.error || "Fallo guardando")
         toast.success("Dirección actualizada con éxito")
       } else {
-        await addCustomerAddress({}, formDataObj)
+        const result = await addPayloadAddressAction({}, formDataObj)
+        if (!result.success) throw new Error(result.error || "Fallo guardando")
         toast.success("Dirección agregada con éxito")
       }
 

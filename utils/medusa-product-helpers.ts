@@ -107,12 +107,32 @@ export function isVariantAvailable(
 export function hasGroupPricing(
   variant: HttpTypes.StoreProductVariant | VariantWithPricing
 ): boolean {
-  const variantWithPricing = variant as VariantWithPricing
+  const v = variant as any
   
-  if (!variant.calculated_price?.calculated_amount) return false
-  if (!variantWithPricing.original_price?.original_amount) return false
+  // Extract calculated price amount (handles multiple formats)
+  const calcAmount = 
+    v.calculated_price?.calculated_amount ??  // BaseCalculatedPriceSet format
+    v.calculated_price?.amount ??              // Direct API format { amount, currency_code }
+    null
   
-  return variant.calculated_price.calculated_amount !== variantWithPricing.original_price.original_amount
+  // Extract original price amount (handles multiple formats)
+  const origAmount = 
+    v.original_price?.original_amount ??       // VariantWithPricing format
+    v.original_price?.amount ??                // Direct API format { amount, currency_code }
+    v.calculated_price?.original_amount ??     // BaseCalculatedPriceSet original_amount field
+    null
+  
+  // Method 1: Compare calculated vs original amounts
+  if (calcAmount != null && origAmount != null && calcAmount !== origAmount) {
+    return true
+  }
+  
+  // Method 2: Check if a price_list is applied (indicates group/sale pricing even if prices match)
+  if (v.price_list_id != null && v.price_list_type != null) {
+    return true
+  }
+  
+  return false
 }
 
 /**

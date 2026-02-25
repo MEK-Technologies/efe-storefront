@@ -136,7 +136,7 @@ export default function OrdersPage() {
                     <div className="text-right">
                       <p className="text-sm text-gray-600">Total</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        {orden.moneda} ${(orden.total / 100).toFixed(2)}
+                        {orden.moneda} ${(orden.total).toFixed(2)}
                       </p>
                     </div>
 

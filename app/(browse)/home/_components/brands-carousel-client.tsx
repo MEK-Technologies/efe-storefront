@@ -46,7 +46,7 @@ export function BrandsCarouselClient({ brands, className }: BrandsCarouselClient
 
         <div className="relative overflow-hidden">
           <div 
-            className="flex animate-scroll-x hover:[animation-play-state:paused] will-change-transform"
+            className="flex animate-scroll-x will-change-transform"
             style={{ animationDuration: `${duplicatedBrands.length * 2.5}s` }}
           >
             {duplicatedBrands.map((brand, index) => {

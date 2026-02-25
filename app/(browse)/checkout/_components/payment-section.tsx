@@ -1,15 +1,17 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { HttpTypes } from "@medusajs/types"
 import { completePayment } from "app/actions/payment.actions"
 import { Button } from "components/ui/button"
 import { toast } from "sonner"
 
 interface PaymentSectionProps {
   onBack: () => void
+  cart: HttpTypes.StoreCart
 }
 
-export function PaymentSection({ onBack }: PaymentSectionProps) {
+export function PaymentSection({ onBack, cart }: PaymentSectionProps) {
   const [isPending, startTransition] = useTransition()
   const [inventoryErrors, setInventoryErrors] = useState<Array<{
     item_id: string
@@ -70,6 +72,75 @@ export function PaymentSection({ onBack }: PaymentSectionProps) {
       )}
 
       <div className="space-y-4">
+        <div className="rounded-lg border bg-gray-50 p-6">
+          <h3 className="mb-4 text-lg font-semibold">Resumen de tu Orden</h3>
+          
+          <div className="space-y-4">
+            {cart?.items?.map((item) => (
+              <div key={item.id} className="flex gap-4">
+                {item.thumbnail && (
+                  <img
+                    src={item.thumbnail}
+                    alt={item.title}
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                )}
+                <div className="flex-1">
+                  <p className="font-medium">{item.title}</p>
+                  <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                </div>
+                <p className="font-medium">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: cart?.currency_code || "USD",
+                  }).format(item.total || 0)}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 space-y-2 border-t pt-4">
+            <div className="flex justify-between text-sm">
+              <span>Subtotal</span>
+              <span>
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: cart?.currency_code || "USD",
+                }).format(cart?.subtotal || 0)}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Envío</span>
+              <span>
+                {cart?.shipping_total != null
+                  ? new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: cart?.currency_code || "USD",
+                    }).format(cart.shipping_total)
+                  : "Por calcular"}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Impuesto</span>
+              <span>
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: cart?.currency_code || "USD",
+                }).format(cart?.tax_total || 0)}
+              </span>
+            </div>
+            <div className="flex justify-between border-t pt-2 text-lg font-bold">
+              <span>Total</span>
+              <span>
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: cart?.currency_code || "USD",
+                }).format(cart?.total || 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-lg border border-green-200 bg-green-50 p-4">
           <h3 className="mb-2 font-semibold text-green-800">Confirmación de Pedido</h3>
           <p className="text-sm text-green-700">

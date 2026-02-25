@@ -1,7 +1,11 @@
 "use client"
 
 import { useAuth } from "hooks/useAuth"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { CheckCircle2, ClipboardList, MapPin, Package, ShoppingBag, UserPen } from "lucide-react"
+import { listOrdenesByEmail } from "lib/medusa/data/ordenes"
+import { getCustomerAddressesAction } from "app/actions/address.actions"
 
 export default function AccountPage() {
   const { customer } = useAuth()
@@ -14,23 +18,46 @@ export default function AccountPage() {
     )
   }
 
+  const [ordersCount, setOrdersCount] = useState<number>(0)
+  const [addressesCount, setAddressesCount] = useState<number>(customer.addresses?.length || 0)
+
+  useEffect(() => {
+    async function fetchStats() {
+      if (!customer?.email) return
+
+      try {
+        const [ordenes, payloadAddresses] = await Promise.all([
+          listOrdenesByEmail(customer.email),
+          getCustomerAddressesAction()
+        ])
+        
+        setOrdersCount(ordenes.length)
+        setAddressesCount(payloadAddresses.length)
+      } catch (error) {
+        console.error("Error fetching account stats:", error)
+      }
+    }
+
+    fetchStats()
+  }, [customer?.email])
+
   const stats = [
     {
       label: "Total de Órdenes",
-      value: 0, // Orders would come from separate API call
-      icon: "📦",
+      value: ordersCount, 
+      icon: Package,
       href: "/account/orders",
     },
     {
       label: "Direcciones Guardadas",
-      value: customer.addresses?.length || 0,
-      icon: "📍",
+      value: addressesCount,
+      icon: MapPin,
       href: "/account/addresses",
     },
     {
       label: "Estado de la Cuenta",
       value: "Activa",
-      icon: "✅",
+      icon: CheckCircle2,
       href: "/account/profile",
     },
   ]
@@ -57,7 +84,7 @@ export default function AccountPage() {
                 <p className="text-sm font-medium text-gray-600">{stat.label}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">{stat.value}</p>
               </div>
-              <span className="text-3xl">{stat.icon}</span>
+              <stat.icon className="size-8 text-orange-600" />
             </div>
           </Link>
         ))}
@@ -69,9 +96,9 @@ export default function AccountPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
             href="/account/profile"
-            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
+            className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
           >
-            <span className="text-2xl">✏️</span>
+            <UserPen className="size-6 text-orange-600 transition-colors group-hover:text-orange-500" />
             <div>
               <p className="font-medium text-gray-900">Editar Perfil</p>
               <p className="text-sm text-gray-600">Actualiza tu información personal</p>
@@ -80,9 +107,9 @@ export default function AccountPage() {
 
           <Link
             href="/account/orders"
-            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
+            className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
           >
-            <span className="text-2xl">📋</span>
+            <ClipboardList className="size-6 text-orange-600 transition-colors group-hover:text-orange-500" />
             <div>
               <p className="font-medium text-gray-900">Ver Órdenes</p>
               <p className="text-sm text-gray-600">Rastrea tu historial de órdenes</p>
@@ -91,9 +118,9 @@ export default function AccountPage() {
 
           <Link
             href="/account/addresses"
-            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
+            className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
           >
-            <span className="text-2xl">🏠</span>
+            <MapPin className="size-6 text-orange-600 transition-colors group-hover:text-orange-500" />
             <div>
               <p className="font-medium text-gray-900">Gestionar Direcciones</p>
               <p className="text-sm text-gray-600">Actualiza tus direcciones de envío</p>
@@ -102,9 +129,9 @@ export default function AccountPage() {
 
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
+            className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
           >
-            <span className="text-2xl">🛍️</span>
+            <ShoppingBag className="size-6 text-orange-600 transition-colors group-hover:text-orange-500" />
             <div>
               <p className="font-medium text-gray-900">Continuar Comprando</p>
               <p className="text-sm text-gray-600">Explora nuestros productos</p>

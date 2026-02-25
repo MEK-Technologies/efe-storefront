@@ -58,15 +58,21 @@ function getMinPriceVariant(
   }
 
   // Fallback: find variants with original_price (for override price lists)
+  // Check both .amount and .original_amount formats
   const variantsWithOriginalPrice = variants.filter(
-    (v) => (v as any).original_price?.amount != null
+    (v) => (v as any).original_price?.amount != null || 
+           (v as any).original_price?.original_amount != null ||
+           v.calculated_price?.original_amount != null
   )
 
   if (variantsWithOriginalPrice.length > 0) {
     return variantsWithOriginalPrice.reduce((min, current) => {
-      const minPrice = (min as any).original_price?.amount || Infinity
-      const currentPrice = (current as any).original_price?.amount || Infinity
-      return currentPrice < minPrice ? current : min
+      const getPrice = (v: any) => 
+        v.original_price?.amount ?? 
+        v.original_price?.original_amount ?? 
+        v.calculated_price?.original_amount ?? 
+        Infinity
+      return getPrice(current) < getPrice(min) ? current : min
     }) as VariantWithPricing
   }
 

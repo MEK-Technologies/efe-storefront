@@ -61,14 +61,14 @@ export function CartSheet({ cart, isOpen, onCartClose, isPending }: CartSheetPro
         {hasAnyItems && (
           <SheetFooter className="border-t border-black p-4">
             <div className="w-full bg-white py-4 text-sm text-neutral-500">
-              <div className="flex items-center justify-between border-b border-neutral-200 pb-4 ">
+              {/* <div className="flex items-center justify-between border-b border-neutral-200 pb-4 ">
                 <p>Subtotal</p>
                 <p className="text-right text-base text-black ">{subtotalFormatted}</p>
               </div>
               <div className="flex items-center justify-between border-b border-neutral-200 py-4 ">
                 <p>Envío</p>
                 <p className="text-right">Se calculará al finalizar compra</p>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between border-neutral-200 py-4 ">
                 <p>Total</p>
                 <p className="text-right text-base text-black ">{totalFomatted}</p>
@@ -77,7 +77,10 @@ export function CartSheet({ cart, isOpen, onCartClose, isPending }: CartSheetPro
                 variant="secondary"
                 className="w-full justify-center text-center hover:text-white"
                 size="lg"
-                onClick={() => router.push(checkoutUrl)}
+                onClick={() => {
+                  onCartClose()
+                  router.push(checkoutUrl)
+                }}
               >
                 Proceder al Pago
               </Button>

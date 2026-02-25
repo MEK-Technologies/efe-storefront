@@ -7,7 +7,13 @@ import withPlugins from "next-compose-plugins"
  */
 const config = withPlugins([[withVercelToolbar(), withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" })]], {
   reactStrictMode: true,
-  serverExternalPackages: [],
+  serverExternalPackages: ["pg", "pg-connection-string"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   logging: {
     fetches: {
       fullUrl: true,

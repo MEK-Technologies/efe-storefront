@@ -16,6 +16,7 @@ import { SearchButton } from "./search-button"
 import { NavigationItem } from "./navigation-item"
 import Link from "next/link"
 import { AuthButton } from "components/modals/auth-helpers"
+import { MobileNav } from "./mobile/mobile-nav"
 
 const ProductAddedAlert = dynamic(() =>
   import("components/product/product-added-alert").then((mod) => mod.ProductAddedAlert)
@@ -66,34 +67,17 @@ export function NavigationBar({ items }: NavigationBarProps) {
 
   return (
     <header className="mega-navbar sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-xl transition-all duration-300">
-      <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:py-5">
+      <div className="container relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:py-5">
         <Link
           prefetch={false}
           href="/"
-          className="brand mr-12 hidden items-center text-2xl font-black tracking-tighter text-foreground transition-opacity hover:opacity-80 md:flex"
+          className="brand absolute left-4 top-1/2 z-50 hidden -translate-y-1/2 items-center transition-opacity hover:opacity-80 md:flex"
         >
-          EFE<span className="font-light text-muted-foreground ml-1">Storefront</span>
+          <img src="/LOGO DE EFE-01.svg" alt="EFE Storefront" className="h-28 lg:h-36 w-auto object-contain" />
         </Link>
 
-        <section className="navbar__left not-supports-[container-type]:md:hidden flex w-full justify-between supports-[container-type]:@3xl:hidden">
-          <button className="burger" id="burger" aria-label="abrir menú" aria-controls="menu">
-            <span className="burger-line"></span>
-            <span className="burger-line"></span>
-            <span className="burger-line"></span>
-          </button>
-          <Link prefetch={false} href="/" className="brand flex items-center text-xl font-bold">
-            EFE Storefront
-          </Link>
-          <div className="menu-actions absolute right-4 flex items-center justify-center gap-2">
-            <Favorites className="not-supports-[container-type]:md:hidden flex supports-[container-type]:@3xl:hidden" />
-            <Suspense fallback={<Skeleton className="size-8" />}>
-              <Cart className="not-supports-[container-type]:md:hidden flex supports-[container-type]:@3xl:hidden" />
-            </Suspense>
-            <SearchButton />
-          </div>
-          <ProductAddedAlert className="not-supports-[container-type]:md:hidden supports-[container-type]:@3xl:hidden" />
-        </section>
-        <section className="navbar__center not-supports-[container-type]:md:justify-center w-full supports-[container-type]:@3xl:justify-center">
+        <MobileNav items={items} />
+        <section className="navbar__center hidden w-full justify-center md:flex">
           <span className="overlay"></span>
           <div className="menu w-full" id="menu">
             <div className="menu__header">
@@ -105,7 +89,7 @@ export function NavigationBar({ items }: NavigationBarProps) {
               <span className="menu__title"></span>
             </div>
             <div className="menu__inner flex w-full justify-between">
-              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:md:gap-10 not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@3xl:gap-10 supports-[container-type]:@7xl:px-0">
+              <ul className="not-supports-[container-type]:md:mt-0 not-supports-[container-type]:md:w-auto not-supports-[container-type]:md:flex-row not-supports-[container-type]:md:items-center not-supports-[container-type]:md:justify-start not-supports-[container-type]:md:gap-6 not-supports-[container-type]:xl:px-0 mt-10 flex w-full flex-col gap-4 px-4 supports-[container-type]:@3xl:mt-0 supports-[container-type]:@3xl:w-auto supports-[container-type]:@3xl:flex-row supports-[container-type]:@3xl:items-center supports-[container-type]:@3xl:justify-start supports-[container-type]:@3xl:gap-6 supports-[container-type]:@7xl:px-0 md:pl-28 lg:pl-36">
                 {itemsMarkup}
               </ul>
               <div className="relative ml-auto flex items-center">

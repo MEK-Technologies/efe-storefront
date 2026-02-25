@@ -442,6 +442,15 @@ export async function getVariantsAsStandaloneProducts({
   for (const product of products) {
     if (!product.variants || product.variants.length === 0) continue
 
+    // Calculate the parent product's minimum price to inject into each virtual product
+    const parentMinVariant = product.variants.reduce((min, v) => {
+      const minPrice = min?.calculated_price?.calculated_amount ?? Infinity
+      const curPrice = v.calculated_price?.calculated_amount ?? Infinity
+      return curPrice < minPrice ? v : min
+    }, product.variants[0])
+    const parentPrice = parentMinVariant?.calculated_price
+    const parentOriginalPrice = (parentMinVariant as any)?.original_price
+
     for (const variant of product.variants) {
       // Logic to determine the image for this variant
       // User requested to "ignore defaults", so we start with null instead of product.thumbnail
@@ -488,20 +497,19 @@ export async function getVariantsAsStandaloneProducts({
       }
       
       // Create a "virtual" product for this variant
+      // Override the variant's calculated_price with the parent product's min price
       const virtualProduct: any = {
         ...product,
-        // Create a unique ID for the key (optional, but good for React keys if used directly)
         id: `${product.id}_${variant.id}`, 
-        // We might want to append variant title, but ProductCard usually just shows product.title.
-        // If we want to show "Shirt - Red", we can append it here.
-        // For now, let's keep the main title but maybe the variants array only has THIS variant.
         title: product.title, 
         thumbnail: variantImage,
-        // CRITICAL: Only include THIS variant so ProductCard logic (min price, etc.) works on this specific item
-        variants: [variant],
-        // Preserve original handle for linking, but ProductCard logic might need tweaking if we want unique URLs?
-        // ProductCard uses: /product/{handle}?variant={variant.id}
-        // If we pass the parent handle and this single variant, ProductCard will generate the correct deep link.
+        // Inject parent price into the variant so ProductCard shows the parent's price
+        // Also inject parent's original_price so group pricing detection works correctly
+        variants: [{
+          ...variant,
+          calculated_price: parentPrice || variant.calculated_price,
+          original_price: parentOriginalPrice || (variant as any).original_price,
+        }],
         handle: product.handle
       }
       
@@ -533,20 +541,21 @@ export async function getProductsBySearch(
   query: string,
   limit: number = 100
 ): Promise<HttpTypes.StoreProduct[]> {
-  const next = {
-    ...(await getCacheOptions("products")),
-  }
-
   const region = await getRegion(DEFAULT_COUNTRY_CODE)
 
   if (!region) {
     return []
   }
 
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
   const normalizedQuery = query.toLowerCase().trim()
 
   try {
     // 1. Fetch broad candidates using Medusa's fuzzy search
+    // Uses no-cache + auth headers so group pricing is applied per-user
     const productsResponse = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
       `/store/products`,
       {
@@ -557,8 +566,8 @@ export async function getProductsBySearch(
           fields: "*variants,*variants.calculated_price,*variants.original_price,+variants.inventory_quantity,*variants.images,+variants.metadata,+variants.thumbnail,*images,*thumbnail,+title,+handle,+description,+metadata,+tags",
           limit,
         },
-        next,
-        cache: "force-cache",
+        headers,
+        cache: "no-cache",
       }
     )
 
@@ -569,11 +578,17 @@ export async function getProductsBySearch(
     for (const product of products) {
       if (!product.variants || product.variants.length === 0) continue
 
+      // Calculate the parent product's minimum price to inject into each virtual product
+      const parentMinVariant = product.variants.reduce((min, v) => {
+        const minPrice = min?.calculated_price?.calculated_amount ?? Infinity
+        const curPrice = v.calculated_price?.calculated_amount ?? Infinity
+        return curPrice < minPrice ? v : min
+      }, product.variants[0])
+      const parentPrice = parentMinVariant?.calculated_price
+      const parentOriginalPrice = (parentMinVariant as any)?.original_price
+
       for (const variant of product.variants) {
         // STRICT FILTERING: Check if the Product Title, Handle, or Variant Title contains the query
-        // We only want to show this variant if it matches the name/handle explicitly.
-        // This avoids showing "Steam Engine" when searching for "Ruthless" just because "Ruthless" is in the description.
-        
         const productTitleMatch = product.title?.toLowerCase().includes(normalizedQuery)
         const productHandleMatch = product.handle?.toLowerCase().includes(normalizedQuery)
         const variantTitleMatch = variant.title?.toLowerCase().includes(normalizedQuery)
@@ -609,12 +624,19 @@ export async function getProductsBySearch(
         }
         
         // Create a "virtual" product for this variant
+        // Override the variant's calculated_price with the parent product's min price
         const virtualProduct: any = {
           ...product,
-          id: `${product.id}_${variant.id}`, // Unique ID for React keys
-          title: product.title, // Keep main title, ProductCard can handle variant info if needed
+          id: `${product.id}_${variant.id}`,
+          title: product.title,
           thumbnail: variantImage,
-          variants: [variant], // Only include THIS variant
+          // Inject parent price into the variant so ProductCard shows the parent's price
+          // Also inject parent's original_price so group pricing detection works correctly
+          variants: [{
+            ...variant,
+            calculated_price: parentPrice || variant.calculated_price,
+            original_price: parentOriginalPrice || (variant as any).original_price,
+          }],
           handle: product.handle
         }
         

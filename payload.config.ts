@@ -120,7 +120,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.PAYLOAD_DATABASE_URL || 'postgres://admin:password@127.0.0.1:5432/payload',
     },
-    push: true, // ENABLED: Allow Payload to modify tables to fix schema mismatch (UUID vs Int)
+    push: false, // DISABLED: Allow Payload to modify tables to fix schema mismatch (UUID vs Int)
   }),
   sharp,
   plugins: [

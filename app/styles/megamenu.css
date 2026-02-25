@@ -3,6 +3,7 @@
     opacity: 0;
     transform: translateX(100%);
   }
+
   100% {
     opacity: 1;
     transform: translateX(0%);
@@ -14,6 +15,7 @@
     opacity: 1;
     transform: translateX(0%);
   }
+
   100% {
     opacity: 0;
     transform: translateX(100%);
@@ -80,13 +82,11 @@
   }
 }
 
-.brand,
 .menu-actions {
   display: none;
 }
 
 @media (max-width: 639px) {
-  .brand,
   .menu-actions {
     display: flex;
     align-items: center;
@@ -95,7 +95,6 @@
 }
 
 @container (max-width: 42rem) {
-  .brand,
   .menu-actions {
     display: flex;
     align-items: center;
@@ -117,6 +116,7 @@
     transform: translate(-100%);
     transition: all 0.25s ease-in-out;
   }
+
   .menu.is-active {
     transform: translate(0%);
   }
@@ -136,6 +136,7 @@
     transform: translate(-100%);
     transition: all 0.25s ease-in-out;
   }
+
   .menu.is-active {
     transform: translate(0%);
   }
@@ -157,11 +158,13 @@
     visibility: hidden;
     background: transparent;
   }
+
   .menu .menu__header.is-active {
     visibility: visible;
     background-color: #fff;
   }
-  .menu .menu__header.is-active > .menu__arrow {
+
+  .menu .menu__header.is-active>.menu__arrow {
     display: flex;
   }
 }
@@ -178,11 +181,13 @@
     visibility: hidden;
     background: transparent;
   }
+
   .menu .menu__header.is-active {
     visibility: visible;
     background-color: #fff;
   }
-  .menu .menu__header.is-active > .menu__arrow {
+
+  .menu .menu__header.is-active>.menu__arrow {
     display: flex;
   }
 }
@@ -196,7 +201,7 @@
     width: 3rem;
   }
 
-  .menu .menu__header .menu__arrow > i {
+  .menu .menu__header .menu__arrow>i {
     font-size: 1.5rem;
     color: #000;
     transition: all 0.25s ease;
@@ -212,7 +217,7 @@
     width: 3rem;
   }
 
-  .menu .menu__header .menu__arrow > i {
+  .menu .menu__header .menu__arrow>i {
     font-size: 1.5rem;
     color: #000;
     transition: all 0.25s ease;
@@ -304,49 +309,57 @@
 }
 
 @media (min-width: 767px) {
-  .menu .menu__inner .menu__item:hover > .menu__link i {
+  .menu .menu__inner .menu__item:hover>.menu__link i {
     transform: rotate(-90deg);
   }
 }
 
 @container (min-width: 48rem) {
-  .menu .menu__inner .menu__item:hover > .menu__link i {
+  .menu .menu__inner .menu__item:hover>.menu__link i {
     transform: rotate(-90deg);
   }
 }
 
 @media (min-width: 767px) {
-  .menu .menu__inner .menu__item.menu__dropdown:hover > .submenu {
+  .menu .menu__inner .menu__item.menu__dropdown:hover>.submenu {
     opacity: 1;
     visibility: visible;
-    top: 100%; /* Animate to close gap on hover */
+    top: 100%;
+    /* Animate to close gap on hover */
     pointer-events: auto;
   }
-  .menu .menu__inner .menu__item.menu__dropdown > .submenu:hover {
+
+  .menu .menu__inner .menu__item.menu__dropdown>.submenu:hover {
     opacity: 1;
     visibility: visible;
-    top: 100%; /* Keep same position - fixed from 101% */
+    top: 100%;
+    /* Keep same position - fixed from 101% */
     pointer-events: auto;
   }
-  .menu .menu__inner .menu__item.menu__dropdown > .submenu {
+
+  .menu .menu__inner .menu__item.menu__dropdown>.submenu {
     pointer-events: none;
   }
 }
 
 @container (min-width: 48rem) {
-  .menu .menu__inner .menu__item.menu__dropdown:hover > .submenu {
+  .menu .menu__inner .menu__item.menu__dropdown:hover>.submenu {
     opacity: 1;
     visibility: visible;
-    top: 100%; /* Animate to close gap on hover */
+    top: 100%;
+    /* Animate to close gap on hover */
     pointer-events: auto;
   }
-  .menu .menu__inner .menu__item.menu__dropdown > .submenu:hover {
+
+  .menu .menu__inner .menu__item.menu__dropdown>.submenu:hover {
     opacity: 1;
     visibility: visible;
-    top: 100%; /* Keep same position - fixed from 101% */
+    top: 100%;
+    /* Keep same position - fixed from 101% */
     pointer-events: auto;
   }
-  .menu .menu__inner .menu__item.menu__dropdown > .submenu {
+
+  .menu .menu__inner .menu__item.menu__dropdown>.submenu {
     pointer-events: none;
   }
 }
@@ -373,7 +386,7 @@
   }
 }
 
-.menu .menu__inner .menu__item .menu__link > i {
+.menu .menu__inner .menu__item .menu__link>i {
   margin-left: 2px;
   font-size: 1.35rem;
   transform: rotate(0deg);
@@ -381,14 +394,14 @@
 }
 
 @media (max-width: 767px) {
-  .menu .menu__inner .menu__item .menu__link > i {
+  .menu .menu__inner .menu__item .menu__link>i {
     margin-left: 10px;
     transform: rotate(-90deg);
   }
 }
 
 @container (max-width: 48rem) {
-  .menu .menu__inner .menu__item .menu__link > i {
+  .menu .menu__inner .menu__item .menu__link>i {
     margin-left: 10px;
     transform: rotate(-90deg);
   }
@@ -440,6 +453,7 @@
     visibility: visible;
     transform: translateX(0%);
   }
+
   .submenu.is-active {
     display: block;
   }
@@ -464,6 +478,7 @@
     visibility: visible;
     transform: translateX(0%);
   }
+
   .submenu.is-active {
     display: block;
   }
@@ -557,6 +572,7 @@
     cursor: zoom-out;
     pointer-events: visible;
   }
+
   .overlay.is-active {
     opacity: 1;
     visibility: visible;
@@ -568,6 +584,7 @@
     cursor: zoom-out;
     pointer-events: visible;
   }
+
   .overlay.is-active {
     opacity: 1;
     visibility: visible;
@@ -628,6 +645,7 @@
 
 /* Minimal hover continuity fix */
 @media (min-width: 767px) {
+
   /* Create invisible bridge on menu items */
   .menu .menu__inner .menu__item.menu__dropdown::before {
     content: '';
@@ -641,13 +659,13 @@
     opacity: 0;
     pointer-events: none;
   }
-  
+
   .menu .menu__inner .menu__item.menu__dropdown:hover::before {
     pointer-events: auto;
   }
-  
+
   /* Add slight overlap on submenu */
-  .menu .menu__inner .menu__item.menu__dropdown:hover > .submenu::before {
+  .menu .menu__inner .menu__item.menu__dropdown:hover>.submenu::before {
     content: '';
     position: absolute;
     left: 0;
@@ -660,6 +678,7 @@
 }
 
 @container (min-width: 48rem) {
+
   /* Create invisible bridge on menu items */
   .menu .menu__inner .menu__item.menu__dropdown::before {
     content: '';
@@ -673,13 +692,13 @@
     opacity: 0;
     pointer-events: none;
   }
-  
+
   .menu .menu__inner .menu__item.menu__dropdown:hover::before {
     pointer-events: auto;
   }
-  
+
   /* Add slight overlap on submenu */
-  .menu .menu__inner .menu__item.menu__dropdown:hover > .submenu::before {
+  .menu .menu__inner .menu__item.menu__dropdown:hover>.submenu::before {
     content: '';
     position: absolute;
     left: 0;

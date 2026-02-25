@@ -9,7 +9,7 @@ export async function Footer() {
       <div className="mx-auto max-w-container-md px-6 py-12">
         <BrandsCarouselSection className="mb-12" />
         
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
+        {/* <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary">Tienda</h3>
             <ul className="space-y-2 text-sm">
@@ -46,7 +46,7 @@ export async function Footer() {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
         
         <div className="mt-8 border-t border-muted-foreground/20 pt-8">
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
@@ -61,26 +61,13 @@ export async function Footer() {
               <a
                 href="#"
                 className="text-muted-foreground transition-colors hover:text-primary"
-                aria-label="X.com"
-              >
-                <TwitterIcon className="size-6" />
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-primary"
                 aria-label="Instagram"
               >
                 <InstagramIcon className="size-6 text-white" />
               </a>
-              <a
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-primary"
-                aria-label="YouTube"
-              >
-                <YoutubeIcon className="-mt-1 size-8 text-white" />
-              </a>
+              
             </div>
-            <div className="text-sm">© {new Date().getFullYear()} EFE Distributions. Todos los derechos reservados.</div>
+            <div className="text-sm">© {new Date().getFullYear()} EFE Distributions S.R.L. Todos los derechos reservados.</div>
           </div>
         </div>
       </div>
